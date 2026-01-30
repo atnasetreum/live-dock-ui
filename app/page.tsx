@@ -289,6 +289,9 @@ const LoginPage = () => {
                   textTransform: "none",
                   fontSize: "1rem",
                   color: "#fff",
+                  "&.Mui-disabled": {
+                    color: "#fff",
+                  },
                 }}
               >
                 {isSubmitting ? "Autenticando…" : "Entrar al panel"}

@@ -185,7 +185,14 @@ const DashboardPage = () => {
 
           <Grid container spacing={3}>
             {stats.map((stat) => (
-              <Grid item xs={12} sm={6} md={3} key={stat.label}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6,
+                  md: 3,
+                }}
+                key={stat.label}
+              >
                 <Paper
                   sx={{
                     p: 2.5,
