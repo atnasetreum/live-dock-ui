@@ -158,10 +158,7 @@ const LoginPage = () => {
             <Typography variant="h2" sx={{ fontWeight: 600, lineHeight: 1.1 }}>
               Impulsa tus operaciones portuarias con accesos seguros
             </Typography>
-            <Typography
-              variant="body1"
-              sx={{ maxWidth: 520, color: "#fff" }}
-            >
+            <Typography variant="body1" sx={{ maxWidth: 520, color: "#fff" }}>
               Centraliza autorizaciones, visibilidad en tiempo real y métricas
               de desempeño en una sola plataforma. El módulo de acceso conecta a
               tus equipos con la data crítica en segundos.
@@ -176,10 +173,7 @@ const LoginPage = () => {
                 { label: "< 60s onboarding", emphasis: "Ágil" },
               ].map((stat) => (
                 <Box key={stat.label}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#fff" }}
-                  >
+                  <Typography variant="caption" sx={{ color: "#fff" }}>
                     {stat.emphasis}
                   </Typography>
                   <Typography variant="h5" sx={{ fontWeight: 600 }}>
@@ -211,11 +205,8 @@ const LoginPage = () => {
                 <Typography variant="h5" sx={{ fontWeight: 600 }}>
                   Acceso a LiveDock Control
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#fff" }}
-                >
-                  Ingresa tus credenciales o invita a tu equipo.
+                <Typography variant="body2" sx={{ color: "#fff" }}>
+                  Ingresa tus credenciales
                 </Typography>
               </Box>
 

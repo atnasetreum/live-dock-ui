@@ -2,6 +2,7 @@
 
 import { Space_Grotesk } from "next/font/google";
 import TimelineIcon from "@mui/icons-material/Timeline";
+import LogoutIcon from "@mui/icons-material/Logout";
 import SailingIcon from "@mui/icons-material/Sailing";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -179,6 +180,25 @@ const DashboardPage = () => {
                 }}
               >
                 Monitor en tiempo real
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<LogoutIcon />}
+                onClick={() => {
+                  window.location.href = "/";
+                }}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                  borderColor: "rgba(255,255,255,0.5)",
+                  color: "#fff",
+                  "&:hover": {
+                    borderColor: "#fff",
+                    backgroundColor: "rgba(255,255,255,0.08)",
+                  },
+                }}
+              >
+                Cerrar sesión
               </Button>
             </Stack>
           </Stack>
