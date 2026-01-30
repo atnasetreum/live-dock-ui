@@ -46,7 +46,7 @@ const LoginPage = () => {
     "& .MuiOutlinedInput-root": {
       borderRadius: 2,
       backgroundColor: "rgba(10,18,46,0.4)",
-      color: "#f4f6fb",
+      color: "#fff",
       "& fieldset": {
         borderColor: "rgba(255,255,255,0.78)",
       },
@@ -59,7 +59,7 @@ const LoginPage = () => {
       },
     },
     "& .MuiInputAdornment-root, & .MuiInputLabel-root": {
-      color: "rgba(244,246,251,0.75)",
+      color: "#fff",
       transition: "color 120ms ease",
     },
     "& .MuiInputLabel-root": {
@@ -71,10 +71,10 @@ const LoginPage = () => {
       backgroundColor: "rgba(7,11,32,0.92)",
     },
     "& .MuiInputLabel-root.Mui-focused": {
-      color: "rgba(255,255,255,0.92)",
+      color: "#fff",
     },
     "& .MuiInputBase-input": {
-      color: "#f4f6fb",
+      color: "#fff",
     },
   } as const;
 
@@ -109,6 +109,7 @@ const LoginPage = () => {
         overflow: "hidden",
         px: { xs: 2, md: 4 },
         py: { xs: 6, md: 10 },
+        color: "#fff",
         "::before": {
           content: '""',
           position: "absolute",
@@ -145,7 +146,7 @@ const LoginPage = () => {
             id="info-section"
             sx={{
               flex: 1,
-              color: "rgba(255,255,255,0.92)",
+              color: "#fff",
               display: { xs: "none", lg: "flex" },
               flexDirection: "column",
               gap: 3,
@@ -159,7 +160,7 @@ const LoginPage = () => {
             </Typography>
             <Typography
               variant="body1"
-              sx={{ maxWidth: 520, color: "rgba(255,255,255,0.72)" }}
+              sx={{ maxWidth: 520, color: "#fff" }}
             >
               Centraliza autorizaciones, visibilidad en tiempo real y métricas
               de desempeño en una sola plataforma. El módulo de acceso conecta a
@@ -177,7 +178,7 @@ const LoginPage = () => {
                 <Box key={stat.label}>
                   <Typography
                     variant="caption"
-                    sx={{ color: "rgba(255,255,255,0.6)" }}
+                    sx={{ color: "#fff" }}
                   >
                     {stat.emphasis}
                   </Typography>
@@ -201,7 +202,7 @@ const LoginPage = () => {
               background: "rgba(7, 11, 32, 0.82)",
               border: "1px solid rgba(255,255,255,0.08)",
               boxShadow: "0 30px 80px rgba(2,7,21,0.65)",
-              color: "#f4f6fb",
+              color: "#fff",
               backdropFilter: "blur(16px)",
             }}
           >
@@ -212,7 +213,7 @@ const LoginPage = () => {
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: "rgba(244,246,251,0.65)" }}
+                  sx={{ color: "#fff" }}
                 >
                   Ingresa tus credenciales o invita a tu equipo.
                 </Typography>
@@ -287,6 +288,7 @@ const LoginPage = () => {
                   fontWeight: 600,
                   textTransform: "none",
                   fontSize: "1rem",
+                  color: "#fff",
                 }}
               >
                 {isSubmitting ? "Autenticando…" : "Entrar al panel"}
