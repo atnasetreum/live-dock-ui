@@ -1,0 +1,338 @@
+"use client";
+
+import * as React from "react";
+import Box from "@mui/material/Box";
+import ReactFlow, {
+  Background,
+  Controls,
+  MarkerType,
+  type Edge,
+  type Node,
+  type NodeProps,
+} from "reactflow";
+import "reactflow/dist/style.css";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
+import { useThemeConfig } from "../../../theme/ThemeProvider";
+import {
+  COLUMN_SPACING,
+  LANE_LABEL_WIDTH,
+  LANE_SPACING,
+  laneConfig,
+  processSteps,
+  processConnections,
+  type LaneId,
+} from "./processFlowData";
+
+type LaneNodeData = { label: string; accent: string };
+type ProcessNodeData = {
+  title?: string;
+  subtitle?: string;
+  accent: string;
+  variant: "solid" | "outlined";
+  width: number;
+};
+type CircleNodeData = { circleLabel?: string; accent: string };
+type DiamondNodeData = { label?: string; accent: string };
+
+const laneIndex = laneConfig.reduce<Record<LaneId, number>>(
+  (acc, lane, idx) => {
+    acc[lane.id] = idx;
+    return acc;
+  },
+  {} as Record<LaneId, number>,
+);
+
+const laneColorMap = laneConfig.reduce<Record<LaneId, string>>(
+  (acc, lane) => {
+    acc[lane.id] = lane.accent;
+    return acc;
+  },
+  {} as Record<LaneId, string>,
+);
+
+const buildNodes = () => {
+  const nodes: Node[] = laneConfig.map((lane) => ({
+    id: `lane-${lane.id}`,
+    type: "lane",
+    position: { x: 0, y: laneIndex[lane.id] * LANE_SPACING },
+    data: { label: lane.label, accent: lane.accent },
+    draggable: false,
+    selectable: false,
+    connectable: false,
+  }));
+
+  processSteps.forEach((step) => {
+    const type =
+      step.kind === "circle"
+        ? "circle"
+        : step.kind === "diamond"
+          ? "diamond"
+          : "process";
+    const accent = laneColorMap[step.lane];
+
+    if (type === "process") {
+      nodes.push({
+        id: step.id,
+        type,
+        position: {
+          x: LANE_LABEL_WIDTH + step.column * COLUMN_SPACING,
+          y: laneIndex[step.lane] * LANE_SPACING,
+        },
+        data: {
+          title: step.title,
+          subtitle: step.subtitle,
+          accent,
+          variant: step.emphasis ?? "solid",
+          width: (step.span ?? 1) * COLUMN_SPACING - 36,
+        },
+        draggable: false,
+        selectable: false,
+        connectable: false,
+      });
+      return;
+    }
+
+    if (type === "circle") {
+      nodes.push({
+        id: step.id,
+        type,
+        position: {
+          x: LANE_LABEL_WIDTH + step.column * COLUMN_SPACING,
+          y: laneIndex[step.lane] * LANE_SPACING,
+        },
+        data: {
+          circleLabel: step.circleLabel,
+          accent,
+        },
+        draggable: false,
+        selectable: false,
+        connectable: false,
+      });
+      return;
+    }
+
+    nodes.push({
+      id: step.id,
+      type,
+      position: {
+        x: LANE_LABEL_WIDTH + step.column * COLUMN_SPACING,
+        y: laneIndex[step.lane] * LANE_SPACING,
+      },
+      data: {
+        label: step.title,
+        accent,
+      },
+      draggable: false,
+      selectable: false,
+      connectable: false,
+    });
+  });
+
+  return nodes;
+};
+
+const staticNodes = buildNodes();
+
+const LaneLabelNode = ({ data }: NodeProps<LaneNodeData>) => {
+  const { theme } = useThemeConfig();
+  return (
+    <Box
+      sx={{
+        minWidth: LANE_LABEL_WIDTH - 12,
+        minHeight: 110,
+        borderRadius: 3,
+        border: `1px solid ${theme.surfaces.border}`,
+        borderLeft: `6px solid ${data.accent}`,
+        backgroundColor: theme.surfaces.panel,
+        color: theme.palette.textPrimary,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        fontWeight: 700,
+        px: 1,
+      }}
+    >
+      {data.label}
+    </Box>
+  );
+};
+
+const ProcessNode = ({ data }: NodeProps<ProcessNodeData>) => {
+  const { theme } = useThemeConfig();
+  return (
+    <Box
+      sx={{
+        minHeight: 110,
+        width: data.width,
+        borderRadius: 3,
+        border: `2px solid ${data.accent}`,
+        backgroundColor:
+          data.variant === "outlined" ? "transparent" : theme.surfaces.card,
+        boxShadow:
+          data.variant === "outlined" ? "none" : theme.overlays.cardShadow,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        px: 1.5,
+        color: theme.palette.textPrimary,
+      }}
+    >
+      <Stack spacing={0.5}>
+        {data.title && (
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            {data.title}
+          </Typography>
+        )}
+        {data.subtitle && (
+          <Typography
+            variant="caption"
+            sx={{ color: theme.palette.textSecondary }}
+          >
+            {data.subtitle}
+          </Typography>
+        )}
+      </Stack>
+    </Box>
+  );
+};
+
+const CircleNode = ({ data }: NodeProps<CircleNodeData>) => (
+  <Box
+    sx={{
+      width: 56,
+      height: 56,
+      borderRadius: "50%",
+      backgroundColor: data.accent,
+      color: "#fff",
+      display: "grid",
+      placeItems: "center",
+      fontWeight: 700,
+      letterSpacing: 1,
+      boxShadow: "0 10px 20px rgba(15,23,42,0.35)",
+    }}
+  >
+    {data.circleLabel ?? ""}
+  </Box>
+);
+
+const DiamondNode = ({ data }: NodeProps<DiamondNodeData>) => {
+  const { theme } = useThemeConfig();
+  return (
+    <Box
+      sx={{
+        width: 120,
+        height: 120,
+        border: `3px solid ${data.accent}`,
+        backgroundColor: theme.surfaces.card,
+        clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+        display: "grid",
+        placeItems: "center",
+        fontWeight: 700,
+        textTransform: "uppercase",
+        color: theme.palette.textPrimary,
+      }}
+    >
+      {data.label}
+    </Box>
+  );
+};
+
+const nodeTypes = {
+  lane: LaneLabelNode,
+  process: ProcessNode,
+  circle: CircleNode,
+  diamond: DiamondNode,
+};
+
+const ProcessFlow = () => {
+  const { theme } = useThemeConfig();
+  const nodes = React.useMemo<Node[]>(() => staticNodes, []);
+  const connectionColor = theme.name === "light" ? "#1c5cb6" : "#7fc0ff";
+
+  const edges = React.useMemo<Edge[]>(
+    () =>
+      processConnections.map((edge) => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        type: "step",
+        label: edge.label,
+        animated: false,
+        style: {
+          stroke: connectionColor,
+          strokeWidth: 1.5,
+          strokeDasharray: edge.dashed ? "6 4" : undefined,
+        },
+        labelStyle: {
+          fill: connectionColor,
+          fontSize: 12,
+          fontWeight: 600,
+        },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: connectionColor,
+          width: 16,
+          height: 16,
+        },
+      })),
+    [connectionColor],
+  );
+
+  return (
+    <Box
+      sx={{
+        position: "relative",
+        width: "100%",
+        height: { xs: 540, md: 620 },
+        "& .react-flow__attribution": { display: "none" },
+      }}
+    >
+      <Box
+        sx={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 1,
+        }}
+      >
+        {laneConfig.map((lane, idx) => (
+          <Box
+            key={lane.id}
+            sx={{
+              position: "absolute",
+              left: LANE_LABEL_WIDTH - 20,
+              right: 12,
+              top: idx * LANE_SPACING + LANE_SPACING / 2,
+              borderTop: `1px solid ${theme.surfaces.border}`,
+            }}
+          />
+        ))}
+      </Box>
+
+      <Box sx={{ position: "relative", zIndex: 2, height: "100%" }}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          fitView
+          panOnScroll={false}
+          zoomOnScroll={false}
+          zoomOnPinch={false}
+          nodesDraggable={false}
+          elementsSelectable={false}
+          proOptions={{ hideAttribution: true }}
+          style={{ background: theme.surfaces.panel }}
+          fitViewOptions={{ padding: 0.2 }}
+        >
+          <Background color={theme.surfaces.border} gap={48} size={2} />
+          <Controls showInteractive={false} position="bottom-right" />
+        </ReactFlow>
+      </Box>
+    </Box>
+  );
+};
+
+export default ProcessFlow;
