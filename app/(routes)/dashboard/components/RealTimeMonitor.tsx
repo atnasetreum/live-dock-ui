@@ -65,7 +65,7 @@ const RealTimeMonitor = ({ handleClose }: { handleClose: () => void }) => {
       >
         <Toolbar sx={{ gap: 2, flexWrap: "wrap" }}>
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Monitor de flujo en tiempo real
+            Flujo de proceso recepción de pipa con alcohol, agua, LESS y Colgate
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <ButtonGroup
@@ -105,19 +105,7 @@ const RealTimeMonitor = ({ handleClose }: { handleClose: () => void }) => {
       <Box
         sx={{ px: { xs: 2, md: 4 }, py: { xs: 3, md: 5 }, overflowY: "auto" }}
       >
-        <Stack spacing={3}>
-          <Stack spacing={1}>
-            <Typography variant="h4" sx={{ fontWeight: 600 }}>
-              Flujo de proceso recepción de pipa con alcohol, agua, LESS y
-              Colgate
-            </Typography>
-            <Typography variant="body1" sx={{ color: textSecondary }}>
-              Representación visual pensada para control operativo. Cada carril
-              muestra las actividades principales por área y conserva la
-              semántica del diagrama proporcionado.
-            </Typography>
-          </Stack>
-
+        <Stack spacing={1}>
           <Paper
             sx={{
               p: { xs: 2, md: 3 },

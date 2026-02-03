@@ -103,19 +103,13 @@ export const processSteps: ProcessFlowStep[] = [
     id: "security-exit",
     lane: "security",
     column: 3,
-    title: "Procesa la salida segura del proveedor",
+    title: "Permite salida segura",
   },
   {
     id: "supplier-weigh-out",
     lane: "supplier",
     column: 4,
     title: "Realiza pesaje y llena los datos del ticket",
-  },
-  {
-    id: "security-allow-exit",
-    lane: "security",
-    column: 4,
-    title: "Permite salida segura",
   },
   {
     id: "security-access",
@@ -148,19 +142,28 @@ export const processSteps: ProcessFlowStep[] = [
     title: "Puede hacer uso del alcohol",
   },
   {
-    id: "supplier-end",
-    lane: "supplier",
-    column: 6,
-    kind: "circle",
-    circleLabel: "F",
-  },
-  {
     id: "production-end",
     lane: "production",
     column: 6,
     kind: "circle",
     circleLabel: "F",
   },
+  {
+    id: "security-allow-exit",
+    lane: "security",
+    column: 4,
+    title: "Procesa la salida segura del proveedor",
+  },
+  /*
+  
+  {
+    id: "supplier-end",
+    lane: "supplier",
+    column: 6,
+    kind: "circle",
+    circleLabel: "F",
+  },
+   */
 ];
 
 export type ProcessFlowEdge = {
@@ -188,6 +191,8 @@ export const processConnections: ProcessFlowEdge[] = [
     id: "edge-review-weigh",
     source: "security-review",
     target: "supplier-weigh-in",
+    sourceHandle: "source-right",
+    targetHandle: "target-left",
   },
   {
     id: "edge-weigh-entry",
@@ -219,12 +224,15 @@ export const processConnections: ProcessFlowEdge[] = [
     source: "decision-ok",
     target: "production-discharge",
     label: "Sí",
+    sourceHandle: "source-right",
   },
   {
     id: "edge-decision-inform",
     source: "decision-ok",
     target: "quality-inform",
     label: "No",
+    sourceHandle: "source-bottom",
+    targetHandle: "target-bottom",
   },
   {
     id: "edge-discharge-proof",
@@ -236,7 +244,58 @@ export const processConnections: ProcessFlowEdge[] = [
     id: "edge-exit-weighout",
     source: "security-exit",
     target: "supplier-weigh-out",
+    targetHandle: "target-left",
   },
+  {
+    id: "edge-weighout-access",
+    source: "supplier-weigh-out",
+    target: "security-access",
+    sourceHandle: "source-right",
+    targetHandle: "target-bottom",
+  },
+  {
+    id: "edge-access-ticket",
+    source: "security-access",
+    target: "supplier-ticket",
+  },
+  {
+    id: "edge-ticket-sap",
+    source: "supplier-ticket",
+    target: "logistics-sap",
+    sourceHandle: "source-right",
+    targetHandle: "target-right",
+  },
+  {
+    id: "edge-sap-release",
+    source: "logistics-sap",
+    target: "quality-release",
+    sourceHandle: "source-left",
+    targetHandle: "target-left",
+  },
+  {
+    id: "edge-release-available",
+    source: "quality-release",
+    target: "production-available",
+  },
+  {
+    id: "edge-available-production-end",
+    source: "production-available",
+    target: "production-end",
+  },
+  {
+    id: "edge-inform-exit",
+    source: "quality-inform",
+    target: "security-allow-exit",
+  },
+  {
+    id: "edge-allowexit-weighout",
+    source: "security-allow-exit",
+    target: "production-end",
+    sourceHandle: "source-top",
+    targetHandle: "target-top",
+  },
+  /*
+  
   {
     id: "edge-weighout-allow",
     source: "supplier-weigh-out",
@@ -263,19 +322,15 @@ export const processConnections: ProcessFlowEdge[] = [
     source: "quality-release",
     target: "production-available",
   },
-  {
-    id: "edge-available-production-end",
-    source: "production-available",
-    target: "production-end",
-  },
+  
   {
     id: "edge-exit-supplier-end",
     source: "security-exit",
     target: "supplier-end",
     dashed: true,
-  },
+  }, */
 ];
 
 export const COLUMN_SPACING = 300;
-export const LANE_SPACING = 150;
-export const LANE_LABEL_WIDTH = 200;
+export const LANE_SPACING = 180;
+export const LANE_LABEL_WIDTH = 300;
