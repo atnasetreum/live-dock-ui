@@ -1,8 +1,6 @@
 import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import ButtonGroup from "@mui/material/ButtonGroup";
 import Chip from "@mui/material/Chip";
 import Dialog from "@mui/material/Dialog";
 import Divider from "@mui/material/Divider";
@@ -15,7 +13,6 @@ import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import { TransitionProps } from "@mui/material/transitions";
 import { useThemeConfig } from "../../../theme/ThemeProvider";
-import type { ThemePreference } from "../../../theme/tokens";
 import ProcessFlow from "./ProcessFlow";
 import { laneConfig } from "./processFlowData";
 
@@ -26,20 +23,12 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const themeOptions: Array<{ value: ThemePreference; label: string }> = [
-  { value: "system", label: "Sistema" },
-  { value: "light", label: "Claro" },
-  { value: "dark", label: "Oscuro" },
-];
-
 const RealTimeMonitor = ({ handleClose }: { handleClose: () => void }) => {
-  const { theme, preference, setPreference } = useThemeConfig();
+  const { theme } = useThemeConfig();
 
   const surface = theme.surfaces.panel;
   const border = theme.surfaces.border;
-  const shadow = theme.overlays.cardShadow;
   const textPrimary = theme.palette.textPrimary;
-  const textSecondary = theme.palette.textSecondary;
 
   return (
     <Dialog
@@ -68,34 +57,6 @@ const RealTimeMonitor = ({ handleClose }: { handleClose: () => void }) => {
             Flujo de proceso recepción de pipa con alcohol, agua, LESS y Colgate
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
-          <ButtonGroup
-            size="small"
-            variant="outlined"
-            sx={{ borderColor: border }}
-          >
-            {themeOptions.map((option) => (
-              <Button
-                key={option.value}
-                onClick={() => setPreference(option.value)}
-                sx={{
-                  textTransform: "none",
-                  fontWeight: 600,
-                  px: 1.5,
-                  borderColor: border,
-                  backgroundColor:
-                    preference === option.value
-                      ? theme.surfaces.translucent
-                      : "transparent",
-                  color:
-                    preference === option.value
-                      ? textPrimary
-                      : theme.palette.textSecondary,
-                }}
-              >
-                {option.label}
-              </Button>
-            ))}
-          </ButtonGroup>
           <IconButton onClick={handleClose} sx={{ color: textPrimary }}>
             <CloseIcon />
           </IconButton>
