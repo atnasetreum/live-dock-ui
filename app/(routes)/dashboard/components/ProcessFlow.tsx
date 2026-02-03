@@ -6,9 +6,9 @@ import ReactFlow, {
   Background,
   Controls,
   MarkerType,
-  StepEdge,
+  Handle,
+  Position,
   type Edge,
-  type EdgeTypes,
   type Node,
   type NodeProps,
 } from "reactflow";
@@ -53,6 +53,96 @@ const laneColorMap = laneConfig.reduce<Record<LaneId, string>>(
   {} as Record<LaneId, string>,
 );
 
+type StepMeta = { laneIndex: number; column: number };
+
+const stepMeta = processSteps.reduce<Record<string, StepMeta>>((acc, step) => {
+  acc[step.id] = {
+    laneIndex: laneIndex[step.lane],
+    column: step.column,
+  };
+  return acc;
+}, {});
+
+const handlePositions = [
+  Position.Top,
+  Position.Right,
+  Position.Bottom,
+  Position.Left,
+] as const;
+
+const handleTransforms: Record<Position, string> = {
+  [Position.Top]: "translate(-50%, -50%)",
+  [Position.Right]: "translate(50%, -50%)",
+  [Position.Bottom]: "translate(-50%, 50%)",
+  [Position.Left]: "translate(-50%, -50%)",
+};
+
+const getHandleStyle = (
+  position: Position,
+  accent: string,
+  surface: string,
+) => ({
+  /* width: 12,
+  height: 12, */
+  borderRadius: "50%",
+  border: `2px solid ${accent}`,
+  backgroundColor: surface,
+  boxShadow: `0 0 0 2px ${surface}`,
+  pointerEvents: "none" as const,
+  transform: handleTransforms[position],
+});
+
+const NodeHandles = ({
+  accent,
+  surface,
+}: {
+  accent: string;
+  surface: string;
+}) => (
+  <>
+    {handlePositions.map((position) => (
+      <React.Fragment key={position}>
+        <Handle
+          id={`source-${position}`}
+          type="source"
+          position={position}
+          isConnectable={false}
+          style={getHandleStyle(position, accent, surface)}
+        />
+        <Handle
+          id={`target-${position}`}
+          type="target"
+          position={position}
+          isConnectable={false}
+          style={getHandleStyle(position, accent, surface)}
+        />
+      </React.Fragment>
+    ))}
+  </>
+);
+
+type HandleSelection = {
+  sourceHandle?: string;
+  targetHandle?: string;
+};
+
+const determineEdgeHandles = (
+  source?: StepMeta,
+  target?: StepMeta,
+): HandleSelection => {
+  if (!source || !target) return {};
+  if (source.laneIndex === target.laneIndex) {
+    if (source.column <= target.column) {
+      return { sourceHandle: "source-right", targetHandle: "target-left" };
+    }
+    return { sourceHandle: "source-left", targetHandle: "target-right" };
+  }
+  if (source.laneIndex < target.laneIndex) {
+    return { sourceHandle: "source-bottom", targetHandle: "target-top" };
+  }
+  return { sourceHandle: "source-top", targetHandle: "target-bottom" };
+};
+
 const buildNodes = () => {
   const nodes: Node[] = laneConfig.map((lane) => ({
     id: `lane-${lane.id}`,
@@ -61,7 +151,6 @@ const buildNodes = () => {
     data: { label: lane.label, accent: lane.accent },
     draggable: false,
     selectable: false,
-    connectable: false,
   }));
 
   processSteps.forEach((step) => {
@@ -90,7 +179,6 @@ const buildNodes = () => {
         },
         draggable: false,
         selectable: false,
-        connectable: false,
       });
       return;
     }
@@ -100,8 +188,8 @@ const buildNodes = () => {
         id: step.id,
         type,
         position: {
-          x: LANE_LABEL_WIDTH + step.column * COLUMN_SPACING,
-          y: laneIndex[step.lane] * LANE_SPACING,
+          x: LANE_LABEL_WIDTH + step.column * COLUMN_SPACING + 100,
+          y: laneIndex[step.lane] * LANE_SPACING + 27,
         },
         data: {
           circleLabel: step.circleLabel,
@@ -109,7 +197,6 @@ const buildNodes = () => {
         },
         draggable: false,
         selectable: false,
-        connectable: false,
       });
       return;
     }
@@ -127,7 +214,6 @@ const buildNodes = () => {
       },
       draggable: false,
       selectable: false,
-      connectable: false,
     });
   });
 
@@ -180,8 +266,10 @@ const ProcessNode = ({ data }: NodeProps<ProcessNodeData>) => {
         textAlign: "center",
         px: 1.5,
         color: theme.palette.textPrimary,
+        position: "relative",
       }}
     >
+      <NodeHandles accent={data.accent} surface={theme.surfaces.panel} />
       <Stack spacing={0.5}>
         {data.title && (
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -201,24 +289,29 @@ const ProcessNode = ({ data }: NodeProps<ProcessNodeData>) => {
   );
 };
 
-const CircleNode = ({ data }: NodeProps<CircleNodeData>) => (
-  <Box
-    sx={{
-      width: 56,
-      height: 56,
-      borderRadius: "50%",
-      backgroundColor: data.accent,
-      color: "#fff",
-      display: "grid",
-      placeItems: "center",
-      fontWeight: 700,
-      letterSpacing: 1,
-      boxShadow: "0 10px 20px rgba(15,23,42,0.35)",
-    }}
-  >
-    {data.circleLabel ?? ""}
-  </Box>
-);
+const CircleNode = ({ data }: NodeProps<CircleNodeData>) => {
+  const { theme } = useThemeConfig();
+  return (
+    <Box
+      sx={{
+        width: 56,
+        height: 56,
+        borderRadius: "50%",
+        backgroundColor: data.accent,
+        color: "#fff",
+        display: "grid",
+        placeItems: "center",
+        fontWeight: 700,
+        letterSpacing: 1,
+        boxShadow: "0 10px 20px rgba(15,23,42,0.35)",
+        position: "relative",
+      }}
+    >
+      <NodeHandles accent={data.accent} surface={theme.surfaces.panel} />
+      {data.circleLabel ?? ""}
+    </Box>
+  );
+};
 
 const DiamondNode = ({ data }: NodeProps<DiamondNodeData>) => {
   const { theme } = useThemeConfig();
@@ -235,8 +328,10 @@ const DiamondNode = ({ data }: NodeProps<DiamondNodeData>) => {
         fontWeight: 700,
         textTransform: "uppercase",
         color: theme.palette.textPrimary,
+        position: "relative",
       }}
     >
+      <NodeHandles accent={data.accent} surface={theme.surfaces.panel} />
       {data.label}
     </Box>
   );
@@ -249,10 +344,6 @@ const nodeTypes = {
   diamond: DiamondNode,
 };
 
-const edgeTypes: EdgeTypes = {
-  step: StepEdge,
-};
-
 const ProcessFlow = () => {
   const { theme } = useThemeConfig();
   const nodes = React.useMemo<Node[]>(() => staticNodes, []);
@@ -260,30 +351,38 @@ const ProcessFlow = () => {
 
   const edges = React.useMemo<Edge[]>(
     () =>
-      processConnections.map((edge) => ({
-        id: edge.id,
-        source: edge.source,
-        target: edge.target,
-        type: "step",
-        label: edge.label,
-        animated: false,
-        style: {
-          stroke: connectionColor,
-          strokeWidth: 2,
-          strokeDasharray: edge.dashed ? "6 4" : undefined,
-        },
-        labelStyle: {
-          fill: connectionColor,
-          fontSize: 12,
-          fontWeight: 600,
-        },
-        markerEnd: {
-          type: MarkerType.ArrowClosed,
-          color: connectionColor,
-          width: 16,
-          height: 16,
-        },
-      })),
+      processConnections.map((edge) => {
+        const handleMap = determineEdgeHandles(
+          stepMeta[edge.source],
+          stepMeta[edge.target],
+        );
+        return {
+          id: edge.id,
+          source: edge.source,
+          target: edge.target,
+          type: "smoothstep",
+          label: edge.label,
+          animated: false,
+          sourceHandle: edge.sourceHandle ?? handleMap.sourceHandle,
+          targetHandle: edge.targetHandle ?? handleMap.targetHandle,
+          style: {
+            stroke: connectionColor,
+            strokeWidth: 2,
+            strokeDasharray: edge.dashed ? "6 4" : undefined,
+          },
+          labelStyle: {
+            fill: connectionColor,
+            fontSize: 12,
+            fontWeight: 600,
+          },
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            color: connectionColor,
+            width: 16,
+            height: 16,
+          },
+        };
+      }),
     [connectionColor],
   );
 
@@ -323,12 +422,12 @@ const ProcessFlow = () => {
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
           fitView
           panOnScroll={false}
           zoomOnScroll={false}
           zoomOnPinch={false}
           nodesDraggable={false}
+          nodesConnectable={false}
           elementsSelectable={false}
           proOptions={{ hideAttribution: true }}
           style={{ background: theme.surfaces.panel }}

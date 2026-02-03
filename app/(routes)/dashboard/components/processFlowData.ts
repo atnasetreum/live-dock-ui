@@ -1,5 +1,5 @@
 export const laneConfig = [
-  { id: "supplier", label: "Proveedor", accent: "#111827" },
+  { id: "supplier", label: "Proveedor", accent: "#BB86FC" },
   { id: "security", label: "Vigilancia", accent: "#1d4ed8" },
   { id: "logistics", label: "Logística", accent: "#f97316" },
   { id: "production", label: "Producción", accent: "#16a34a" },
@@ -38,7 +38,7 @@ export const processSteps: ProcessFlowStep[] = [
     id: "security-review",
     lane: "security",
     column: 1,
-    span: 2,
+    /* span: 2, */
     title: "Revisa documentos, cumplimiento SST",
     subtitle: "Entrega tickets de pesaje",
   },
@@ -169,6 +169,8 @@ export type ProcessFlowEdge = {
   target: string;
   label?: string;
   dashed?: boolean;
+  sourceHandle?: string;
+  targetHandle?: string;
 };
 
 export const processConnections: ProcessFlowEdge[] = [
@@ -274,6 +276,6 @@ export const processConnections: ProcessFlowEdge[] = [
   },
 ];
 
-export const COLUMN_SPACING = 230;
+export const COLUMN_SPACING = 300;
 export const LANE_SPACING = 150;
-export const LANE_LABEL_WIDTH = 150;
+export const LANE_LABEL_WIDTH = 300;
