@@ -322,7 +322,7 @@ const DiamondNode = ({ data }: NodeProps<DiamondNodeData>) => {
         height: 120,
         border: `3px solid ${data.accent}`,
         backgroundColor: theme.surfaces.card,
-        clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+        //clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
         display: "grid",
         placeItems: "center",
         fontWeight: 700,

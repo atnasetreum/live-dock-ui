@@ -278,4 +278,4 @@ export const processConnections: ProcessFlowEdge[] = [
 
 export const COLUMN_SPACING = 300;
 export const LANE_SPACING = 150;
-export const LANE_LABEL_WIDTH = 300;
+export const LANE_LABEL_WIDTH = 200;
