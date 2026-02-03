@@ -84,7 +84,7 @@ export const processSteps: ProcessFlowStep[] = [
     lane: "quality",
     column: 4,
     title: "Informa a producción, proveedor, compras y logística",
-    subtitle: "Si el resultado no es OK",
+    subtitle: "Si el resultado es NO conforme",
     emphasis: "outlined",
   },
   {

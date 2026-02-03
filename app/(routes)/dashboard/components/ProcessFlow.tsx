@@ -240,6 +240,7 @@ const LaneLabelNode = ({ data }: NodeProps<LaneNodeData>) => {
         textAlign: "center",
         fontWeight: 700,
         px: 1,
+        fontSize: 25,
       }}
     >
       {data.label}
@@ -272,14 +273,14 @@ const ProcessNode = ({ data }: NodeProps<ProcessNodeData>) => {
       <NodeHandles accent={data.accent} surface={theme.surfaces.panel} />
       <Stack spacing={0.5}>
         {data.title && (
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+          <Typography variant="body1" sx={{ fontWeight: 600, fontSize: 22 }}>
             {data.title}
           </Typography>
         )}
         {data.subtitle && (
           <Typography
-            variant="caption"
-            sx={{ color: theme.palette.textSecondary }}
+            variant="body2"
+            sx={{ color: theme.palette.textSecondary, fontSize: 18 }}
           >
             {data.subtitle}
           </Typography>
@@ -305,6 +306,7 @@ const CircleNode = ({ data }: NodeProps<CircleNodeData>) => {
         letterSpacing: 1,
         boxShadow: "0 10px 20px rgba(15,23,42,0.35)",
         position: "relative",
+        fontSize: 24,
       }}
     >
       <NodeHandles accent={data.accent} surface={theme.surfaces.panel} />
@@ -329,6 +331,7 @@ const DiamondNode = ({ data }: NodeProps<DiamondNodeData>) => {
         textTransform: "uppercase",
         color: theme.palette.textPrimary,
         position: "relative",
+        fontSize: 24,
       }}
     >
       <NodeHandles accent={data.accent} surface={theme.surfaces.panel} />
