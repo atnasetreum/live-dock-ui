@@ -6,7 +6,9 @@ import ReactFlow, {
   Background,
   Controls,
   MarkerType,
+  StepEdge,
   type Edge,
+  type EdgeTypes,
   type Node,
   type NodeProps,
 } from "reactflow";
@@ -247,6 +249,10 @@ const nodeTypes = {
   diamond: DiamondNode,
 };
 
+const edgeTypes: EdgeTypes = {
+  step: StepEdge,
+};
+
 const ProcessFlow = () => {
   const { theme } = useThemeConfig();
   const nodes = React.useMemo<Node[]>(() => staticNodes, []);
@@ -263,7 +269,7 @@ const ProcessFlow = () => {
         animated: false,
         style: {
           stroke: connectionColor,
-          strokeWidth: 1.5,
+          strokeWidth: 2,
           strokeDasharray: edge.dashed ? "6 4" : undefined,
         },
         labelStyle: {
@@ -317,6 +323,7 @@ const ProcessFlow = () => {
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           fitView
           panOnScroll={false}
           zoomOnScroll={false}
