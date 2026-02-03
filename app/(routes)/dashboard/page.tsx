@@ -23,6 +23,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { useThemeConfig } from "../../theme/ThemeProvider";
+import type { GlowLayer } from "../../theme/tokens";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -101,42 +103,45 @@ const alerts = [
   },
 ];
 
+const glowLayerStyles = (layer: GlowLayer) => ({
+  content: '""',
+  position: "absolute" as const,
+  width: layer.width,
+  height: layer.height,
+  top: layer.top,
+  left: layer.left,
+  right: layer.right,
+  bottom: layer.bottom,
+  background: layer.gradient,
+  filter: `blur(${layer.blur}px)`,
+});
+
 const DashboardPage = () => {
+  const { theme } = useThemeConfig();
+
+  const severityColor = (level: string) => {
+    if (level === "Alta") return theme.chips.high;
+    if (level === "Media") return theme.chips.medium;
+    return theme.chips.low;
+  };
+
+  const roles = ["Control tráfico", "Patio", "Seguridad", "Operaciones"];
+
   return (
     <Box
       className={spaceGrotesk.className}
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #040a1c, #0f2557 38%, #17507b)",
-        color: "#fff",
+        background: theme.palette.pageBackground,
+        color: theme.palette.textPrimary,
         display: "flex",
         justifyContent: "center",
         px: { xs: 2, md: 4 },
         py: { xs: 4, md: 8 },
         position: "relative",
         overflow: "hidden",
-        "::before": {
-          content: '""',
-          position: "absolute",
-          width: 600,
-          height: 600,
-          background:
-            "radial-gradient(circle, rgba(73,118,255,0.42), transparent 60%)",
-          top: -200,
-          left: -120,
-          filter: "blur(18px)",
-        },
-        "::after": {
-          content: '""',
-          position: "absolute",
-          width: 380,
-          height: 380,
-          background:
-            "radial-gradient(circle, rgba(7,181,159,0.55), transparent 65%)",
-          bottom: -90,
-          right: -120,
-          filter: "blur(16px)",
-        },
+        "::before": glowLayerStyles(theme.glows.primary),
+        "::after": glowLayerStyles(theme.glows.secondary),
       }}
     >
       <Box
@@ -159,7 +164,10 @@ const DashboardPage = () => {
               >
                 Bienvenido a LiveDock Control
               </Typography>
-              <Typography variant="body1" sx={{ color: "#fff" }}>
+              <Typography
+                variant="body1"
+                sx={{ color: theme.palette.textSecondary }}
+              >
                 Seguimiento en tiempo real de flota, recursos y alertas críticas
                 para tu terminal.
               </Typography>
@@ -175,8 +183,9 @@ const DashboardPage = () => {
                 sx={{
                   textTransform: "none",
                   fontWeight: 600,
-                  background: "linear-gradient(90deg, #1c6fe8, #23a6d9)",
-                  color: "#fff",
+                  backgroundImage: theme.gradients.primary,
+                  color: theme.buttons.containedText,
+                  boxShadow: theme.overlays.cardShadow,
                 }}
               >
                 Monitor en tiempo real
@@ -190,11 +199,11 @@ const DashboardPage = () => {
                 sx={{
                   textTransform: "none",
                   fontWeight: 600,
-                  borderColor: "rgba(255,255,255,0.5)",
-                  color: "#fff",
+                  borderColor: theme.buttons.outlinedColor,
+                  color: theme.buttons.outlinedColor,
                   "&:hover": {
-                    borderColor: "#fff",
-                    backgroundColor: "rgba(255,255,255,0.08)",
+                    borderColor: theme.buttons.outlinedColor,
+                    backgroundColor: theme.surfaces.translucent,
                   },
                 }}
               >
@@ -217,9 +226,9 @@ const DashboardPage = () => {
                   sx={{
                     p: 2.5,
                     borderRadius: 3,
-                    background: "rgba(7,11,32,0.72)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    boxShadow: "0 25px 65px rgba(2,7,21,0.4)",
+                    background: theme.surfaces.card,
+                    border: `1px solid ${theme.surfaces.border}`,
+                    boxShadow: theme.overlays.cardShadow,
                   }}
                 >
                   <Stack direction="row" spacing={2} alignItems="center">
@@ -228,24 +237,36 @@ const DashboardPage = () => {
                         width: 48,
                         height: 48,
                         borderRadius: 2,
-                        background: "rgba(33,150,243,0.12)",
+                        background: theme.surfaces.iconBox,
                         display: "grid",
                         placeItems: "center",
                       }}
                     >
-                      <stat.icon fontSize="medium" sx={{ color: "#fff" }} />
+                      <stat.icon
+                        fontSize="medium"
+                        sx={{ color: theme.palette.textPrimary }}
+                      />
                     </Box>
                     <Box>
-                      <Typography variant="body2" sx={{ color: "#fff" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: theme.palette.textSecondary }}
+                      >
                         {stat.label}
                       </Typography>
                       <Typography
                         variant="h5"
-                        sx={{ fontWeight: 600, color: "#fff" }}
+                        sx={{
+                          fontWeight: 600,
+                          color: theme.palette.textPrimary,
+                        }}
                       >
                         {stat.value}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: "#fff" }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: theme.palette.textSecondary }}
+                      >
                         {stat.delta}
                       </Typography>
                     </Box>
@@ -261,9 +282,9 @@ const DashboardPage = () => {
                 flex: 1,
                 borderRadius: 4,
                 p: { xs: 3, sm: 4 },
-                background: "rgba(7,11,32,0.85)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                boxShadow: "0 30px 80px rgba(2,7,21,0.5)",
+                background: theme.surfaces.panel,
+                border: `1px solid ${theme.surfaces.border}`,
+                boxShadow: theme.overlays.panelShadow,
               }}
             >
               <Stack
@@ -275,20 +296,24 @@ const DashboardPage = () => {
                 <Box>
                   <Typography
                     variant="h6"
-                    sx={{ fontWeight: 600, color: "#fff" }}
+                    sx={{ fontWeight: 600, color: theme.palette.textPrimary }}
                   >
                     Operaciones de hoy
                   </Typography>
-                  <Typography variant="body2" sx={{ color: "#fff" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: theme.palette.textSecondary }}
+                  >
                     Seguimiento de buques y estado de atraque
                   </Typography>
                 </Box>
                 <Chip
                   label="Tiempo real"
-                  color="primary"
+                  size="small"
                   sx={{
-                    backgroundColor: "rgba(33,150,243,0.2)",
-                    color: "#fff",
+                    backgroundColor: theme.chips.realTime,
+                    color: theme.palette.textPrimary,
+                    fontWeight: 600,
                   }}
                 />
               </Stack>
@@ -304,33 +329,51 @@ const DashboardPage = () => {
                       alignItems: "center",
                       padding: 1.5,
                       borderRadius: 2,
-                      backgroundColor: "rgba(255,255,255,0.03)",
+                      backgroundColor: theme.surfaces.translucent,
                     }}
                   >
                     <Box>
                       <Typography
                         variant="subtitle2"
-                        sx={{ fontWeight: 600, color: "#fff" }}
+                        sx={{
+                          fontWeight: 600,
+                          color: theme.palette.textPrimary,
+                        }}
                       >
                         {op.vessel}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: "#fff" }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: theme.palette.textSecondary }}
+                      >
                         {op.status}
                       </Typography>
                     </Box>
                     <Box>
-                      <Typography variant="overline" sx={{ color: "#fff" }}>
+                      <Typography
+                        variant="overline"
+                        sx={{ color: theme.palette.textSecondary }}
+                      >
                         ETA
                       </Typography>
-                      <Typography variant="body1" sx={{ color: "#fff" }}>
+                      <Typography
+                        variant="body1"
+                        sx={{ color: theme.palette.textPrimary }}
+                      >
                         {op.eta}
                       </Typography>
                     </Box>
                     <Box>
-                      <Typography variant="overline" sx={{ color: "#fff" }}>
+                      <Typography
+                        variant="overline"
+                        sx={{ color: theme.palette.textSecondary }}
+                      >
                         Muelle
                       </Typography>
-                      <Typography variant="body1" sx={{ color: "#fff" }}>
+                      <Typography
+                        variant="body1"
+                        sx={{ color: theme.palette.textPrimary }}
+                      >
                         {op.berth}
                       </Typography>
                     </Box>
@@ -346,11 +389,10 @@ const DashboardPage = () => {
                       sx={{
                         height: 6,
                         borderRadius: 10,
-                        backgroundColor: "rgba(255,255,255,0.12)",
+                        backgroundColor: theme.linearProgressTrack,
                         "& .MuiLinearProgress-bar": {
                           borderRadius: 10,
-                          background:
-                            "linear-gradient(90deg, #1c6fe8, #23a6d9)",
+                          background: theme.gradients.progress,
                         },
                       }}
                     />
@@ -364,18 +406,19 @@ const DashboardPage = () => {
                 sx={{
                   borderRadius: 4,
                   p: 3,
-                  background: "rgba(7,11,32,0.85)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: theme.surfaces.panel,
+                  border: `1px solid ${theme.surfaces.border}`,
+                  boxShadow: theme.overlays.panelShadow,
                 }}
               >
                 <Typography
                   variant="h6"
-                  sx={{ fontWeight: 600, color: "#fff" }}
+                  sx={{ fontWeight: 600, color: theme.palette.textPrimary }}
                   mb={1.5}
                 >
                   Alertas prioritarias
                 </Typography>
-                <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
+                <Divider sx={{ borderColor: theme.divider }} />
                 <Stack spacing={2} mt={2}>
                   {alerts.map((alert) => (
                     <Box key={alert.title}>
@@ -386,7 +429,10 @@ const DashboardPage = () => {
                       >
                         <Typography
                           variant="subtitle1"
-                          sx={{ fontWeight: 600, color: "#fff" }}
+                          sx={{
+                            fontWeight: 600,
+                            color: theme.palette.textPrimary,
+                          }}
                         >
                           {alert.title}
                         </Typography>
@@ -394,17 +440,15 @@ const DashboardPage = () => {
                           label={alert.severity}
                           size="small"
                           sx={{
-                            backgroundColor:
-                              alert.severity === "Alta"
-                                ? "rgba(239,83,80,0.25)"
-                                : alert.severity === "Media"
-                                  ? "rgba(255,167,38,0.2)"
-                                  : "rgba(76,175,80,0.2)",
-                            color: "#fff",
+                            backgroundColor: severityColor(alert.severity),
+                            color: theme.palette.textPrimary,
                           }}
                         />
                       </Stack>
-                      <Typography variant="body2" sx={{ color: "#fff" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: theme.palette.textSecondary }}
+                      >
                         {alert.detail}
                       </Typography>
                     </Box>
@@ -416,13 +460,14 @@ const DashboardPage = () => {
                 sx={{
                   borderRadius: 4,
                   p: 3,
-                  background: "rgba(7,11,32,0.85)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: theme.surfaces.panel,
+                  border: `1px solid ${theme.surfaces.border}`,
+                  boxShadow: theme.overlays.panelShadow,
                 }}
               >
                 <Typography
                   variant="h6"
-                  sx={{ fontWeight: 600, color: "#fff" }}
+                  sx={{ fontWeight: 600, color: theme.palette.textPrimary }}
                   mb={2}
                 >
                   Equipo en turno
@@ -438,8 +483,8 @@ const DashboardPage = () => {
                       <ListItemAvatar>
                         <Avatar
                           sx={{
-                            bgcolor: "rgba(33,150,243,0.28)",
-                            color: "#fff",
+                            bgcolor: theme.avatarBackground,
+                            color: theme.palette.textPrimary,
                           }}
                         >
                           {member[0]}
@@ -448,11 +493,11 @@ const DashboardPage = () => {
                       <ListItemText
                         primary={member}
                         primaryTypographyProps={{
-                          sx: { color: "#fff" },
+                          sx: { color: theme.palette.textPrimary },
                         }}
-                        secondary={`Rol ${index === 0 ? "Control tráfico" : index === 1 ? "Patio" : index === 2 ? "Seguridad" : "Operaciones"}`}
+                        secondary={`Rol ${roles[index] || roles[roles.length - 1]}`}
                         secondaryTypographyProps={{
-                          color: "#fff",
+                          sx: { color: theme.listSecondary },
                         }}
                       />
                     </ListItem>

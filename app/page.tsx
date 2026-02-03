@@ -19,6 +19,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useThemeConfig } from "./theme/ThemeProvider";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -41,40 +42,41 @@ const LoginPage = () => {
   const [formState, setFormState] = useState<FormState>(initialState);
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { theme } = useThemeConfig();
 
   const textFieldSx = {
     "& .MuiOutlinedInput-root": {
       borderRadius: 2,
-      backgroundColor: "rgba(10,18,46,0.4)",
-      color: "#fff",
+      backgroundColor: theme.forms.fieldBackground,
+      color: theme.forms.inputColor,
       "& fieldset": {
-        borderColor: "rgba(255,255,255,0.78)",
+        borderColor: theme.forms.border,
       },
       "&:hover fieldset": {
-        borderColor: "rgba(255,255,255,0.92)",
+        borderColor: theme.forms.borderHover,
       },
       "&.Mui-focused fieldset": {
-        borderColor: "#fefefe",
-        boxShadow: "0 0 0 1px rgba(255,255,255,0.32)",
+        borderColor: theme.forms.borderFocus,
+        boxShadow: theme.forms.focusShadow,
       },
     },
     "& .MuiInputAdornment-root, & .MuiInputLabel-root": {
-      color: "#fff",
+      color: theme.forms.adornmentColor,
       transition: "color 120ms ease",
     },
     "& .MuiInputLabel-root": {
       px: 0.75,
       borderRadius: 1,
-      backgroundColor: "rgba(7,11,32,0.92)",
+      backgroundColor: theme.forms.labelBackground,
     },
     "& .MuiInputLabel-root.MuiInputLabel-shrink": {
-      backgroundColor: "rgba(7,11,32,0.92)",
+      backgroundColor: theme.forms.labelBackground,
     },
     "& .MuiInputLabel-root.Mui-focused": {
-      color: "#fff",
+      color: theme.forms.adornmentColor,
     },
     "& .MuiInputBase-input": {
-      color: "#fff",
+      color: theme.forms.inputColor,
     },
   } as const;
 
@@ -100,8 +102,7 @@ const LoginPage = () => {
       className={spaceGrotesk.className}
       sx={{
         minHeight: "100vh",
-        background:
-          "linear-gradient(135deg, #040a1c 0%, #0f2557 38%, #17507b 100%)",
+        background: theme.palette.pageBackground,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -109,28 +110,30 @@ const LoginPage = () => {
         overflow: "hidden",
         px: { xs: 2, md: 4 },
         py: { xs: 6, md: 10 },
-        color: "#fff",
+        color: theme.palette.textPrimary,
         "::before": {
           content: '""',
           position: "absolute",
-          width: 420,
-          height: 420,
-          top: "-10%",
-          right: "-5%",
-          background:
-            "radial-gradient(circle, rgba(73,118,255,0.6), transparent 60%)",
-          filter: "blur(20px)",
+          width: theme.glows.primary.width,
+          height: theme.glows.primary.height,
+          top: theme.glows.primary.top,
+          left: theme.glows.primary.left,
+          right: theme.glows.primary.right,
+          bottom: theme.glows.primary.bottom,
+          background: theme.glows.primary.gradient,
+          filter: `blur(${theme.glows.primary.blur}px)`,
         },
         "::after": {
           content: '""',
           position: "absolute",
-          width: 320,
-          height: 320,
-          bottom: "-5%",
-          left: "-8%",
-          background:
-            "radial-gradient(circle, rgba(7,181,159,0.55), transparent 60%)",
-          filter: "blur(18px)",
+          width: theme.glows.secondary.width,
+          height: theme.glows.secondary.height,
+          top: theme.glows.secondary.top,
+          left: theme.glows.secondary.left,
+          right: theme.glows.secondary.right,
+          bottom: theme.glows.secondary.bottom,
+          background: theme.glows.secondary.gradient,
+          filter: `blur(${theme.glows.secondary.blur}px)`,
         },
       }}
     >
@@ -146,7 +149,7 @@ const LoginPage = () => {
             id="info-section"
             sx={{
               flex: 1,
-              color: "#fff",
+              color: theme.palette.textPrimary,
               display: { xs: "none", lg: "flex" },
               flexDirection: "column",
               gap: 3,
@@ -158,14 +161,15 @@ const LoginPage = () => {
             <Typography variant="h2" sx={{ fontWeight: 600, lineHeight: 1.1 }}>
               Impulsa tus operaciones portuarias con accesos seguros
             </Typography>
-            <Typography variant="body1" sx={{ maxWidth: 520, color: "#fff" }}>
+            <Typography
+              variant="body1"
+              sx={{ maxWidth: 520, color: theme.palette.textSecondary }}
+            >
               Centraliza autorizaciones, visibilidad en tiempo real y métricas
               de desempeño en una sola plataforma. El módulo de acceso conecta a
               tus equipos con la data crítica en segundos.
             </Typography>
-            <Divider
-              sx={{ borderColor: "rgba(255,255,255,0.18)", maxWidth: 320 }}
-            />
+            <Divider sx={{ borderColor: theme.divider, maxWidth: 320 }} />
             <Stack direction="row" spacing={3} flexWrap="wrap">
               {[
                 { label: "99.98% uptime", emphasis: "Disponibilidad" },
@@ -173,7 +177,10 @@ const LoginPage = () => {
                 { label: "< 60s onboarding", emphasis: "Ágil" },
               ].map((stat) => (
                 <Box key={stat.label}>
-                  <Typography variant="caption" sx={{ color: "#fff" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: theme.palette.textSecondary }}
+                  >
                     {stat.emphasis}
                   </Typography>
                   <Typography variant="h5" sx={{ fontWeight: 600 }}>
@@ -193,10 +200,10 @@ const LoginPage = () => {
               alignSelf: "center",
               borderRadius: 4,
               p: { xs: 3, sm: 4 },
-              background: "rgba(7, 11, 32, 0.82)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              boxShadow: "0 30px 80px rgba(2,7,21,0.65)",
-              color: "#fff",
+              background: theme.surfaces.glass,
+              border: `1px solid ${theme.surfaces.border}`,
+              boxShadow: theme.overlays.glassShadow,
+              color: theme.palette.textPrimary,
               backdropFilter: "blur(16px)",
             }}
           >
@@ -205,7 +212,10 @@ const LoginPage = () => {
                 <Typography variant="h5" sx={{ fontWeight: 600 }}>
                   Acceso a LiveDock Control
                 </Typography>
-                <Typography variant="body2" sx={{ color: "#fff" }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: theme.palette.textSecondary }}
+                >
                   Ingresa tus credenciales
                 </Typography>
               </Box>
@@ -256,6 +266,7 @@ const LoginPage = () => {
                               : "Mostrar contraseña"
                           }
                           onClick={() => setShowPassword((prev) => !prev)}
+                          sx={{ color: theme.palette.textPrimary }}
                         >
                           {showPassword ? (
                             <VisibilityOff fontSize="small" />
@@ -279,9 +290,13 @@ const LoginPage = () => {
                   fontWeight: 600,
                   textTransform: "none",
                   fontSize: "1rem",
-                  color: "#fff",
+                  color: theme.buttons.containedText,
+                  backgroundImage: theme.gradients.primary,
+                  boxShadow: theme.overlays.cardShadow,
                   "&.Mui-disabled": {
-                    color: "#fff",
+                    color: theme.buttons.containedText,
+                    backgroundImage: theme.gradients.primary,
+                    opacity: 0.72,
                   },
                 }}
               >
