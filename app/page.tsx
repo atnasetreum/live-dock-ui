@@ -1,7 +1,7 @@
 "use client";
 
-import type { ChangeEvent, ComponentProps } from "react";
-import { useState } from "react";
+import { useState, type ChangeEvent, type ComponentProps } from "react";
+
 import { Space_Grotesk } from "next/font/google";
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -19,7 +19,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useThemeConfig } from "./theme/ThemeProvider";
+
+import { useThemeConfig } from "@/theme/ThemeProvider";
+import { authService } from "@/services";
+import { Toast } from "@/utils";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -91,8 +94,15 @@ const LoginPage = () => {
     // Fake delay to mimic a network request.
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
-    //Navegar a la página principal del panel de control
-    window.location.href = "/dashboard";
+    await authService
+      .login(formState.email, formState.password)
+      .then(({ message }) => {
+        Toast.success(message);
+        setTimeout(() => {
+          //Navegar a la página principal del panel de control
+          window.location.href = "/dashboard";
+        }, 1500);
+      });
 
     setIsSubmitting(false);
   };

@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { Space_Grotesk } from "next/font/google";
+
 import TimelineIcon from "@mui/icons-material/Timeline";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SailingIcon from "@mui/icons-material/Sailing";
@@ -25,9 +26,12 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useThemeConfig } from "../../theme/ThemeProvider";
-import type { GlowLayer } from "../../theme/tokens";
+
 import RealTimeMonitor from "./components/RealTimeMonitor";
+import { useThemeConfig } from "@/theme/ThemeProvider";
+import { GlowLayer } from "@/theme/tokens";
+import { authService } from "@/services";
+import { Toast } from "@/utils";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -208,7 +212,12 @@ const DashboardPage = () => {
                   variant="outlined"
                   startIcon={<LogoutIcon />}
                   onClick={() => {
-                    window.location.href = "/";
+                    authService.logout().then(({ message }) => {
+                      Toast.success(message);
+                      setTimeout(() => {
+                        window.location.replace("/");
+                      }, 1500);
+                    });
                   }}
                   sx={{
                     textTransform: "none",
