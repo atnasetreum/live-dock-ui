@@ -13,11 +13,11 @@ export const getSocket = (): Socket => {
 };
 
 export const connectSocket = () => {
-  const s = getSocket();
-  if (!s.connected) {
-    s.connect();
+  const currentSocket = getSocket();
+  if (!currentSocket.connected) {
+    currentSocket.connect();
   }
-  return s;
+  return currentSocket;
 };
 
 export const disconnectSocket = () => {

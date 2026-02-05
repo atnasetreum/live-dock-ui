@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+
 import Box from "@mui/material/Box";
 import ReactFlow, {
   Background,
@@ -12,10 +13,10 @@ import ReactFlow, {
   type Node,
   type NodeProps,
 } from "reactflow";
-import "reactflow/dist/style.css";
+
+import { useThemeConfig } from "@/theme/ThemeProvider";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
-import { useThemeConfig } from "../../../theme/ThemeProvider";
 import {
   COLUMN_SPACING,
   LANE_LABEL_WIDTH,
@@ -25,6 +26,8 @@ import {
   processConnections,
   type LaneId,
 } from "./processFlowData";
+
+import "reactflow/dist/style.css";
 
 type LaneNodeData = { label: string; accent: string };
 type ProcessNodeData = {

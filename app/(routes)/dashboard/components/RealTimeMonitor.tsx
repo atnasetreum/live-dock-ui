@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
@@ -12,9 +13,10 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import { TransitionProps } from "@mui/material/transitions";
-import { useThemeConfig } from "../../../theme/ThemeProvider";
-import ProcessFlow from "./ProcessFlow";
+
+import { useThemeConfig } from "@/theme/ThemeProvider";
 import { laneConfig } from "./processFlowData";
+import ProcessFlow from "./ProcessFlow";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children: React.ReactElement<unknown> },

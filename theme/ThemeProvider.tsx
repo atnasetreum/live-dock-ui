@@ -20,23 +20,28 @@ type ThemeProviderProps = {
 };
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [preference, setPreference] = useState<ThemePreference>(() => {
-    if (typeof window === "undefined") return "system";
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "dark" || stored === "light" || stored === "system") {
-      return stored;
-    }
-    return "system";
-  });
-
-  const [systemTheme, setSystemTheme] = useState<ThemeName>(() => {
-    if (typeof window === "undefined") return "dark";
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  });
+  const [mounted, setMounted] = useState(false);
+  const [preference, setPreference] = useState<ThemePreference>("system");
+  const [systemTheme, setSystemTheme] = useState<ThemeName>("dark");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+    // Read from localStorage after mount
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored === "dark" || stored === "light" || stored === "system") {
+      setPreference(stored);
+    }
+    // Read system preference after mount
+    setSystemTheme(
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light",
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handler = (event: MediaQueryListEvent) => {
       setSystemTheme(event.matches ? "dark" : "light");
@@ -45,12 +50,12 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     mediaQuery.addEventListener("change", handler);
 
     return () => mediaQuery.removeEventListener("change", handler);
-  }, []);
+  }, [mounted]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (!mounted) return;
     window.localStorage.setItem(STORAGE_KEY, preference);
-  }, [preference]);
+  }, [preference, mounted]);
 
   const resolvedName: ThemeName =
     preference === "system" ? systemTheme : preference;
@@ -58,13 +63,13 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const theme = themes[resolvedName];
 
   useEffect(() => {
-    if (typeof document === "undefined") return;
+    if (!mounted) return;
     const root = document.documentElement;
     root.style.setProperty("color-scheme", resolvedName);
     root.dataset.theme = resolvedName;
     document.body.style.background = theme.palette.pageBackground;
     document.body.style.color = theme.palette.textPrimary;
-  }, [resolvedName, theme]);
+  }, [resolvedName, theme, mounted]);
 
   const contextValue = useMemo<ThemeContextValue>(
     () => ({
