@@ -11,6 +11,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
   Box,
   Button,
+  Chip,
   Divider,
   IconButton,
   InputAdornment,
@@ -19,6 +20,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { keyframes } from "@mui/system";
 
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { authService } from "@/services";
@@ -28,6 +30,16 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
+
+const floatPrimary = keyframes`
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(14px, -18px, 0); }
+`;
+
+const floatSecondary = keyframes`
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-18px, 12px, 0); }
+`;
 
 type FormState = {
   email: string;
@@ -133,6 +145,7 @@ const LoginPage = () => {
           bottom: theme.glows.primary.bottom,
           background: theme.glows.primary.gradient,
           filter: `blur(${theme.glows.primary.blur}px)`,
+          animation: `${floatPrimary} 18s ease-in-out infinite`,
         },
         "::after": {
           content: '""',
@@ -145,9 +158,21 @@ const LoginPage = () => {
           bottom: theme.glows.secondary.bottom,
           background: theme.glows.secondary.gradient,
           filter: `blur(${theme.glows.secondary.blur}px)`,
+          animation: `${floatSecondary} 22s ease-in-out infinite`,
         },
       }}
     >
+      <Box
+        aria-hidden
+        sx={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "linear-gradient(120deg, rgba(255,255,255,0.04), rgba(255,255,255,0) 60%), radial-gradient(circle at 18% 22%, rgba(255,255,255,0.12), transparent 45%), radial-gradient(circle at 82% 18%, rgba(255,255,255,0.08), transparent 40%)",
+          opacity: 0.7,
+          pointerEvents: "none",
+        }}
+      />
       <Box
         sx={{ position: "relative", width: "100%", maxWidth: 1100, zIndex: 1 }}
       >
@@ -216,10 +241,51 @@ const LoginPage = () => {
               boxShadow: theme.overlays.glassShadow,
               color: theme.palette.textPrimary,
               backdropFilter: "blur(16px)",
+              position: "relative",
+              overflow: "hidden",
+              "::before": {
+                content: '""',
+                position: "absolute",
+                inset: 0,
+                borderRadius: 4,
+                padding: "1px",
+                background:
+                  "linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0))",
+                mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+                maskComposite: "exclude",
+                pointerEvents: "none",
+                opacity: 0.8,
+              },
             }}
           >
             <Stack spacing={3}>
               <Box>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  sx={{ mb: 1 }}
+                >
+                  <Chip
+                    icon={<LockOutlinedIcon fontSize="small" />}
+                    label="Acceso seguro"
+                    size="small"
+                    sx={{
+                      fontWeight: 600,
+                      bgcolor: "rgba(255,255,255,0.08)",
+                      color: theme.palette.textPrimary,
+                      "& .MuiChip-icon": {
+                        color: theme.palette.textPrimary,
+                      },
+                    }}
+                  />
+                  <Typography
+                    variant="caption"
+                    sx={{ color: theme.palette.textSecondary }}
+                  >
+                    SOC2 + SSO listo
+                  </Typography>
+                </Stack>
                 <Typography variant="h5" sx={{ fontWeight: 600 }}>
                   Acceso a LiveDock Control
                 </Typography>
@@ -277,7 +343,11 @@ const LoginPage = () => {
                               : "Mostrar contraseña"
                           }
                           onClick={() => setShowPassword((prev) => !prev)}
-                          sx={{ color: theme.palette.textPrimary }}
+                          sx={{
+                            color: theme.palette.textPrimary,
+                            minHeight: 44,
+                            minWidth: 44,
+                          }}
                         >
                           {showPassword ? (
                             <VisibilityOff fontSize="small" />
@@ -304,6 +374,13 @@ const LoginPage = () => {
                   color: theme.buttons.containedText,
                   backgroundImage: theme.gradients.primary,
                   boxShadow: theme.overlays.cardShadow,
+                  borderRadius: 999,
+                  alignSelf: "stretch",
+                  transition: "transform 150ms ease, box-shadow 150ms ease",
+                  "&:hover": {
+                    transform: "translateY(-1px)",
+                    boxShadow: theme.overlays.glassShadow,
+                  },
                   "&.Mui-disabled": {
                     color: theme.buttons.containedText,
                     backgroundImage: theme.gradients.primary,

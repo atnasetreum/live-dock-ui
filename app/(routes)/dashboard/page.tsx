@@ -99,6 +99,12 @@ const alerts = [
   },
 ];
 
+const statusChips = [
+  { label: "Terminal activa", tone: "success" },
+  { label: "Turno 08:00 - 18:00", tone: "neutral" },
+  { label: "Clima estable", tone: "info" },
+];
+
 const DashboardPage = () => {
   const { theme } = useThemeConfig();
   const [realTimeMonitor, setRealTimeMonitor] = useState(false);
@@ -115,138 +121,189 @@ const DashboardPage = () => {
         <RealTimeMonitor handleClose={() => setRealTimeMonitor(false)} />
       )}
       <Stack spacing={4}>
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          spacing={2}
-          justifyContent="space-between"
-          alignItems={{ xs: "flex-start", md: "center" }}
+        <Paper
+          sx={{
+            borderRadius: 4,
+            p: { xs: 3, md: 4 },
+            background: theme.surfaces.panel,
+            border: `1px solid ${theme.surfaces.border}`,
+            boxShadow: theme.overlays.panelShadow,
+          }}
         >
-          <Box>
-            <Typography variant="overline" sx={{ letterSpacing: 4 }}>
-              PANEL OPERATIVO
-            </Typography>
-            <Typography variant="h3" sx={{ fontWeight: 600, lineHeight: 1.1 }}>
-              Bienvenido a LiveDock Control
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{ color: theme.palette.textSecondary }}
-            >
-              Seguimiento en tiempo real de flota, recursos y alertas críticas
-              para tu terminal.
-            </Typography>
-          </Box>
           <Stack
-            direction={{ xs: "column", sm: "row" }}
+            direction={{ xs: "column", md: "row" }}
             spacing={2}
-            width={{ xs: "100%", md: "auto" }}
+            justifyContent="space-between"
+            alignItems={{ xs: "flex-start", md: "center" }}
           >
-            <Button
-              variant="contained"
-              startIcon={<TimelineIcon />}
-              sx={{
-                textTransform: "none",
-                fontWeight: 600,
-                backgroundImage: theme.gradients.primary,
-                color: theme.buttons.containedText,
-                boxShadow: theme.overlays.cardShadow,
-              }}
-              onClick={() => setRealTimeMonitor(true)}
-            >
-              Monitor en tiempo real
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<LogoutIcon />}
-              onClick={() => {
-                authService.logout().then(({ message }) => {
-                  Toast.success(message);
-                  setTimeout(() => {
-                    disconnectSocket();
-                    window.location.replace("/");
-                  }, 1500);
-                });
-              }}
-              sx={{
-                textTransform: "none",
-                fontWeight: 600,
-                borderColor: theme.buttons.outlinedColor,
-                color: theme.buttons.outlinedColor,
-                "&:hover": {
-                  borderColor: theme.buttons.outlinedColor,
-                  backgroundColor: theme.surfaces.translucent,
-                },
-              }}
-            >
-              Cerrar sesión
-            </Button>
-          </Stack>
-        </Stack>
-
-        <Grid container spacing={3}>
-          {stats.map((stat) => (
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-                md: 3,
-              }}
-              key={stat.label}
-            >
-              <Paper
+            <Box>
+              <Typography variant="overline" sx={{ letterSpacing: 4 }}>
+                PANEL OPERATIVO
+              </Typography>
+              <Typography
+                variant="h3"
                 sx={{
-                  p: 2.5,
-                  borderRadius: 3,
-                  background: theme.surfaces.card,
-                  border: `1px solid ${theme.surfaces.border}`,
-                  boxShadow: theme.overlays.cardShadow,
+                  fontWeight: 600,
+                  lineHeight: 1.1,
+                  color: theme.palette.textPrimary,
                 }}
               >
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <Box
-                    sx={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 2,
-                      background: theme.surfaces.iconBox,
-                      display: "grid",
-                      placeItems: "center",
-                    }}
-                  >
-                    <stat.icon
-                      fontSize="medium"
-                      sx={{ color: theme.palette.textPrimary }}
-                    />
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: theme.palette.textSecondary }}
-                    >
-                      {stat.label}
-                    </Typography>
-                    <Typography
-                      variant="h5"
+                Bienvenido a LiveDock Control
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{ color: theme.palette.textSecondary }}
+              >
+                Seguimiento en tiempo real de flota, recursos y alertas críticas
+                para tu terminal.
+              </Typography>
+            </Box>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              width={{ xs: "100%", md: "auto" }}
+            >
+              <Button
+                variant="contained"
+                startIcon={<TimelineIcon />}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                  minHeight: 44,
+                  backgroundImage: theme.gradients.primary,
+                  color: theme.buttons.containedText,
+                  boxShadow: theme.overlays.cardShadow,
+                }}
+                onClick={() => setRealTimeMonitor(true)}
+              >
+                Monitor en tiempo real
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<LogoutIcon />}
+                onClick={() => {
+                  authService.logout().then(({ message }) => {
+                    Toast.success(message);
+                    setTimeout(() => {
+                      disconnectSocket();
+                      window.location.replace("/");
+                    }, 1500);
+                  });
+                }}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                  minHeight: 44,
+                  borderColor: theme.buttons.outlinedColor,
+                  color: theme.buttons.outlinedColor,
+                  "&:hover": {
+                    borderColor: theme.buttons.outlinedColor,
+                    backgroundColor: theme.surfaces.translucent,
+                  },
+                }}
+              >
+                Cerrar sesión
+              </Button>
+            </Stack>
+          </Stack>
+          <Stack
+            direction="row"
+            spacing={1.5}
+            flexWrap="wrap"
+            mt={{ xs: 2, md: 3 }}
+          >
+            {statusChips.map((chip) => (
+              <Chip
+                key={chip.label}
+                label={chip.label}
+                size="small"
+                sx={{
+                  backgroundColor: theme.surfaces.translucent,
+                  color: theme.palette.textPrimary,
+                  fontWeight: 600,
+                }}
+              />
+            ))}
+          </Stack>
+        </Paper>
+
+        <Stack spacing={2}>
+          <Typography variant="overline" sx={{ letterSpacing: 3 }}>
+            Resumen operativo
+          </Typography>
+          <Grid container spacing={3}>
+            {stats.map((stat) => (
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6,
+                  md: 3,
+                }}
+                key={stat.label}
+              >
+                <Paper
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 3,
+                    background: theme.surfaces.card,
+                    border: `1px solid ${theme.surfaces.border}`,
+                    boxShadow: theme.overlays.cardShadow,
+                    transition: "transform 160ms ease, box-shadow 160ms ease",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: theme.overlays.panelShadow,
+                    },
+                  }}
+                >
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Box
                       sx={{
-                        fontWeight: 600,
-                        color: theme.palette.textPrimary,
+                        width: 48,
+                        height: 48,
+                        borderRadius: 2,
+                        background: theme.surfaces.iconBox,
+                        display: "grid",
+                        placeItems: "center",
                       }}
                     >
-                      {stat.value}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: theme.palette.textSecondary }}
-                    >
-                      {stat.delta}
-                    </Typography>
-                  </Box>
-                </Stack>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
-
+                      <stat.icon
+                        fontSize="medium"
+                        sx={{ color: theme.palette.textPrimary }}
+                      />
+                    </Box>
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: theme.palette.textSecondary }}
+                      >
+                        {stat.label}
+                      </Typography>
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontWeight: 600,
+                          color: theme.palette.textPrimary,
+                        }}
+                      >
+                        {stat.value}
+                      </Typography>
+                      <Chip
+                        label={stat.delta}
+                        size="small"
+                        sx={{
+                          mt: 0.8,
+                          backgroundColor: theme.surfaces.translucent,
+                          color: theme.palette.textPrimary,
+                          fontWeight: 600,
+                        }}
+                      />
+                    </Box>
+                  </Stack>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        </Stack>
         <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
           <Paper
             sx={{
@@ -265,6 +322,9 @@ const DashboardPage = () => {
               mb={3}
             >
               <Box>
+                <Typography variant="overline" sx={{ letterSpacing: 3 }}>
+                  Movimientos
+                </Typography>
                 <Typography
                   variant="h6"
                   sx={{
@@ -384,6 +444,9 @@ const DashboardPage = () => {
                 boxShadow: theme.overlays.panelShadow,
               }}
             >
+              <Typography variant="overline" sx={{ letterSpacing: 3 }}>
+                Alertas
+              </Typography>
               <Typography
                 variant="h6"
                 sx={{

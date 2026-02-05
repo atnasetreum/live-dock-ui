@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.7",
     "@mui/material": "^7.3.7",
+    "@mui/system": "^7.3.7",
     "@mui/x-charts": "^8.26.0",
     "@mui/x-data-grid": "^8.26.0",
     "@mui/x-data-grid-pro": "^8.26.0",
