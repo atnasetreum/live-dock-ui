@@ -105,6 +105,33 @@ const statusChips = [
   { label: "Clima estable", tone: "info" },
 ];
 
+const trendSeries = [
+  {
+    label: "Arribos",
+    value: "18 buques",
+    change: "+3 vs ayer",
+    series: [32, 38, 42, 36, 52, 58, 64],
+  },
+  {
+    label: "TEU",
+    value: "42.7k",
+    change: "+12% semanal",
+    series: [44, 48, 52, 60, 66, 62, 70],
+  },
+  {
+    label: "SLAs",
+    value: "96.4%",
+    change: "+1.2pp",
+    series: [68, 72, 74, 78, 80, 86, 90],
+  },
+  {
+    label: "Interv.",
+    value: "5 equipos",
+    change: "2 criticos",
+    series: [40, 36, 44, 52, 48, 56, 50],
+  },
+];
+
 const DashboardPage = () => {
   const { theme } = useThemeConfig();
   const [realTimeMonitor, setRealTimeMonitor] = useState(false);
@@ -304,6 +331,115 @@ const DashboardPage = () => {
             ))}
           </Grid>
         </Stack>
+
+        <Paper
+          sx={{
+            borderRadius: 4,
+            p: { xs: 3, md: 4 },
+            background: theme.surfaces.panel,
+            border: `1px solid ${theme.surfaces.border}`,
+            boxShadow: theme.overlays.panelShadow,
+          }}
+        >
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={2}
+            justifyContent="space-between"
+            alignItems={{ xs: "flex-start", md: "center" }}
+            mb={3}
+          >
+            <Box>
+              <Typography variant="overline" sx={{ letterSpacing: 3 }}>
+                Tendencias
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 600, color: theme.palette.textPrimary }}
+              >
+                Ritmo operativo - ultimos 7 dias
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: theme.palette.textSecondary }}
+              >
+                Indicadores clave con variacion semanal.
+              </Typography>
+            </Box>
+            <Chip
+              label="Actualizado hace 2 min"
+              size="small"
+              sx={{
+                backgroundColor: theme.surfaces.translucent,
+                color: theme.palette.textPrimary,
+                fontWeight: 600,
+              }}
+            />
+          </Stack>
+          <Grid container spacing={2.5}>
+            {trendSeries.map((item) => (
+              <Grid key={item.label} size={{ xs: 12, sm: 6, lg: 3 }}>
+                <Paper
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 3,
+                    background: theme.surfaces.card,
+                    border: `1px solid ${theme.surfaces.border}`,
+                    boxShadow: theme.overlays.cardShadow,
+                  }}
+                >
+                  <Stack spacing={1.5}>
+                    <Stack direction="row" justifyContent="space-between">
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ color: theme.palette.textSecondary }}
+                      >
+                        {item.label}
+                      </Typography>
+                      <Chip
+                        label={item.change}
+                        size="small"
+                        sx={{
+                          backgroundColor: theme.surfaces.translucent,
+                          color: theme.palette.textPrimary,
+                          fontWeight: 600,
+                        }}
+                      />
+                    </Stack>
+                    <Typography
+                      variant="h5"
+                      sx={{ fontWeight: 600, color: theme.palette.textPrimary }}
+                    >
+                      {item.value}
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridAutoFlow: "column",
+                        gap: 0.7,
+                        alignItems: "end",
+                        height: 48,
+                      }}
+                    >
+                      {item.series.map((point, index) => (
+                        <Box
+                          key={`${item.label}-${index}`}
+                          sx={{
+                            width: 6,
+                            height: `${point}%`,
+                            borderRadius: 999,
+                            background: theme.gradients.progress,
+                            opacity: index === item.series.length - 1 ? 1 : 0.6,
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Stack>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        </Paper>
+
         <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
           <Paper
             sx={{
