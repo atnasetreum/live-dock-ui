@@ -71,9 +71,11 @@ axiosClient.interceptors.response.use(
 
     if (error?.response?.status === 401) {
       if (window.location.pathname !== "/") {
-        window.location.replace("/");
-        alert(message);
-        //return notify(message);
+        Toast.error(message);
+        setTimeout(() => {
+          window.location.replace("/");
+        }, 1500);
+        return;
       }
     }
 
