@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Space_Grotesk } from "next/font/google";
 
@@ -27,6 +27,7 @@ import {
   Typography,
 } from "@mui/material";
 
+import { connectSocket, disconnectSocket } from "@/libs/socket";
 import RealTimeMonitor from "./components/RealTimeMonitor";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { GlowLayer } from "@/theme/tokens";
@@ -135,6 +136,20 @@ const DashboardPage = () => {
 
   const roles = ["Control tráfico", "Patio", "Seguridad", "Operaciones"];
 
+  useEffect(() => {
+    const socket = connectSocket();
+
+    socket.on("connect", () => {
+      console.log("Socket conectado:", socket.id);
+      // Puedes emitir un evento de login al backend
+      //socket.emit("user:login", { userId: session.user.id });
+    });
+
+    return () => {
+      disconnectSocket();
+    };
+  }, []);
+
   return (
     <>
       {realTimeMonitor && (
@@ -214,6 +229,7 @@ const DashboardPage = () => {
                   onClick={() => {
                     authService.logout().then(({ message }) => {
                       Toast.success(message);
+                      disconnectSocket();
                       setTimeout(() => {
                         window.location.replace("/");
                       }, 1500);

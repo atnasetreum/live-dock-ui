@@ -102,9 +102,10 @@ const LoginPage = () => {
           //Navegar a la página principal del panel de control
           window.location.href = "/dashboard";
         }, 1500);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
-
-    setIsSubmitting(false);
   };
 
   return (
