@@ -27,12 +27,13 @@ import {
   Typography,
 } from "@mui/material";
 
-import { connectSocket, disconnectSocket } from "@/libs/socket";
+import { disconnectSocket } from "@/libs/socket";
 import RealTimeMonitor from "./components/RealTimeMonitor";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { GlowLayer } from "@/theme/tokens";
 import { authService } from "@/services";
 import { Toast } from "@/utils";
+import { useSocket } from "@/common/SocketProvider";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -136,19 +137,25 @@ const DashboardPage = () => {
 
   const roles = ["Control tráfico", "Patio", "Seguridad", "Operaciones"];
 
-  useEffect(() => {
-    const socket = connectSocket();
+  const { socket, isConnected } = useSocket();
 
-    socket.on("connect", () => {
-      console.log("Socket conectado:", socket.id);
-      // Puedes emitir un evento de login al backend
-      //socket.emit("user:login", { userId: session.user.id });
-    });
+  useEffect(() => {
+    console.log("Socket connection status:", isConnected);
+  }, [isConnected]);
+
+  useEffect(() => {
+    if (!socket) return undefined;
+
+    const handleSessionsReady = (payload: unknown) => {
+      console.log("sessions:ready data", payload);
+    };
+
+    socket.on("sessions:ready", handleSessionsReady);
 
     return () => {
-      disconnectSocket();
+      socket.off("sessions:ready", handleSessionsReady);
     };
-  }, []);
+  }, [socket]);
 
   return (
     <>
