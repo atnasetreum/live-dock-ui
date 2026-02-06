@@ -1,12 +1,13 @@
 import axiosClient from "@/common/axiosClient";
 
 export const authService = {
+  baseUrl: "/auth",
   login: async (
     email: string,
     password: string,
   ): Promise<{ message: string }> => {
     const { data } = await axiosClient.post<{ message: string }>(
-      "/auth/login",
+      `${authService.baseUrl}/login`,
       {
         email,
         password,
@@ -17,7 +18,7 @@ export const authService = {
 
   logout: async (): Promise<{ message: string }> => {
     const { data } = await axiosClient.post<{ message: string }>(
-      "/auth/logout",
+      `${authService.baseUrl}/logout`,
     );
     return data;
   },

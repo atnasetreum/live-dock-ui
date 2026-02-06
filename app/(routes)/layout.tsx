@@ -1,13 +1,15 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { Space_Grotesk } from "next/font/google";
 
 import { Box, Typography } from "@mui/material";
 
+import PushNotificationRequest from "./components/PushNotificationRequest";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useSocket } from "@/common/SocketProvider";
 import { GlowLayer } from "@/theme/tokens";
+import { webPushService } from "@/services/web-push.service";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -32,6 +34,8 @@ export default function MainLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
   const { theme } = useThemeConfig();
   const { socket, isConnected } = useSocket();
 
@@ -51,56 +55,112 @@ export default function MainLayout({
     };
   }, [socket]);
 
+  useEffect(() => {
+    const notifyPermission = () => {
+      if (typeof window !== "undefined" && "Notification" in window) {
+        if (Notification.permission === "granted") return;
+
+        setIsOpen(true);
+      } else {
+        console.log("Notification API not supported.");
+      }
+    };
+
+    notifyPermission();
+  }, []);
+
+  const handleNotificationPermisson = (confirm: boolean) => {
+    if (!confirm) return setIsOpen(false);
+
+    Notification.requestPermission().then(async (permission) => {
+      if (permission === "granted") {
+        const registration = await navigator.serviceWorker.ready;
+
+        console.log("Notification permission granted.");
+        webPushService.getPublicKey().then((publicKey) => {
+          registration.pushManager
+            .subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: publicKey,
+            })
+            .then((subscription) => {
+              console.log("Push subscription successful:", subscription);
+              webPushService.createSubscribe(subscription).then(() => {
+                // Notification test
+                registration.showNotification("LiveDock", {
+                  body: "¡Notificaciones push activadas correctamente!",
+                  icon: "/icons/icon-192x192.png",
+                  badge: "/push-notifications/badge.png",
+                });
+              });
+            })
+            .catch((error) => {
+              console.error("Push subscription failed:", error);
+            });
+        });
+      } else {
+        console.log("Notification permission denied.");
+      }
+      setIsOpen(false);
+    });
+  };
+
   return (
-    <Box
-      className={spaceGrotesk.className}
-      sx={{
-        minHeight: "100vh",
-        background: theme.palette.pageBackground,
-        color: theme.palette.textPrimary,
-        display: "flex",
-        justifyContent: "center",
-        px: { xs: 2, md: 4 },
-        py: { xs: 4, md: 8 },
-        position: "relative",
-        overflow: "hidden",
-        "::before": glowLayerStyles(theme.glows.primary),
-        "::after": glowLayerStyles(theme.glows.secondary),
-      }}
-    >
+    <>
+      <PushNotificationRequest
+        isOpen={isOpen}
+        handleClose={handleNotificationPermisson}
+      />
       <Box
+        className={spaceGrotesk.className}
         sx={{
+          minHeight: "100vh",
+          background: theme.palette.pageBackground,
+          color: theme.palette.textPrimary,
+          display: "flex",
+          justifyContent: "center",
+          px: { xs: 2, md: 4 },
+          py: { xs: 4, md: 8 },
           position: "relative",
-          width: "100%",
-          maxWidth: 1280,
-          zIndex: 1,
+          overflow: "hidden",
+          "::before": glowLayerStyles(theme.glows.primary),
+          "::after": glowLayerStyles(theme.glows.secondary),
         }}
       >
-        {isConnected ? (
-          <>{children}</>
-        ) : (
-          <Box
-            sx={{
-              mt: 6,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              p: 4,
-              borderRadius: 4,
-              background: theme.surfaces.panel,
-              border: `1px solid ${theme.surfaces.border}`,
-              boxShadow: theme.overlays.panelShadow,
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{ color: theme.palette.textSecondary }}
+        <Box
+          sx={{
+            position: "relative",
+            width: "100%",
+            maxWidth: 1280,
+            zIndex: 1,
+          }}
+        >
+          {isConnected ? (
+            <>{children}</>
+          ) : (
+            <Box
+              sx={{
+                mt: 6,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                p: 4,
+                borderRadius: 4,
+                background: theme.surfaces.panel,
+                border: `1px solid ${theme.surfaces.border}`,
+                boxShadow: theme.overlays.panelShadow,
+              }}
             >
-              Conectando al servidor de datos en tiempo real...
-            </Typography>
-          </Box>
-        )}
+              <Typography
+                variant="h6"
+                sx={{ color: theme.palette.textSecondary }}
+              >
+                Conectando al servidor de datos en tiempo real...
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 }
