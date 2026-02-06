@@ -21,13 +21,10 @@ const ConnectedUsers = () => {
   const { socket } = useSocket();
   const [users, setUsers] = useState<UsersOnDuty[]>([]);
 
-  const roles = ["Control tráfico", "Patio", "Seguridad", "Operaciones"];
-
   useEffect(() => {
     if (!socket) return undefined;
 
     const handleSessionsReady = (payload: UsersOnDuty[]) => {
-      console.log(payload);
       setUsers(payload);
     };
 
@@ -59,7 +56,7 @@ const ConnectedUsers = () => {
         Equipo en turno
       </Typography>
       <List disablePadding>
-        {users.map((user, index) => (
+        {users.map((user) => (
           <ListItem key={user.id} sx={{ px: 0 }}>
             <ListItemAvatar>
               <Avatar

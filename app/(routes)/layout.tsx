@@ -36,34 +36,18 @@ export default function MainLayout({
   const { socket, isConnected } = useSocket();
 
   useEffect(() => {
-    //console.log("Socket connection status:", isConnected);
-  }, [isConnected]);
-
-  useEffect(() => {
     if (!socket) return undefined;
 
-    const handleSessionsReady = (payload: unknown, callback: unknown) => {
+    const handleSessionsReady = (_: unknown, callback: unknown) => {
       if (callback && typeof callback === "function") {
-        setTimeout(() => {
-          callback({ status: "ok" });
-        }, 100);
+        setTimeout(callback, 100);
       }
-      //console.log("sessions:ready data", payload);
-      /* setTimeout(() => {
-        socket.emit("sessions:new_user_connected");
-      }, 2000); */
-    };
-
-    const handleSessionsUpdate = (payload: unknown) => {
-      //console.log("sessions:update data", payload);
     };
 
     socket.on("sessions:ready", handleSessionsReady);
-    socket.on("sessions:update", handleSessionsUpdate);
 
     return () => {
       socket.off("sessions:ready", handleSessionsReady);
-      socket.off("sessions:update", handleSessionsUpdate);
     };
   }, [socket]);
 

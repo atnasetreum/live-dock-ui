@@ -2,15 +2,12 @@
 
 import { useState } from "react";
 
-import TimelineIcon from "@mui/icons-material/Timeline";
-import LogoutIcon from "@mui/icons-material/Logout";
 import SailingIcon from "@mui/icons-material/Sailing";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import {
   Box,
-  Button,
   Chip,
   Divider,
   Grid,
@@ -23,9 +20,7 @@ import {
 import RealTimeMonitor from "./components/RealTimeMonitor";
 import ConnectedUsers from "./components/ConnectedUsers";
 import { useThemeConfig } from "@/theme/ThemeProvider";
-import { disconnectSocket } from "@/libs/socket";
-import { authService } from "@/services";
-import { Toast } from "@/utils";
+import MainBanner from "./components/MainBanner";
 
 const stats = [
   {
@@ -99,12 +94,6 @@ const alerts = [
   },
 ];
 
-const statusChips = [
-  { label: "Terminal activa", tone: "success" },
-  { label: "Turno 08:00 - 18:00", tone: "neutral" },
-  { label: "Clima estable", tone: "info" },
-];
-
 const trendSeries = [
   {
     label: "Arribos",
@@ -148,111 +137,7 @@ const DashboardPage = () => {
         <RealTimeMonitor handleClose={() => setRealTimeMonitor(false)} />
       )}
       <Stack spacing={4}>
-        <Paper
-          sx={{
-            borderRadius: 4,
-            p: { xs: 3, md: 4 },
-            background: theme.surfaces.panel,
-            border: `1px solid ${theme.surfaces.border}`,
-            boxShadow: theme.overlays.panelShadow,
-          }}
-        >
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            spacing={2}
-            justifyContent="space-between"
-            alignItems={{ xs: "flex-start", md: "center" }}
-          >
-            <Box>
-              <Typography variant="overline" sx={{ letterSpacing: 4 }}>
-                PANEL OPERATIVO
-              </Typography>
-              <Typography
-                variant="h3"
-                sx={{
-                  fontWeight: 600,
-                  lineHeight: 1.1,
-                  color: theme.palette.textPrimary,
-                }}
-              >
-                Bienvenido a LiveDock Control
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{ color: theme.palette.textSecondary }}
-              >
-                Seguimiento en tiempo real de flota, recursos y alertas críticas
-                para tu terminal.
-              </Typography>
-            </Box>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={2}
-              width={{ xs: "100%", md: "auto" }}
-            >
-              <Button
-                variant="contained"
-                startIcon={<TimelineIcon />}
-                sx={{
-                  textTransform: "none",
-                  fontWeight: 600,
-                  minHeight: 44,
-                  backgroundImage: theme.gradients.primary,
-                  color: theme.buttons.containedText,
-                  boxShadow: theme.overlays.cardShadow,
-                }}
-                onClick={() => setRealTimeMonitor(true)}
-              >
-                Monitor en tiempo real
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<LogoutIcon />}
-                onClick={() => {
-                  authService.logout().then(({ message }) => {
-                    Toast.success(message);
-                    setTimeout(() => {
-                      disconnectSocket();
-                      window.location.replace("/");
-                    }, 1500);
-                  });
-                }}
-                sx={{
-                  textTransform: "none",
-                  fontWeight: 600,
-                  minHeight: 44,
-                  borderColor: theme.buttons.outlinedColor,
-                  color: theme.buttons.outlinedColor,
-                  "&:hover": {
-                    borderColor: theme.buttons.outlinedColor,
-                    backgroundColor: theme.surfaces.translucent,
-                  },
-                }}
-              >
-                Cerrar sesión
-              </Button>
-            </Stack>
-          </Stack>
-          <Stack
-            direction="row"
-            spacing={1.5}
-            flexWrap="wrap"
-            mt={{ xs: 2, md: 3 }}
-          >
-            {statusChips.map((chip) => (
-              <Chip
-                key={chip.label}
-                label={chip.label}
-                size="small"
-                sx={{
-                  backgroundColor: theme.surfaces.translucent,
-                  color: theme.palette.textPrimary,
-                  fontWeight: 600,
-                }}
-              />
-            ))}
-          </Stack>
-        </Paper>
+        <MainBanner setRealTimeMonitor={setRealTimeMonitor} />
 
         <Stack spacing={2}>
           <Typography variant="overline" sx={{ letterSpacing: 3 }}>
