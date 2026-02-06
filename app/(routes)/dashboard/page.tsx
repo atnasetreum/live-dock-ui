@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import SailingIcon from "@mui/icons-material/Sailing";
 import InventoryIcon from "@mui/icons-material/Inventory";
@@ -130,6 +130,19 @@ const DashboardPage = () => {
     if (level === "Media") return theme.chips.medium;
     return theme.chips.low;
   };
+
+  useEffect(() => {
+    if (!navigator.serviceWorker) return;
+
+    navigator.serviceWorker.addEventListener("message", (event) => {
+      if (event.data?.type === "PIPA_NOTIFICATION") {
+        const payload = event.data.data;
+
+        // actualizar estado, router, modal, etc.
+        console.log("Pipa desde notificación", payload);
+      }
+    });
+  }, []);
 
   return (
     <>
