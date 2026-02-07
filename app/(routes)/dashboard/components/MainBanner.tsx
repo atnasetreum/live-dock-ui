@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Box, Button, Chip, Paper, Stack, Typography } from "@mui/material";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import LogoutIcon from "@mui/icons-material/Logout";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useSocket } from "@/common/SocketProvider";
@@ -21,8 +22,10 @@ const statusChips = [
 
 const MainBanner = ({
   setRealTimeMonitor,
+  onPipaIngreso,
 }: {
   setRealTimeMonitor: React.Dispatch<React.SetStateAction<boolean>>;
+  onPipaIngreso?: () => void;
 }) => {
   const { theme } = useThemeConfig();
   const { socket } = useSocket();
@@ -87,11 +90,25 @@ const MainBanner = ({
             para tu terminal.
           </Typography>
         </Box>
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
-          width={{ xs: "100%", md: "auto" }}
-        >
+        <Stack spacing={2} width={{ xs: "100%", md: "auto" }}>
+          <Button
+            variant="outlined"
+            startIcon={<LocalShippingIcon />}
+            onClick={onPipaIngreso}
+            sx={{
+              textTransform: "none",
+              fontWeight: 600,
+              minHeight: 44,
+              borderColor: theme.buttons.outlinedColor,
+              color: theme.buttons.outlinedColor,
+              "&:hover": {
+                borderColor: theme.buttons.outlinedColor,
+                backgroundColor: theme.surfaces.translucent,
+              },
+            }}
+          >
+            Ingreso de pipa
+          </Button>
           <Button
             variant="contained"
             startIcon={<TimelineIcon />}

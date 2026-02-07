@@ -24,8 +24,20 @@ self.handlePush = (event) => {
 
   const lang = data.lang ?? "es-MX";
   const timestamp = data.timestamp ?? 1 * 1000; // 3 segundos, en milisegundos
-  const vibrate = data.vibrate ?? [200, 100, 200]; // vibrar durante 200ms, pausar 100ms, vibrar durante 200ms
+  const vibrate = data.vibrate ?? [200, 100, 200, 100, 400];
   const eventTime = data.eventTime;
+
+  const llegaPipa = [200];
+
+  const aprobacionCalidad = [100, 50, 100];
+
+  const rechazoCalidad = [300, 100, 300, 100, 300];
+
+  const vibrateCurrent = vibrate
+    ? llegaPipa
+    : aprobacionCalidad
+      ? rechazoCalidad
+      : vibrate;
 
   const options = {
     body: `${body} \n Fecha del evento: ${new Date(eventTime).toLocaleString("es-MX")}`,
@@ -36,10 +48,10 @@ self.handlePush = (event) => {
       visibleAt: Date.now(),
       eventTime,
     },
-    icon: `${ROOT_IMG_FOLDER}/confirm-icon.webp`, //IMAGES[typeNotification]?.icon,
+    //icon: `${ROOT_IMG_FOLDER}/confirm-icon.webp`, //IMAGES[typeNotification]?.icon,
     lang,
     timestamp,
-    vibrate,
+    vibrate: vibrateCurrent,
     //renotify: true, // Si se recibe una nueva notificación con el mismo tag, se mostrará de nuevo y vibrará
     silent: false,
     requireInteraction: true, // La notificación permanecerá visible hasta que el usuario interactúe con ella

@@ -247,7 +247,10 @@ const DashboardPage = () => {
             mb={3}
           >
             <Box>
-              <Typography variant="overline" sx={{ letterSpacing: 3 }}>
+              <Typography
+                variant="overline"
+                sx={{ letterSpacing: 3, color: theme.palette.textSecondary }}
+              >
                 Tendencias
               </Typography>
               <Typography
@@ -356,7 +359,10 @@ const DashboardPage = () => {
               mb={3}
             >
               <Box>
-                <Typography variant="overline" sx={{ letterSpacing: 3 }}>
+                <Typography
+                  variant="overline"
+                  sx={{ letterSpacing: 3, color: theme.palette.textSecondary }}
+                >
                   Movimientos
                 </Typography>
                 <Typography
