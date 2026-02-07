@@ -21,6 +21,9 @@ import RealTimeMonitor from "./components/RealTimeMonitor";
 import ConnectedUsers from "./components/ConnectedUsers";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import MainBanner from "./components/MainBanner";
+import PipaIngresoDialog from "./components/PipaIngresoDialog";
+import { receptionProcessesService } from "@/services";
+import { Toast } from "@/utils";
 
 const stats = [
   {
@@ -124,6 +127,8 @@ const trendSeries = [
 const DashboardPage = () => {
   const { theme } = useThemeConfig();
   const [realTimeMonitor, setRealTimeMonitor] = useState(false);
+  const [isPipaDialogOpen, setIsPipaDialogOpen] = useState(false);
+  const [isPipaSubmitting, setIsPipaSubmitting] = useState(false);
 
   const severityColor = (level: string) => {
     if (level === "Alta") return theme.chips.high;
@@ -144,13 +149,46 @@ const DashboardPage = () => {
     });
   }, []);
 
+  const handleOpenPipaDialog = () => {
+    setIsPipaDialogOpen(true);
+  };
+
+  const handleClosePipaDialog = () => {
+    if (isPipaSubmitting) return;
+    setIsPipaDialogOpen(false);
+  };
+
+  const handleConfirmPipaIngreso = async () => {
+    if (isPipaSubmitting) return;
+    setIsPipaSubmitting(true);
+
+    try {
+      await receptionProcessesService.create({});
+      Toast.success("Ingreso de pipa registrado.");
+      setIsPipaDialogOpen(false);
+    } catch (error) {
+      Toast.error("No se pudo registrar el ingreso de pipa.");
+    } finally {
+      setIsPipaSubmitting(false);
+    }
+  };
+
   return (
     <>
       {realTimeMonitor && (
         <RealTimeMonitor handleClose={() => setRealTimeMonitor(false)} />
       )}
+      <PipaIngresoDialog
+        open={isPipaDialogOpen}
+        isSubmitting={isPipaSubmitting}
+        onClose={handleClosePipaDialog}
+        onConfirm={handleConfirmPipaIngreso}
+      />
       <Stack spacing={4}>
-        <MainBanner setRealTimeMonitor={setRealTimeMonitor} />
+        <MainBanner
+          setRealTimeMonitor={setRealTimeMonitor}
+          onPipaIngreso={handleOpenPipaDialog}
+        />
 
         <Stack spacing={2}>
           <Typography variant="overline" sx={{ letterSpacing: 3 }}>
