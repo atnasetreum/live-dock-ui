@@ -16,6 +16,21 @@ const IMAGES = {
   },
 };
 
+const NOTIFICATION_EXPIRE_MS = 10 * 1000; // 10 segundos para pruebas, luego se puede ajustar a un tiempo más largo como 5 minutos (5 * 60 * 1000)
+const notificationExpirations = new Map();
+
+self.cancelNotificationExpiration = (notificationTag) => {
+  const entry = notificationExpirations.get(notificationTag);
+
+  if (!entry) {
+    return;
+  }
+
+  clearTimeout(entry.timerId);
+  entry.resolve();
+  notificationExpirations.delete(notificationTag);
+};
+
 self.handlePush = (event) => {
   const data = event.data ? event.data.json() : {};
 
@@ -42,6 +57,8 @@ self.handlePush = (event) => {
       : vibrate; */
 
   const visibleAt = Date.now();
+
+  self.cancelNotificationExpiration(tagId);
 
   const options = {
     body: `${body} \n Fecha del evento: ${new Date(eventTime).toLocaleString("es-MX")}`,
@@ -81,10 +98,19 @@ self.handlePush = (event) => {
     });
   }
 
+  const expirationPromise = new Promise((resolve) => {
+    const timerId = setTimeout(() => {
+      notificationExpirations.delete(tagId);
+      notifyMetric("EXPIRED").finally(resolve);
+    }, NOTIFICATION_EXPIRE_MS);
+    notificationExpirations.set(tagId, { timerId, resolve });
+  });
+
   event.waitUntil(
     Promise.all([
       self.registration.showNotification(title, options),
       notifyMetric("NOTIFICATION_SHOWN"),
+      expirationPromise,
     ]),
   );
 };

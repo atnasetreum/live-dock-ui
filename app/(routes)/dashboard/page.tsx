@@ -141,8 +141,10 @@ const DashboardPage = () => {
     if (!navigator.serviceWorker) return;
 
     navigator.serviceWorker.addEventListener("message", (event) => {
-      if (event.data?.type === "PIPA_NOTIFICATION") {
+      if (event.data?.type === "confirm-logistic-clicked") {
         const payload = event.data.data;
+
+        setRealTimeMonitor(true);
 
         // actualizar estado, router, modal, etc.
         console.log("Pipa desde notificación", payload);

@@ -1,52 +1,69 @@
 self.handleNotificationClick = (event) => {
   //event.notification.close();
 
+  if (self.cancelNotificationExpiration) {
+    self.cancelNotificationExpiration(event.notification.tag);
+  }
+
   const action = event.action;
 
-  const payload = event.notification.data || {};
+  const metadata = event.notification.data || {};
 
-  const { id, visibleAt, eventTime } = payload;
+  const { id, notifiedUserId, visibleAt, eventTime } = metadata;
 
   const accionAt = Date.now();
 
   //Tiempo reacción = acciónAt - visibleAt
   const visibleTimeMs = accionAt - visibleAt;
-  const tiempoReaccionUsuario = Math.floor(visibleTimeMs / 1000);
+  const reactionTimeSec = Math.floor(visibleTimeMs / 1000);
 
   //Tiempo atraso = visibleAt - eventAt
   const eventAt = new Date(eventTime).getTime();
   const atrasoTimeMs = visibleAt - eventAt;
-  const tiempoAtrasoBackend = Math.floor(atrasoTimeMs / 1000);
+  const systemDelaySec = Math.floor(atrasoTimeMs / 1000);
 
-  const tiempoTotal = tiempoReaccionUsuario + tiempoAtrasoBackend;
+  const totalTimeSec = reactionTimeSec + systemDelaySec;
 
   console.log({
     id,
-    tiempoReaccionUsuario,
-    tiempoAtrasoBackend,
-    tiempoTotal,
+    reactionTimeSec,
+    systemDelaySec,
+    totalTimeSec,
   });
+
+  const url = `${metadata.publicBackendUrl}/reception-process/notify-metric`;
+
+  function notifyMetric(eventType) {
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id,
+        reactionTimeSec,
+        accionAt: new Date(accionAt).toISOString(),
+        systemDelaySec,
+        notifiedUserId,
+        visibleAt,
+        eventTime,
+        eventType,
+        timestamp: new Date().toISOString(),
+        metadata: {
+          userAgent: navigator.userAgent,
+          platform: navigator.platform,
+          language: navigator.language,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          isOnline: navigator.onLine,
+          deviceMemory: navigator.deviceMemory || "unknown",
+          connection: navigator.connection?.effectiveType || "unknown",
+        },
+      }),
+    });
+  }
 
   switch (action) {
     case "confirm-logistic":
-      const payloadMetric = {
-        id: Number(metadata.id),
-        notifiedUserId: Number(metadata.notifiedUserId),
-        visibleAt,
-        eventType: "PUSH_RECEIVED",
-      };
-
-      const url = `${metadata.publicBackendUrl}/reception-process/notify-metric`;
-
-      function notifyMetric() {
-        return fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payloadMetric),
-        });
-      }
       event.waitUntil(
         Promise.all([
           (async () => {
@@ -66,7 +83,7 @@ self.handleNotificationClick = (event) => {
 
                 // mandar datos a la app
                 client.postMessage({
-                  type: "PIPA_NOTIFICATION",
+                  type: "confirm-logistic-clicked",
                   data: event.notification.data,
                 });
 
@@ -76,7 +93,7 @@ self.handleNotificationClick = (event) => {
             // 2️⃣ Si no existe, abrir nueva
             await clients.openWindow(targetUrl);
           })(),
-          notifyMetric(),
+          notifyMetric("ACTION_CLICKED_CONFIRM"),
         ]),
       );
       break;
@@ -89,6 +106,7 @@ self.handleNotificationClick = (event) => {
       // Lógica para manejar el clic en la notificación sin seleccionar una acción específica
       console.log("Usuario hizo clic en la notificación");
       // Aquí puedes realizar cualquier acción adicional, como abrir una URL o enviar un mensaje al cliente
+      event.waitUntil(notifyMetric("NOTIFICATION_CLICKED_NOT_ACTION"));
       break;
   }
 

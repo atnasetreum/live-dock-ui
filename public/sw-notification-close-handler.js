@@ -1,4 +1,8 @@
 self.handleNotificationClose = (event) => {
+  if (self.cancelNotificationExpiration) {
+    self.cancelNotificationExpiration(event.notification.tag);
+  }
+
   const data = event.notification.data;
 
   const closedAt = Date.now();
