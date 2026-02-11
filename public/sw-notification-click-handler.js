@@ -9,7 +9,8 @@ self.handleNotificationClick = (event) => {
 
   const metadata = event.notification.data || {};
 
-  const { id, notifiedUserId, visibleAt, eventTime } = metadata;
+  const { id, notifiedUserId, publicBackendUrl, visibleAt, eventTime } =
+    metadata;
 
   const accionAt = Date.now();
 
@@ -19,8 +20,8 @@ self.handleNotificationClick = (event) => {
 
   //Tiempo atraso = visibleAt - eventAt
   const eventAt = new Date(eventTime).getTime();
-  const atrasoTimeMs = visibleAt - eventAt;
-  const systemDelaySec = Math.floor(atrasoTimeMs / 1000);
+  const delayTimeMs = visibleAt - eventAt;
+  const systemDelaySec = Math.floor(delayTimeMs / 1000);
 
   const totalTimeSec = reactionTimeSec + systemDelaySec;
 
@@ -30,37 +31,6 @@ self.handleNotificationClick = (event) => {
     systemDelaySec,
     totalTimeSec,
   });
-
-  const url = `${metadata.publicBackendUrl}/reception-process/notify-metric`;
-
-  function notifyMetric(eventType) {
-    return fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id,
-        reactionTimeSec,
-        accionAt: new Date(accionAt).toISOString(),
-        systemDelaySec,
-        notifiedUserId,
-        visibleAt,
-        eventTime,
-        eventType,
-        timestamp: new Date().toISOString(),
-        metadata: {
-          userAgent: navigator.userAgent,
-          platform: navigator.platform,
-          language: navigator.language,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          isOnline: navigator.onLine,
-          deviceMemory: navigator.deviceMemory || "unknown",
-          connection: navigator.connection?.effectiveType || "unknown",
-        },
-      }),
-    });
-  }
 
   switch (action) {
     case "confirm-logistic":
@@ -93,7 +63,16 @@ self.handleNotificationClick = (event) => {
             // 2️⃣ Si no existe, abrir nueva
             await clients.openWindow(targetUrl);
           })(),
-          notifyMetric("ACTION_CLICKED_CONFIRM"),
+          self.notifyMetric({
+            id,
+            publicBackendUrl,
+            reactionTimeSec,
+            accionAt: new Date(accionAt).toISOString(),
+            systemDelaySec,
+            notifiedUserId,
+            visibleAt,
+            eventType: "ACTION_CLICKED_CONFIRM",
+          }),
         ]),
       );
       break;
@@ -106,7 +85,18 @@ self.handleNotificationClick = (event) => {
       // Lógica para manejar el clic en la notificación sin seleccionar una acción específica
       console.log("Usuario hizo clic en la notificación");
       // Aquí puedes realizar cualquier acción adicional, como abrir una URL o enviar un mensaje al cliente
-      event.waitUntil(notifyMetric("NOTIFICATION_CLICKED_NOT_ACTION"));
+      event.waitUntil(
+        self.notifyMetric({
+          id,
+          publicBackendUrl,
+          reactionTimeSec,
+          accionAt: new Date(accionAt).toISOString(),
+          systemDelaySec,
+          notifiedUserId,
+          visibleAt,
+          eventType: "NOTIFICATION_CLICKED_NOT_ACTION",
+        }),
+      );
       break;
   }
 

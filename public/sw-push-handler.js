@@ -81,35 +81,36 @@ self.handlePush = (event) => {
     timestamp: new Date(eventTime).getTime(),
   };
 
-  const url = `${metadata.publicBackendUrl}/reception-process/notify-metric`;
-
-  function notifyMetric(eventType) {
-    return fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: Number(metadata.id),
-        notifiedUserId: Number(metadata.notifiedUserId),
-        visibleAt,
-        eventType,
-      }),
-    });
-  }
+  const publicBackendUrl = metadata.publicBackendUrl;
 
   const expirationPromise = new Promise((resolve) => {
     const timerId = setTimeout(() => {
       notificationExpirations.delete(tagId);
-      notifyMetric("EXPIRED").finally(resolve);
+      self
+        .notifyMetric({
+          id: Number(metadata.id),
+          publicBackendUrl,
+          notifiedUserId: Number(metadata.notifiedUserId),
+          visibleAt,
+          eventType: "EXPIRED",
+        })
+        .finally(resolve);
     }, NOTIFICATION_EXPIRE_MS);
     notificationExpirations.set(tagId, { timerId, resolve });
   });
 
+  console.log({ options });
+
   event.waitUntil(
     Promise.all([
       self.registration.showNotification(title, options),
-      notifyMetric("NOTIFICATION_SHOWN"),
+      self.notifyMetric({
+        id: Number(metadata.id),
+        publicBackendUrl,
+        notifiedUserId: Number(metadata.notifiedUserId),
+        visibleAt,
+        eventType: "NOTIFICATION_SHOWN",
+      }),
       expirationPromise,
     ]),
   );

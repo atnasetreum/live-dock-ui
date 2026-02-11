@@ -1,3 +1,4 @@
+importScripts("/sw-client-info.js");
 importScripts("/sw-push-handler.js");
 importScripts("/sw-notification-click-handler.js");
 importScripts("/sw-notification-close-handler.js");
