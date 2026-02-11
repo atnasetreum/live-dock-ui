@@ -43,7 +43,7 @@ self.getClientInfo = async () => {
   }
 };
 
-self.notifyMetric = async ({ publicBackendUrl, ...payload }) => {
+self.notifyMetric = async ({ publicBackendUrl, appKey, ...payload }) => {
   const url = `${publicBackendUrl}/reception-process/notify-metric`;
 
   const clientInfo = await self.getClientInfo();
@@ -63,6 +63,7 @@ self.notifyMetric = async ({ publicBackendUrl, ...payload }) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "x-app-key": appKey,
     },
     body: JSON.stringify({
       ...payload,

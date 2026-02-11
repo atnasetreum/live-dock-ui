@@ -9,7 +9,7 @@ self.handleNotificationClick = (event) => {
 
   const metadata = event.notification.data || {};
 
-  const { id, notifiedUserId, publicBackendUrl, visibleAt, eventTime } =
+  const { id, notifiedUserId, publicBackendUrl, visibleAt, eventTime, appKey } =
     metadata;
 
   const accionAt = Date.now();
@@ -23,14 +23,19 @@ self.handleNotificationClick = (event) => {
   const delayTimeMs = visibleAt - eventAt;
   const systemDelaySec = Math.floor(delayTimeMs / 1000);
 
-  const totalTimeSec = reactionTimeSec + systemDelaySec;
+  //const totalTimeSec = reactionTimeSec + systemDelaySec;
 
-  console.log({
+  const payloadDefault = {
     id,
+    publicBackendUrl,
+    appKey,
     reactionTimeSec,
+    accionAt: new Date(accionAt).toISOString(),
     systemDelaySec,
-    totalTimeSec,
-  });
+    notifiedUserId,
+    visibleAt,
+    eventType: "ACTION_CLICKED_CONFIRM",
+  };
 
   switch (action) {
     case "confirm-logistic":
@@ -64,13 +69,7 @@ self.handleNotificationClick = (event) => {
             await clients.openWindow(targetUrl);
           })(),
           self.notifyMetric({
-            id,
-            publicBackendUrl,
-            reactionTimeSec,
-            accionAt: new Date(accionAt).toISOString(),
-            systemDelaySec,
-            notifiedUserId,
-            visibleAt,
+            ...payloadDefault,
             eventType: "ACTION_CLICKED_CONFIRM",
           }),
         ]),
@@ -87,13 +86,7 @@ self.handleNotificationClick = (event) => {
       // Aquí puedes realizar cualquier acción adicional, como abrir una URL o enviar un mensaje al cliente
       event.waitUntil(
         self.notifyMetric({
-          id,
-          publicBackendUrl,
-          reactionTimeSec,
-          accionAt: new Date(accionAt).toISOString(),
-          systemDelaySec,
-          notifiedUserId,
-          visibleAt,
+          ...payloadDefault,
           eventType: "NOTIFICATION_CLICKED_NOT_ACTION",
         }),
       );

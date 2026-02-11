@@ -81,17 +81,20 @@ self.handlePush = (event) => {
     timestamp: new Date(eventTime).getTime(),
   };
 
-  const publicBackendUrl = metadata.publicBackendUrl;
+  const payloadDefault = {
+    id: Number(metadata.id),
+    publicBackendUrl: metadata.publicBackendUrl,
+    notifiedUserId: Number(metadata.notifiedUserId),
+    appKey: metadata.appKey,
+    visibleAt,
+  };
 
   const expirationPromise = new Promise((resolve) => {
     const timerId = setTimeout(() => {
       notificationExpirations.delete(tagId);
       self
         .notifyMetric({
-          id: Number(metadata.id),
-          publicBackendUrl,
-          notifiedUserId: Number(metadata.notifiedUserId),
-          visibleAt,
+          ...payloadDefault,
           eventType: "EXPIRED",
         })
         .finally(resolve);
@@ -99,15 +102,11 @@ self.handlePush = (event) => {
     notificationExpirations.set(tagId, { timerId, resolve });
   });
 
-  console.log({ options });
-
   event.waitUntil(
     Promise.all([
       self.registration.showNotification(title, options),
       self.notifyMetric({
-        id: Number(metadata.id),
-        publicBackendUrl,
-        notifiedUserId: Number(metadata.notifiedUserId),
+        ...payloadDefault,
         visibleAt,
         eventType: "NOTIFICATION_SHOWN",
       }),
