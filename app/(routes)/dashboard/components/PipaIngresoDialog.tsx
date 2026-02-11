@@ -7,6 +7,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   Typography,
 } from "@mui/material";
@@ -17,15 +21,19 @@ import { useThemeConfig } from "@/theme/ThemeProvider";
 type PipaIngresoDialogProps = {
   open: boolean;
   isSubmitting: boolean;
+  materialType: string;
   onClose: () => void;
   onConfirm: () => void;
+  onMaterialTypeChange: (value: string) => void;
 };
 
 const PipaIngresoDialog = ({
   open,
   isSubmitting,
+  materialType,
   onClose,
   onConfirm,
+  onMaterialTypeChange,
 }: PipaIngresoDialogProps) => {
   const { theme } = useThemeConfig();
 
@@ -84,6 +92,50 @@ const PipaIngresoDialog = ({
         <Typography sx={{ color: theme.palette.textSecondary }}>
           Esta accion creara un nuevo proceso de recepcion. Deseas continuar?
         </Typography>
+        <FormControl
+          fullWidth
+          size="small"
+          sx={{
+            mt: 2,
+            "& .MuiInputLabel-root": {
+              color: theme.palette.textSecondary,
+              backgroundColor: theme.forms.labelBackground,
+              px: 0.6,
+              borderRadius: 1,
+            },
+            "& .MuiOutlinedInput-root": {
+              backgroundColor: theme.forms.fieldBackground,
+              color: theme.forms.inputColor,
+              borderRadius: 2,
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: theme.forms.border,
+            },
+            "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: theme.forms.borderHover,
+            },
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+              {
+                borderColor: theme.forms.borderFocus,
+                boxShadow: theme.forms.focusShadow,
+              },
+          }}
+        >
+          <InputLabel id="pipa-material-type-label">
+            Tipo de material
+          </InputLabel>
+          <Select
+            labelId="pipa-material-type-label"
+            value={materialType}
+            label="Tipo de material"
+            onChange={(event) => onMaterialTypeChange(event.target.value)}
+          >
+            <MenuItem value="ALCOHOL">ALCOHOL</MenuItem>
+            <MenuItem value="AGUA">AGUA</MenuItem>
+            <MenuItem value="LESS">LESS</MenuItem>
+            <MenuItem value="COLGATE">COLGATE</MenuItem>
+          </Select>
+        </FormControl>
         <Box
           sx={{
             mt: 2,
@@ -129,7 +181,7 @@ const PipaIngresoDialog = ({
         <Button
           variant="contained"
           onClick={onConfirm}
-          disabled={isSubmitting}
+          disabled={isSubmitting || !materialType}
           fullWidth
           sx={{
             textTransform: "none",

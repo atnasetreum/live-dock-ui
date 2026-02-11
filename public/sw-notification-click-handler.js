@@ -5,9 +5,7 @@ self.handleNotificationClick = (event) => {
 
   const payload = event.notification.data || {};
 
-  console.log({ data: event.data, payload });
-
-  const { link, visibleAt, eventTime } = payload;
+  const { id, visibleAt, eventTime } = payload;
 
   const accionAt = Date.now();
 
@@ -23,53 +21,75 @@ self.handleNotificationClick = (event) => {
   const tiempoTotal = tiempoReaccionUsuario + tiempoAtrasoBackend;
 
   console.log({
-    link,
+    id,
     tiempoReaccionUsuario,
     tiempoAtrasoBackend,
     tiempoTotal,
   });
 
-  if (action === "autorizar") {
-    // Lógica para manejar la acción de autorizar
-    console.log("Usuario autorizó la acción");
-    // Aquí puedes realizar cualquier acción adicional, como abrir una URL o enviar un mensaje al cliente
-    event.waitUntil(
-      (async () => {
-        const allClients = await clients.matchAll({
-          type: "window",
-          includeUncontrolled: true,
+  switch (action) {
+    case "confirm-logistic":
+      const payloadMetric = {
+        id: Number(metadata.id),
+        notifiedUserId: Number(metadata.notifiedUserId),
+        visibleAt,
+        eventType: "PUSH_RECEIVED",
+      };
+
+      const url = `${metadata.publicBackendUrl}/reception-process/notify-metric`;
+
+      function notifyMetric() {
+        return fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payloadMetric),
         });
-
-        // URL destino
-        //const targetUrl = `/dashboard?pipa=${event.notification.data.pipaId}`;
-
-        // 1️⃣ Buscar si ya está abierta
-        for (const client of allClients) {
-          if (client.url.includes("/dashboard")) {
-            // traer al frente
-            await client.focus();
-
-            // mandar datos a la app
-            client.postMessage({
-              type: "PIPA_NOTIFICATION",
-              data: event.notification.data,
+      }
+      event.waitUntil(
+        Promise.all([
+          (async () => {
+            const allClients = await clients.matchAll({
+              type: "window",
+              includeUncontrolled: true,
             });
 
-            return;
-          }
-        }
-        // 2️⃣ Si no existe, abrir nueva
-        await clients.openWindow(link);
-      })(),
-    );
-  } else if (action === "rechazar") {
-    // Lógica para manejar la acción de rechazar
-    console.log("Usuario rechazó la acción");
-    // Aquí puedes realizar cualquier acción adicional, como abrir una URL o enviar un mensaje al cliente
-  } else {
-    // Lógica para manejar el clic en la notificación sin seleccionar una acción específica
-    console.log("Usuario hizo clic en la notificación");
-    // Aquí puedes realizar cualquier acción adicional, como abrir una URL o enviar un mensaje al cliente
+            // URL destino
+            const targetUrl = `/dashboard`;
+
+            // 1️⃣ Buscar si ya está abierta
+            for (const client of allClients) {
+              if (client.url.includes(targetUrl)) {
+                // traer al frente
+                await client.focus();
+
+                // mandar datos a la app
+                client.postMessage({
+                  type: "PIPA_NOTIFICATION",
+                  data: event.notification.data,
+                });
+
+                return;
+              }
+            }
+            // 2️⃣ Si no existe, abrir nueva
+            await clients.openWindow(targetUrl);
+          })(),
+          notifyMetric(),
+        ]),
+      );
+      break;
+    case "rechazar":
+      // Lógica para manejar la acción de rechazar
+      console.log("Usuario rechazó la acción");
+      // Aquí puedes realizar cualquier acción adicional, como abrir una URL o enviar un mensaje al cliente
+      break;
+    default:
+      // Lógica para manejar el clic en la notificación sin seleccionar una acción específica
+      console.log("Usuario hizo clic en la notificación");
+      // Aquí puedes realizar cualquier acción adicional, como abrir una URL o enviar un mensaje al cliente
+      break;
   }
 
   // Si deseas abrir una URL específica al hacer clic en la notificación, puedes usar clients.openWindow()

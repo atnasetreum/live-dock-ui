@@ -47,8 +47,8 @@ type FormState = {
 };
 
 const initialState: FormState = {
-  email: "eduardo-266@hotmail.com",
-  password: "123456",
+  email: "user-vigilancia@example.com",
+  password: "123",
 };
 
 type FormSubmitHandler = NonNullable<ComponentProps<"form">["onSubmit"]>;

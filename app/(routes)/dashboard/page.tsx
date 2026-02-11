@@ -129,6 +129,7 @@ const DashboardPage = () => {
   const [realTimeMonitor, setRealTimeMonitor] = useState(false);
   const [isPipaDialogOpen, setIsPipaDialogOpen] = useState(false);
   const [isPipaSubmitting, setIsPipaSubmitting] = useState(false);
+  const [pipaMaterialType, setPipaMaterialType] = useState("");
 
   const severityColor = (level: string) => {
     if (level === "Alta") return theme.chips.high;
@@ -155,6 +156,7 @@ const DashboardPage = () => {
 
   const handleClosePipaDialog = () => {
     if (isPipaSubmitting) return;
+    setPipaMaterialType("");
     setIsPipaDialogOpen(false);
   };
 
@@ -163,11 +165,12 @@ const DashboardPage = () => {
     setIsPipaSubmitting(true);
 
     try {
-      await receptionProcessesService.create({});
+      await receptionProcessesService.create({
+        typeOfMaterial: pipaMaterialType,
+      });
       Toast.success("Ingreso de pipa registrado.");
+      setPipaMaterialType("");
       setIsPipaDialogOpen(false);
-    } catch (error) {
-      Toast.error("No se pudo registrar el ingreso de pipa.");
     } finally {
       setIsPipaSubmitting(false);
     }
@@ -181,8 +184,10 @@ const DashboardPage = () => {
       <PipaIngresoDialog
         open={isPipaDialogOpen}
         isSubmitting={isPipaSubmitting}
+        materialType={pipaMaterialType}
         onClose={handleClosePipaDialog}
         onConfirm={handleConfirmPipaIngreso}
+        onMaterialTypeChange={setPipaMaterialType}
       />
       <Stack spacing={4}>
         <MainBanner
@@ -267,117 +272,6 @@ const DashboardPage = () => {
             ))}
           </Grid>
         </Stack>
-
-        <Paper
-          sx={{
-            borderRadius: 4,
-            p: { xs: 3, md: 4 },
-            background: theme.surfaces.panel,
-            border: `1px solid ${theme.surfaces.border}`,
-            boxShadow: theme.overlays.panelShadow,
-          }}
-        >
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            spacing={2}
-            justifyContent="space-between"
-            alignItems={{ xs: "flex-start", md: "center" }}
-            mb={3}
-          >
-            <Box>
-              <Typography
-                variant="overline"
-                sx={{ letterSpacing: 3, color: theme.palette.textSecondary }}
-              >
-                Tendencias
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 600, color: theme.palette.textPrimary }}
-              >
-                Ritmo operativo - ultimos 7 dias
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: theme.palette.textSecondary }}
-              >
-                Indicadores clave con variacion semanal.
-              </Typography>
-            </Box>
-            <Chip
-              label="Actualizado hace 2 min"
-              size="small"
-              sx={{
-                backgroundColor: theme.surfaces.translucent,
-                color: theme.palette.textPrimary,
-                fontWeight: 600,
-              }}
-            />
-          </Stack>
-          <Grid container spacing={2.5}>
-            {trendSeries.map((item) => (
-              <Grid key={item.label} size={{ xs: 12, sm: 6, lg: 3 }}>
-                <Paper
-                  sx={{
-                    p: 2.5,
-                    borderRadius: 3,
-                    background: theme.surfaces.card,
-                    border: `1px solid ${theme.surfaces.border}`,
-                    boxShadow: theme.overlays.cardShadow,
-                  }}
-                >
-                  <Stack spacing={1.5}>
-                    <Stack direction="row" justifyContent="space-between">
-                      <Typography
-                        variant="subtitle2"
-                        sx={{ color: theme.palette.textSecondary }}
-                      >
-                        {item.label}
-                      </Typography>
-                      <Chip
-                        label={item.change}
-                        size="small"
-                        sx={{
-                          backgroundColor: theme.surfaces.translucent,
-                          color: theme.palette.textPrimary,
-                          fontWeight: 600,
-                        }}
-                      />
-                    </Stack>
-                    <Typography
-                      variant="h5"
-                      sx={{ fontWeight: 600, color: theme.palette.textPrimary }}
-                    >
-                      {item.value}
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "grid",
-                        gridAutoFlow: "column",
-                        gap: 0.7,
-                        alignItems: "end",
-                        height: 48,
-                      }}
-                    >
-                      {item.series.map((point, index) => (
-                        <Box
-                          key={`${item.label}-${index}`}
-                          sx={{
-                            width: 6,
-                            height: `${point}%`,
-                            borderRadius: 999,
-                            background: theme.gradients.progress,
-                            opacity: index === item.series.length - 1 ? 1 : 0.6,
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  </Stack>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Paper>
 
         <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
           <Paper
@@ -576,6 +470,117 @@ const DashboardPage = () => {
             <ConnectedUsers />
           </Stack>
         </Stack>
+
+        <Paper
+          sx={{
+            borderRadius: 4,
+            p: { xs: 3, md: 4 },
+            background: theme.surfaces.panel,
+            border: `1px solid ${theme.surfaces.border}`,
+            boxShadow: theme.overlays.panelShadow,
+          }}
+        >
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={2}
+            justifyContent="space-between"
+            alignItems={{ xs: "flex-start", md: "center" }}
+            mb={3}
+          >
+            <Box>
+              <Typography
+                variant="overline"
+                sx={{ letterSpacing: 3, color: theme.palette.textSecondary }}
+              >
+                Tendencias
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 600, color: theme.palette.textPrimary }}
+              >
+                Ritmo operativo - ultimos 7 dias
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: theme.palette.textSecondary }}
+              >
+                Indicadores clave con variacion semanal.
+              </Typography>
+            </Box>
+            <Chip
+              label="Actualizado hace 2 min"
+              size="small"
+              sx={{
+                backgroundColor: theme.surfaces.translucent,
+                color: theme.palette.textPrimary,
+                fontWeight: 600,
+              }}
+            />
+          </Stack>
+          <Grid container spacing={2.5}>
+            {trendSeries.map((item) => (
+              <Grid key={item.label} size={{ xs: 12, sm: 6, lg: 3 }}>
+                <Paper
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 3,
+                    background: theme.surfaces.card,
+                    border: `1px solid ${theme.surfaces.border}`,
+                    boxShadow: theme.overlays.cardShadow,
+                  }}
+                >
+                  <Stack spacing={1.5}>
+                    <Stack direction="row" justifyContent="space-between">
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ color: theme.palette.textSecondary }}
+                      >
+                        {item.label}
+                      </Typography>
+                      <Chip
+                        label={item.change}
+                        size="small"
+                        sx={{
+                          backgroundColor: theme.surfaces.translucent,
+                          color: theme.palette.textPrimary,
+                          fontWeight: 600,
+                        }}
+                      />
+                    </Stack>
+                    <Typography
+                      variant="h5"
+                      sx={{ fontWeight: 600, color: theme.palette.textPrimary }}
+                    >
+                      {item.value}
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridAutoFlow: "column",
+                        gap: 0.7,
+                        alignItems: "end",
+                        height: 48,
+                      }}
+                    >
+                      {item.series.map((point, index) => (
+                        <Box
+                          key={`${item.label}-${index}`}
+                          sx={{
+                            width: 6,
+                            height: `${point}%`,
+                            borderRadius: 999,
+                            background: theme.gradients.progress,
+                            opacity: index === item.series.length - 1 ? 1 : 0.6,
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Stack>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        </Paper>
       </Stack>
     </>
   );

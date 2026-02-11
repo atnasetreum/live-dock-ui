@@ -11,25 +11,27 @@ const IMAGES = {
   rejected: {
     image: `${ROOT_IMG_FOLDER}/image-rejected.png`,
   },
+  waiting: {
+    image: `${ROOT_IMG_FOLDER}/image-waiting.png`,
+  },
 };
 
 self.handlePush = (event) => {
   const data = event.data ? event.data.json() : {};
 
-  const title = data.title ?? "Notificación de Live Dock";
-  const body = data.body ?? "¡Tienes una nueva notificación!";
+  const title = data?.title ?? "Notificación de Live Dock";
+  const body = data?.body ?? "¡Tienes una nueva notificación!";
+  const typeNotification = data?.typeNotification ?? "warning";
+  const tagId = data?.tagId ?? "live-dock-notification";
+  const lang = data?.lang ?? "es-MX";
+  const timestamp = data?.timestamp ?? 1 * 1000; // 3 segundos, en milisegundos
+  const vibrate = data?.vibrate ?? [];
+  const eventTime = data?.eventTime;
+  const requireInteraction = data?.requireInteraction ?? true;
+  const actions = data?.actions ?? [];
+  const metadata = data?.data ?? {};
 
-  const typeNotification = data.typeNotification ?? "warning";
-  const tagId = data.tagId ?? "live-dock-notification";
-
-  const lang = data.lang ?? "es-MX";
-  const timestamp = data.timestamp ?? 1 * 1000; // 3 segundos, en milisegundos
-  const vibrate = data.vibrate ?? [200, 100, 200, 100, 400];
-  const eventTime = data.eventTime;
-
-  const llegaPipa = [200];
-
-  const aprobacionCalidad = [100, 50, 100];
+  /* const aprobacionCalidad = [100, 50, 100];
 
   const rechazoCalidad = [300, 100, 300, 100, 300];
 
@@ -37,46 +39,52 @@ self.handlePush = (event) => {
     ? llegaPipa
     : aprobacionCalidad
       ? rechazoCalidad
-      : vibrate;
+      : vibrate; */
+
+  const visibleAt = Date.now();
 
   const options = {
     body: `${body} \n Fecha del evento: ${new Date(eventTime).toLocaleString("es-MX")}`,
     image: IMAGES[typeNotification]?.image,
-    //tag: tagId,
+    tag: tagId,
     data: {
-      link: data.link ?? "http://localhost:3000/dashboard", // Puedes incluir cualquier dato adicional que necesites para manejar la notificación
-      visibleAt: Date.now(),
+      ...metadata,
+      visibleAt,
       eventTime,
     },
     //icon: `${ROOT_IMG_FOLDER}/confirm-icon.webp`, //IMAGES[typeNotification]?.icon,
     lang,
     timestamp,
-    vibrate: vibrateCurrent,
-    //renotify: true, // Si se recibe una nueva notificación con el mismo tag, se mostrará de nuevo y vibrará
+    vibrate,
+    renotify: true, // Si se recibe una nueva notificación con el mismo tag, se mostrará de nuevo y vibrará
     silent: false,
-    requireInteraction: true, // La notificación permanecerá visible hasta que el usuario interactúe con ella
-    actions: [
-      {
-        action: "autorizar",
-        title: "Autorizar",
-        icon: `${ROOT_IMG_FOLDER}/confirm-icon.webp`,
-      },
-      {
-        action: "rechazar",
-        title: "Rechazar",
-        icon: `${ROOT_IMG_FOLDER}/reject-icon.png`,
-      },
-    ],
+    requireInteraction,
+    actions,
     lang: "es-MX",
     timestamp: new Date(eventTime).getTime(),
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  const url = `${metadata.publicBackendUrl}/reception-process/notify-metric`;
 
-  /* event.waitUntil(
+  function notifyMetric(eventType) {
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: Number(metadata.id),
+        notifiedUserId: Number(metadata.notifiedUserId),
+        visibleAt,
+        eventType,
+      }),
+    });
+  }
+
+  event.waitUntil(
     Promise.all([
       self.registration.showNotification(title, options),
-      // cualquier otra tarea asíncrona
+      notifyMetric("NOTIFICATION_SHOWN"),
     ]),
-  ); */
+  );
 };

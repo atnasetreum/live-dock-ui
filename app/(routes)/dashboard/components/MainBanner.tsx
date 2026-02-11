@@ -12,7 +12,7 @@ import { useSocket } from "@/common/SocketProvider";
 import { disconnectSocket } from "@/libs/socket";
 import { authService } from "@/services";
 import { Toast } from "@/utils";
-import { User } from "@/types";
+import { ProcessEventRole, User } from "@/types";
 
 const statusChips = [
   { label: "Terminal activa", tone: "success" },
@@ -25,7 +25,7 @@ const MainBanner = ({
   onPipaIngreso,
 }: {
   setRealTimeMonitor: React.Dispatch<React.SetStateAction<boolean>>;
-  onPipaIngreso?: () => void;
+  onPipaIngreso: () => void;
 }) => {
   const { theme } = useThemeConfig();
   const { socket } = useSocket();
@@ -91,24 +91,26 @@ const MainBanner = ({
           </Typography>
         </Box>
         <Stack spacing={2} width={{ xs: "100%", md: "auto" }}>
-          <Button
-            variant="outlined"
-            startIcon={<LocalShippingIcon />}
-            onClick={onPipaIngreso}
-            sx={{
-              textTransform: "none",
-              fontWeight: 600,
-              minHeight: 44,
-              borderColor: theme.buttons.outlinedColor,
-              color: theme.buttons.outlinedColor,
-              "&:hover": {
+          {currentUser.role === ProcessEventRole.VIGILANCIA && (
+            <Button
+              variant="outlined"
+              startIcon={<LocalShippingIcon />}
+              onClick={onPipaIngreso}
+              sx={{
+                textTransform: "none",
+                fontWeight: 600,
+                minHeight: 44,
                 borderColor: theme.buttons.outlinedColor,
-                backgroundColor: theme.surfaces.translucent,
-              },
-            }}
-          >
-            Ingreso de pipa
-          </Button>
+                color: theme.buttons.outlinedColor,
+                "&:hover": {
+                  borderColor: theme.buttons.outlinedColor,
+                  backgroundColor: theme.surfaces.translucent,
+                },
+              }}
+            >
+              Ingreso de pipa
+            </Button>
+          )}
           <Button
             variant="contained"
             startIcon={<TimelineIcon />}
