@@ -6,11 +6,14 @@ import { Box, Button, Chip, Paper, Stack, Typography } from "@mui/material";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
 
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useSocket } from "@/common/SocketProvider";
 import { disconnectSocket } from "@/libs/socket";
 import { authService } from "@/services";
+import { webPushService } from "@/services/web-push.service";
 import { Toast } from "@/utils";
 import { ProcessEventRole, User } from "@/types";
 
@@ -30,6 +33,11 @@ const MainBanner = ({
   const { theme } = useThemeConfig();
   const { socket } = useSocket();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isPushEnabled, setIsPushEnabled] = useState(false);
+  const [isPushBusy, setIsPushBusy] = useState(false);
+  const [pushPermission, setPushPermission] = useState<
+    NotificationPermission | "unsupported"
+  >("unsupported");
 
   useEffect(() => {
     if (!socket) return undefined;
@@ -44,6 +52,97 @@ const MainBanner = ({
       socket.off("sessions:current_user", handleSessionsCurrentUser);
     };
   }, [socket]);
+
+  useEffect(() => {
+    const refreshPushStatus = async () => {
+      if (typeof window === "undefined") return;
+      if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+        setPushPermission("unsupported");
+        setIsPushEnabled(false);
+        return;
+      }
+
+      setPushPermission(Notification.permission);
+
+      if (Notification.permission !== "granted") {
+        setIsPushEnabled(false);
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      setIsPushEnabled(Boolean(subscription));
+    };
+
+    refreshPushStatus();
+  }, []);
+
+  const handleTogglePush = async () => {
+    if (isPushBusy) return;
+
+    if (typeof window === "undefined") return;
+    if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+      Toast.error("Este navegador no soporta notificaciones push.");
+      return;
+    }
+
+    setIsPushBusy(true);
+
+    try {
+      const registration = await navigator.serviceWorker.ready;
+
+      if (isPushEnabled) {
+        const subscription = await registration.pushManager.getSubscription();
+
+        if (subscription) {
+          await subscription.unsubscribe();
+        }
+
+        setIsPushEnabled(false);
+        Toast.success("Notificaciones desactivadas.");
+        return;
+      }
+
+      if (Notification.permission === "denied") {
+        Toast.error(
+          "El permiso de notificaciones esta bloqueado en el navegador.",
+        );
+        return;
+      }
+
+      let permission = Notification.permission;
+
+      if (permission !== "granted") {
+        permission = await Notification.requestPermission();
+      }
+
+      if (permission !== "granted") {
+        Toast.info("Permiso de notificaciones no concedido.");
+        return;
+      }
+
+      const existingSubscription =
+        await registration.pushManager.getSubscription();
+
+      const subscription =
+        existingSubscription ??
+        (await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: await webPushService.getPublicKey(),
+        }));
+
+      await webPushService.createSubscribe(subscription);
+
+      setIsPushEnabled(true);
+      setPushPermission("granted");
+      Toast.success("Notificaciones activadas.");
+    } catch (error) {
+      console.error("Push toggle failed:", error);
+      Toast.error("No se pudo actualizar el estado de notificaciones.");
+    } finally {
+      setIsPushBusy(false);
+    }
+  };
 
   if (!currentUser) {
     return null;
@@ -66,6 +165,40 @@ const MainBanner = ({
         alignItems={{ xs: "flex-start", md: "center" }}
       >
         <Box>
+          <Button
+            variant={isPushEnabled ? "contained" : "outlined"}
+            startIcon={
+              isPushEnabled ? (
+                <NotificationsActiveIcon />
+              ) : (
+                <NotificationsOffIcon />
+              )
+            }
+            onClick={handleTogglePush}
+            disabled={isPushBusy || pushPermission === "unsupported"}
+            sx={{
+              textTransform: "none",
+              fontWeight: 600,
+              minHeight: 44,
+              mb: 1,
+              borderColor: theme.buttons.outlinedColor,
+              color: isPushEnabled
+                ? theme.buttons.containedText
+                : theme.buttons.outlinedColor,
+              backgroundImage: isPushEnabled ? theme.gradients.primary : "none",
+              boxShadow: isPushEnabled ? theme.overlays.cardShadow : "none",
+              "&:hover": {
+                borderColor: theme.buttons.outlinedColor,
+                backgroundColor: isPushEnabled
+                  ? "transparent"
+                  : theme.surfaces.translucent,
+              },
+            }}
+          >
+            {isPushEnabled
+              ? "Notificaciones activas"
+              : "Activar notificaciones"}
+          </Button>
           <Typography
             variant="overline"
             sx={{ letterSpacing: 4, color: theme.palette.textPrimary }}
