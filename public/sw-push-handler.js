@@ -107,7 +107,6 @@ self.handlePush = (event) => {
       self.registration.showNotification(title, options),
       self.notifyMetric({
         ...payloadDefault,
-        visibleAt,
         eventType: "NOTIFICATION_SHOWN",
       }),
       expirationPromise,

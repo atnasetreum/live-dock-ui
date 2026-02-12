@@ -2,27 +2,27 @@
 
 import { useEffect, useState } from "react";
 
-import SailingIcon from "@mui/icons-material/Sailing";
-import InventoryIcon from "@mui/icons-material/Inventory";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import SailingIcon from "@mui/icons-material/Sailing";
 import {
   Box,
   Chip,
   Divider,
   Grid,
-  LinearProgress,
   Paper,
   Stack,
   Typography,
 } from "@mui/material";
 
+import ReceptionProcessTable from "./components/ReceptionProcessTable";
+import PipaIngresoDialog from "./components/PipaIngresoDialog";
 import RealTimeMonitor from "./components/RealTimeMonitor";
 import ConnectedUsers from "./components/ConnectedUsers";
 import { useThemeConfig } from "@/theme/ThemeProvider";
-import MainBanner from "./components/MainBanner";
-import PipaIngresoDialog from "./components/PipaIngresoDialog";
 import { receptionProcessesService } from "@/services";
+import MainBanner from "./components/MainBanner";
 import { Toast } from "@/utils";
 
 const stats = [
@@ -49,33 +49,6 @@ const stats = [
     value: "5 equipos",
     delta: "2 críticos",
     icon: PendingActionsIcon,
-  },
-];
-
-const operations = [
-  {
-    vessel: "MV Aurora Spirit",
-    eta: "09:20",
-    berth: "Muelle 3",
-    status: "En fondeo",
-  },
-  {
-    vessel: "MSC Lima",
-    eta: "11:45",
-    berth: "Muelle 5",
-    status: "En aproximación",
-  },
-  {
-    vessel: "Pacific Star",
-    eta: "13:30",
-    berth: "Muelle 2",
-    status: "Amarrado",
-  },
-  {
-    vessel: "Atlas Explorer",
-    eta: "17:05",
-    berth: "Muelle 1",
-    status: "Zarpando",
   },
 ];
 
@@ -276,137 +249,7 @@ const DashboardPage = () => {
         </Stack>
 
         <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
-          <Paper
-            sx={{
-              flex: 1,
-              borderRadius: 4,
-              p: { xs: 3, sm: 4 },
-              background: theme.surfaces.panel,
-              border: `1px solid ${theme.surfaces.border}`,
-              boxShadow: theme.overlays.panelShadow,
-            }}
-          >
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              mb={3}
-            >
-              <Box>
-                <Typography
-                  variant="overline"
-                  sx={{ letterSpacing: 3, color: theme.palette.textSecondary }}
-                >
-                  Movimientos
-                </Typography>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 600,
-                    color: theme.palette.textPrimary,
-                  }}
-                >
-                  Operaciones de hoy
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: theme.palette.textSecondary }}
-                >
-                  Seguimiento de buques y estado de atraque
-                </Typography>
-              </Box>
-              <Chip
-                label="Tiempo real"
-                size="small"
-                sx={{
-                  backgroundColor: theme.chips.realTime,
-                  color: theme.palette.textPrimary,
-                  fontWeight: 600,
-                }}
-              />
-            </Stack>
-            <Stack spacing={2.5}>
-              {operations.map((op) => (
-                <Box
-                  key={op.vessel}
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-                    gap: 1.5,
-                    alignItems: "center",
-                    padding: 1.5,
-                    borderRadius: 2,
-                    backgroundColor: theme.surfaces.translucent,
-                  }}
-                >
-                  <Box>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        fontWeight: 600,
-                        color: theme.palette.textPrimary,
-                      }}
-                    >
-                      {op.vessel}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: theme.palette.textSecondary }}
-                    >
-                      {op.status}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="overline"
-                      sx={{ color: theme.palette.textSecondary }}
-                    >
-                      ETA
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{ color: theme.palette.textPrimary }}
-                    >
-                      {op.eta}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="overline"
-                      sx={{ color: theme.palette.textSecondary }}
-                    >
-                      Muelle
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{ color: theme.palette.textPrimary }}
-                    >
-                      {op.berth}
-                    </Typography>
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={
-                      op.status === "Amarrado"
-                        ? 100
-                        : op.status === "Zarpando"
-                          ? 60
-                          : 35
-                    }
-                    sx={{
-                      height: 6,
-                      borderRadius: 10,
-                      backgroundColor: theme.linearProgressTrack,
-                      "& .MuiLinearProgress-bar": {
-                        borderRadius: 10,
-                        background: theme.gradients.progress,
-                      },
-                    }}
-                  />
-                </Box>
-              ))}
-            </Stack>
-          </Paper>
+          <ReceptionProcessTable />
 
           <Stack spacing={3} sx={{ width: { xs: "100%", lg: 360 } }}>
             <Paper

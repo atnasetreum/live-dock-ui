@@ -15,4 +15,11 @@ export const webPushService = {
     );
     return data;
   },
+  unsubscribe: async (subscription: PushSubscription) => {
+    const { data } = await axiosClient.post(
+      `${webPushService.baseUrl}/unsubscribe`,
+      { subscription },
+    );
+    return data;
+  },
 };

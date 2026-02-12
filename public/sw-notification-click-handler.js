@@ -9,8 +9,16 @@ self.handleNotificationClick = (event) => {
 
   const metadata = event.notification.data || {};
 
-  const { id, notifiedUserId, publicBackendUrl, visibleAt, eventTime, appKey } =
-    metadata;
+  const {
+    id,
+    notifiedUserId,
+    publicBackendUrl,
+    visibleAt,
+    eventTime,
+    appKey,
+    eventRole,
+    statusProcess,
+  } = metadata;
 
   const accionAt = Date.now();
 
@@ -34,7 +42,8 @@ self.handleNotificationClick = (event) => {
     systemDelaySec,
     notifiedUserId,
     visibleAt,
-    eventType: "ACTION_CLICKED_CONFIRM",
+    eventRole,
+    statusProcess,
   };
 
   switch (action) {

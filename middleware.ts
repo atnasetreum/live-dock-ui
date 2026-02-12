@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 
 import { headersDefault } from "./common/axiosClient";
 
+let idx = 0;
+
 export async function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const pathname = url.pathname;
@@ -18,6 +20,10 @@ export async function middleware(request: NextRequest) {
   let statusCode = 0;
   // token valido = 0
   // token invalido = 1
+
+  idx++;
+
+  console.log({ idx, url: request.url, pathname });
 
   const data = await (
     await fetch(process.env.NEXT_PUBLIC_API_URL + "/auth/check-token", {
@@ -60,6 +66,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|service-worker|sw|manifest).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|service-worker|sw|manifest|icon|push-notifications).*)",
   ],
 };

@@ -92,6 +92,7 @@ export default function MainLayout({
                   icon: "/icons/icon-192x192.png",
                   badge: "/push-notifications/badge.png",
                 });
+                window.location.reload();
               });
             })
             .catch((error) => {

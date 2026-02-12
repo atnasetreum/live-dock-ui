@@ -95,6 +95,8 @@ const MainBanner = ({
         const subscription = await registration.pushManager.getSubscription();
 
         if (subscription) {
+          // Notificar al backend antes de hacer unsubscribe
+          await webPushService.unsubscribe(subscription);
           await subscription.unsubscribe();
         }
 
@@ -110,7 +112,7 @@ const MainBanner = ({
         return;
       }
 
-      let permission = Notification.permission;
+      let permission: NotificationPermission = Notification.permission;
 
       if (permission !== "granted") {
         permission = await Notification.requestPermission();
@@ -181,6 +183,7 @@ const MainBanner = ({
               fontWeight: 600,
               minHeight: 44,
               mb: 1,
+              width: { xs: "100%", md: "auto" },
               borderColor: theme.buttons.outlinedColor,
               color: isPushEnabled
                 ? theme.buttons.containedText
@@ -199,6 +202,7 @@ const MainBanner = ({
               ? "Notificaciones activas"
               : "Activar notificaciones"}
           </Button>
+          <br />
           <Typography
             variant="overline"
             sx={{ letterSpacing: 4, color: theme.palette.textPrimary }}
