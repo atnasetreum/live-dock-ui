@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import SailingIcon from "@mui/icons-material/Sailing";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import {
   Box,
   Chip,
@@ -28,9 +28,9 @@ import { Toast } from "@/utils";
 const stats = [
   {
     label: "Arribos programados",
-    value: "18 buques",
+    value: "3 pipas",
     delta: "+3 respecto ayer",
-    icon: SailingIcon,
+    icon: LocalShippingIcon,
   },
   {
     label: "Volúmenes operados",
