@@ -1,5 +1,10 @@
 import axiosClient from "@/common/axiosClient";
-import { ReceptionProcess } from "@/types";
+import {
+  ProcessEventOption,
+  ProcessEventRole,
+  ProcessState,
+  ReceptionProcess,
+} from "@/types";
 
 export const receptionProcessesService = {
   baseUrl: "/reception-process",
@@ -21,5 +26,20 @@ export const receptionProcessesService = {
       `${receptionProcessesService.baseUrl}/${id}`,
     );
     return data;
+  },
+  changeOfStatus(payload: {
+    id: number;
+    newState: string;
+    actionRole: string;
+    nextEvent: {
+      event: ProcessEventOption;
+      statusProcess: ProcessState;
+      eventRole: ProcessEventRole;
+    };
+  }) {
+    return axiosClient.post(
+      `${receptionProcessesService.baseUrl}/change-of-status`,
+      payload,
+    );
   },
 };

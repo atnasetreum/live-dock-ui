@@ -35,3 +35,11 @@ interface Metric {
   createdAt: string;
   updatedAt: string;
 }
+
+export enum ProcessEventOption {
+  LOGISTICA_AUTORIZA_INGRESO = "LOGISTICA_AUTORIZA_INGRESO",
+}
+
+export enum ProcessState {
+  CALIDAD_PENDIENTE_DE_CONFIRMACION_DE_ANALISIS = "CALIDAD_PENDIENTE_DE_CONFIRMACION_DE_ANALISIS",
+}

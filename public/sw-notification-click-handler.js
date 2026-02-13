@@ -16,8 +16,7 @@ self.handleNotificationClick = (event) => {
     visibleAt,
     eventTime,
     appKey,
-    eventRole,
-    statusProcess,
+    nextEvent,
   } = metadata;
 
   const accionAt = Date.now();
@@ -42,12 +41,11 @@ self.handleNotificationClick = (event) => {
     systemDelaySec,
     notifiedUserId,
     visibleAt,
-    eventRole,
-    statusProcess,
+    nextEvent,
   };
 
   switch (action) {
-    case "confirm-logistic":
+    case "confirm":
       event.waitUntil(
         Promise.all([
           (async () => {
@@ -67,8 +65,11 @@ self.handleNotificationClick = (event) => {
 
                 // mandar datos a la app
                 client.postMessage({
-                  type: "confirm-logistic-clicked",
-                  data: event.notification.data,
+                  type: "confirm-clicked",
+                  data: {
+                    ...payloadDefault,
+                    metadata,
+                  },
                 });
 
                 return;

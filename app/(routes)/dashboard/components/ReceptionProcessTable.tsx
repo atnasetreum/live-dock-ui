@@ -2,26 +2,85 @@
 
 import { useEffect, useState } from "react";
 
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
   Box,
-  ButtonBase,
+  Button,
   Chip,
   Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   LinearProgress,
   Paper,
   Stack,
   Typography,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
+import { receptionProcessesService } from "@/services";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useSocket } from "@/common/SocketProvider";
-import { ReceptionProcess } from "@/types";
-import { receptionProcessesService } from "@/services";
+import { formatTime, Toast } from "@/utils";
+import {
+  ProcessEventOption,
+  ProcessEventRole,
+  ProcessState,
+  ReceptionProcess,
+  User,
+} from "@/types";
+
+interface ProcessEvent {
+  id: number;
+  event: string;
+  createdAt: string;
+}
+
+const ElapsedTimeDisplay = ({
+  events,
+  isProcessFinalized,
+}: {
+  events: ProcessEvent[];
+  isProcessFinalized: boolean;
+}) => {
+  const [elapsedTime, setElapsedTime] = useState<string>("");
+
+  useEffect(() => {
+    const calculateElapsedTime = () => {
+      if (!events || events.length === 0) return;
+
+      const firstEventTime = new Date(events[0].createdAt).getTime();
+      const lastEventTime = isProcessFinalized
+        ? new Date(events[events.length - 1].createdAt).getTime()
+        : new Date().getTime();
+      const diffMs = lastEventTime - firstEventTime;
+
+      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+      setElapsedTime(`${hours}h ${minutes}m ${seconds}s`);
+    };
+
+    calculateElapsedTime();
+    const interval = setInterval(calculateElapsedTime, 1000);
+
+    return () => clearInterval(interval);
+  }, [events, isProcessFinalized]);
+
+  return <Typography variant="caption"> {elapsedTime}</Typography>;
+};
 
 const ReceptionProcessTable = () => {
   const [data, setData] = useState<ReceptionProcess[]>([]);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [openAuthDialog, setOpenAuthDialog] = useState(false);
+  const [selectedProcessId, setSelectedProcessId] = useState<number | null>(
+    null,
+  );
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isLoadingConfirm, setIsLoadingConfirm] = useState<boolean>(false);
 
   const { theme } = useThemeConfig();
   const { socket } = useSocket();
@@ -41,10 +100,16 @@ const ReceptionProcessTable = () => {
       });
     };
 
+    const handleSessionsCurrentUser = (user: User) => {
+      setCurrentUser(user);
+    };
+
+    socket.on("sessions:current_user", handleSessionsCurrentUser);
     socket.on("reception-process:created", handleSessionsReady);
 
     return () => {
       socket.off("reception-process:created", handleSessionsReady);
+      socket.off("sessions:current_user", handleSessionsCurrentUser);
     };
   }, [socket]);
 
@@ -56,27 +121,40 @@ const ReceptionProcessTable = () => {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
-  const formatTime = (value?: string | Date | null) => {
-    if (!value) return "--";
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "--";
-    return date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const handleAuthorize = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    setSelectedProcessId(id);
+    setOpenAuthDialog(true);
   };
 
-  const formatDateTime = (value?: string | Date | null) => {
-    if (!value) return "--";
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "--";
-    return date.toLocaleString([], {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const handleConfirmAuthorize = (actionRole: string) => {
+    if (selectedProcessId !== null) {
+      setIsLoadingConfirm(true);
+      receptionProcessesService
+        .changeOfStatus({
+          id: selectedProcessId,
+          newState: "autorizada",
+          actionRole,
+          nextEvent: {
+            event: ProcessEventOption.LOGISTICA_AUTORIZA_INGRESO,
+            statusProcess:
+              ProcessState.CALIDAD_PENDIENTE_DE_CONFIRMACION_DE_ANALISIS,
+            eventRole: ProcessEventRole.LOGISTICA,
+          },
+        })
+        .then(() => {
+          setIsLoadingConfirm(false);
+          setOpenAuthDialog(false);
+          setSelectedProcessId(null);
+          Toast.success("Operación autorizada exitosamente");
+        });
+    }
+  };
+
+  const handleCloseAuthDialog = () => {
+    setOpenAuthDialog(false);
+    setSelectedProcessId(null);
+    setIsLoadingConfirm(false);
   };
 
   return (
@@ -133,6 +211,11 @@ const ReceptionProcessTable = () => {
         {data.length ? (
           data.map((receptionProcess) => {
             const isExpanded = expandedId === receptionProcess.id;
+
+            const currentStatus = receptionProcess.events?.[
+              receptionProcess.events.length - 1
+            ]?.status.replace(/_/g, " ");
+
             return (
               <Box
                 key={receptionProcess.id}
@@ -143,108 +226,132 @@ const ReceptionProcessTable = () => {
                   overflow: "hidden",
                 }}
               >
-                <ButtonBase
-                  onClick={() => toggleExpanded(receptionProcess.id)}
-                  aria-expanded={isExpanded}
-                  aria-controls={`reception-process-${receptionProcess.id}`}
+                <Box
                   sx={{
                     width: "100%",
                     textAlign: "left",
                     padding: 1.5,
-                    alignItems: "stretch",
-                    display: "block",
                     borderRadius: 2,
                     transition: "background-color 200ms ease",
+                    cursor: "pointer",
                     "&:hover": {
                       backgroundColor: theme.surfaces.panel,
                     },
+                  }}
+                  onClick={() => toggleExpanded(receptionProcess.id)}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isExpanded}
+                  aria-controls={`reception-process-${receptionProcess.id}`}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      toggleExpanded(receptionProcess.id);
+                    }
                   }}
                 >
                   <Box
                     sx={{
                       display: "grid",
-                      gridTemplateColumns:
-                        "repeat(auto-fit, minmax(140px, 1fr))",
-                      gap: 1.5,
+                      gridTemplateColumns: {
+                        xs: "1fr",
+                        sm: "minmax(140px, 1fr) minmax(200px, 1.8fr) minmax(140px, 1fr) minmax(140px, 1fr)",
+                      },
+                      gap: { xs: 1.5, sm: 2 },
                       alignItems: "center",
                     }}
                   >
                     <Box>
                       <Typography
+                        variant="caption"
+                        sx={{
+                          color: theme.palette.textSecondary,
+                          textTransform: "uppercase",
+                          letterSpacing: 0.5,
+                          fontSize: "0.7rem",
+                          display: "block",
+                          mb: 0.25,
+                        }}
+                      >
+                        Material
+                      </Typography>
+                      <Typography
                         variant="subtitle2"
                         sx={{
                           fontWeight: 600,
                           color: theme.palette.textPrimary,
+                          lineHeight: 1.4,
                         }}
                       >
                         {receptionProcess.typeOfMaterial}
                       </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ color: theme.palette.textSecondary }}
-                      >
-                        Tipo de material
-                      </Typography>
                     </Box>
                     <Box>
                       <Typography
-                        variant="subtitle2"
-                        sx={{
-                          fontWeight: 600,
-                          color: theme.palette.textPrimary,
-                        }}
-                      >
-                        {receptionProcess.events?.[
-                          receptionProcess.events.length - 1
-                        ]?.status.replace(/_/g, " ") ?? "Sin eventos"}
-                      </Typography>
-                      <Typography
                         variant="caption"
-                        sx={{ color: theme.palette.textSecondary }}
+                        sx={{
+                          color: theme.palette.textSecondary,
+                          textTransform: "uppercase",
+                          letterSpacing: 0.5,
+                          fontSize: "0.7rem",
+                          display: "block",
+                          mb: 0.25,
+                        }}
                       >
                         Estatus
                       </Typography>
-                    </Box>
-                    <Box>
                       <Typography
                         variant="subtitle2"
                         sx={{
                           fontWeight: 600,
                           color: theme.palette.textPrimary,
+                          lineHeight: 1.4,
                         }}
                       >
-                        {receptionProcess.createdBy.name}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ color: theme.palette.textSecondary }}
-                      >
-                        Creado por
+                        {currentStatus ?? "Sin eventos"}
                       </Typography>
                     </Box>
-                    <Box>
+                    <Box sx={{ display: { xs: "none", sm: "block" } }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: theme.palette.textSecondary,
+                          textTransform: "uppercase",
+                          letterSpacing: 0.5,
+                          fontSize: "0.7rem",
+                          display: "block",
+                          mb: 0.25,
+                        }}
+                      >
+                        Fecha creación
+                      </Typography>
                       <Typography
                         variant="subtitle2"
                         sx={{
                           fontWeight: 600,
                           color: theme.palette.textPrimary,
+                          lineHeight: 1.4,
                         }}
                       >
                         {formatTime(receptionProcess.createdAt)}
                       </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ color: theme.palette.textSecondary }}
-                      >
-                        Fecha de creacion
-                      </Typography>
                     </Box>
-                    <Stack direction="row" alignItems="center" spacing={1}>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                      sx={{
+                        justifyContent: {
+                          xs: "space-between",
+                          sm: "flex-start",
+                        },
+                      }}
+                    >
                       <Typography
                         variant="caption"
                         sx={{ color: theme.palette.textSecondary }}
                       >
-                        Ver detalles
+                        Ver detalles (#{receptionProcess.id})
                       </Typography>
                       <ExpandMoreIcon
                         sx={{
@@ -256,6 +363,29 @@ const ReceptionProcessTable = () => {
                         }}
                       />
                     </Stack>
+                    {currentStatus.endsWith("AUTORIZACION") &&
+                      currentUser?.role !== ProcessEventRole.LOGISTICA && ( // TODO: Cambiar !=== por ===
+                        <Button
+                          onClick={(e) =>
+                            handleAuthorize(e, receptionProcess.id)
+                          }
+                          variant="contained"
+                          size="small"
+                          fullWidth
+                          startIcon={<CheckCircleIcon />}
+                          sx={{
+                            textTransform: "none",
+                            fontSize: "0.875rem",
+                            backgroundColor: theme.palette.success?.main,
+                            gridColumn: { xs: "1 / -1", sm: "auto" },
+                            "&:hover": {
+                              backgroundColor: theme.palette.success?.dark,
+                            },
+                          }}
+                        >
+                          Autorizar
+                        </Button>
+                      )}
                     <LinearProgress
                       variant="determinate"
                       value={
@@ -277,7 +407,7 @@ const ReceptionProcessTable = () => {
                       }}
                     />
                   </Box>
-                </ButtonBase>
+                </Box>
                 <Collapse
                   in={isExpanded}
                   timeout="auto"
@@ -287,6 +417,53 @@ const ReceptionProcessTable = () => {
                 >
                   <Box sx={{ px: 1.5, pb: 1.5 }}>
                     <Stack spacing={2}>
+                      {/* Info adicional visible solo en mobile cuando expandido */}
+                      <Stack
+                        spacing={1.5}
+                        sx={{
+                          display: { xs: "flex", sm: "none" },
+                          padding: 1.5,
+                          borderRadius: 2,
+                          backgroundColor: theme.surfaces.panel,
+                          border: `1px solid ${theme.surfaces.border}`,
+                        }}
+                      >
+                        <Box>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 600,
+                              color: theme.palette.textPrimary,
+                            }}
+                          >
+                            {receptionProcess.createdBy.name}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: theme.palette.textSecondary }}
+                          >
+                            Creado por
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 600,
+                              color: theme.palette.textPrimary,
+                            }}
+                          >
+                            {formatTime(receptionProcess.createdAt)}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: theme.palette.textSecondary }}
+                          >
+                            Fecha de creación
+                          </Typography>
+                        </Box>
+                      </Stack>
+
                       <Box
                         sx={{
                           padding: 1.5,
@@ -306,6 +483,21 @@ const ReceptionProcessTable = () => {
                           >
                             Eventos
                           </Typography>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ color: theme.palette.textPrimary }}
+                          >
+                            Tiempo transcurrido:
+                            {receptionProcess.events &&
+                              receptionProcess.events.length > 0 && (
+                                <ElapsedTimeDisplay
+                                  events={receptionProcess.events}
+                                  isProcessFinalized={receptionProcess.events[
+                                    receptionProcess.events.length - 1
+                                  ]?.event.includes("FINALIZO")}
+                                />
+                              )}
+                          </Typography>
                           <Chip
                             label={`${receptionProcess.events?.length ?? 0} eventos`}
                             size="small"
@@ -322,59 +514,132 @@ const ReceptionProcessTable = () => {
                                 key={eventItem.id}
                                 sx={{
                                   display: "grid",
-                                  gridTemplateColumns:
-                                    "minmax(160px, 1.2fr) minmax(140px, 1fr) minmax(120px, 0.8fr)",
-                                  gap: 1,
-                                  alignItems: "center",
-                                  padding: 1.25,
+                                  gridTemplateColumns: {
+                                    xs: "1fr",
+                                    sm: "minmax(220px, 2fr) minmax(140px, 1fr) minmax(140px, 1fr)",
+                                  },
+                                  gap: { xs: 1.5, sm: 2 },
+                                  alignItems: "start",
+                                  padding: { xs: 1.5, sm: 2 },
                                   borderRadius: 1.5,
                                   backgroundColor: theme.surfaces.translucent,
                                 }}
                               >
+                                <Stack spacing={1}>
+                                  <Box>
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        color: theme.palette.textSecondary,
+                                        textTransform: "uppercase",
+                                        letterSpacing: 0.5,
+                                        fontSize: "0.7rem",
+                                      }}
+                                    >
+                                      Evento
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{
+                                        fontWeight: 600,
+                                        color: theme.palette.textPrimary,
+                                        mt: 0.25,
+                                        lineHeight: 1.4,
+                                      }}
+                                    >
+                                      {eventItem.event.replace(/_/g, " ")}
+                                    </Typography>
+                                  </Box>
+                                  <Box>
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        color: theme.palette.textSecondary,
+                                        textTransform: "uppercase",
+                                        letterSpacing: 0.5,
+                                        fontSize: "0.7rem",
+                                      }}
+                                    >
+                                      Estatus
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{
+                                        fontWeight: 500,
+                                        color: theme.palette.textPrimary,
+                                        mt: 0.25,
+                                      }}
+                                    >
+                                      {eventItem.status?.replace(/_/g, " ")}
+                                    </Typography>
+                                  </Box>
+                                </Stack>
                                 <Box>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      color: theme.palette.textSecondary,
+                                      textTransform: "uppercase",
+                                      letterSpacing: 0.5,
+                                      fontSize: "0.7rem",
+                                    }}
+                                  >
+                                    Responsable
+                                  </Typography>
                                   <Typography
                                     variant="body2"
                                     sx={{
-                                      fontWeight: 600,
                                       color: theme.palette.textPrimary,
+                                      mt: 0.25,
+                                      fontWeight: 500,
                                     }}
                                   >
-                                    Evento: {eventItem.event.replace(/_/g, " ")}
+                                    {eventItem.role !==
+                                      ProcessEventRole.SISTEMA &&
+                                      eventItem.createdBy.name}
                                   </Typography>
                                   <Typography
                                     variant="caption"
-                                    sx={{ color: theme.palette.textSecondary }}
+                                    sx={{
+                                      color: theme.palette.textSecondary,
+                                      mt: 0.5,
+                                      display: "block",
+                                    }}
                                   >
-                                    Estatus:{" "}
-                                    {eventItem.status?.replace(/_/g, " ")}
+                                    {eventItem.role}
                                   </Typography>
                                 </Box>
                                 <Box>
                                   <Typography
-                                    variant="body2"
-                                    sx={{ color: theme.palette.textPrimary }}
-                                  >
-                                    {eventItem.createdBy.name}
-                                  </Typography>
-                                  <Typography
                                     variant="caption"
-                                    sx={{ color: theme.palette.textSecondary }}
+                                    sx={{
+                                      color: theme.palette.textSecondary,
+                                      textTransform: "uppercase",
+                                      letterSpacing: 0.5,
+                                      fontSize: "0.7rem",
+                                    }}
                                   >
-                                    Rol: {eventItem.role}
+                                    Fecha
                                   </Typography>
-                                </Box>
-                                <Box>
                                   <Typography
                                     variant="body2"
-                                    sx={{ color: theme.palette.textPrimary }}
+                                    sx={{
+                                      color: theme.palette.textPrimary,
+                                      mt: 0.25,
+                                      fontWeight: 500,
+                                    }}
                                   >
                                     {formatTime(eventItem.createdAt)}
                                   </Typography>
                                   <Typography
                                     variant="caption"
-                                    sx={{ color: theme.palette.textSecondary }}
+                                    sx={{
+                                      color: theme.palette.textSecondary,
+                                      mt: 0.5,
+                                      display: "block",
+                                    }}
                                   >
-                                    {formatDateTime(eventItem.createdAt)}
+                                    Fecha del evento
                                   </Typography>
                                 </Box>
                               </Box>
@@ -507,6 +772,107 @@ const ReceptionProcessTable = () => {
           </Typography>
         )}
       </Stack>
+
+      {/* Dialog de Confirmación */}
+      <Dialog
+        open={openAuthDialog}
+        onClose={handleCloseAuthDialog}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            backgroundColor:
+              theme.name === "dark"
+                ? "rgba(10, 18, 50, 0.98)"
+                : "rgba(255, 255, 255, 0.99)",
+            border:
+              theme.name === "dark"
+                ? "2px solid rgba(255, 255, 255, 0.18)"
+                : `1px solid ${theme.surfaces.border}`,
+            boxShadow:
+              theme.name === "dark"
+                ? "0 0 60px rgba(0, 0, 0, 0.8), 0 25px 80px rgba(2, 7, 21, 0.7)"
+                : theme.overlays.panelShadow,
+            backgroundImage: "none",
+            minWidth: "320px",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            color: theme.palette.textPrimary,
+            fontWeight: 700,
+            fontSize: "1.35rem",
+            paddingBottom: 1,
+            borderBottom: `1px solid ${theme.surfaces.border}`,
+          }}
+        >
+          Confirmar Autorización
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            color: theme.palette.textSecondary,
+            padding: 2,
+            marginTop: 3,
+            fontSize: "0.95rem",
+            lineHeight: 1.6,
+          }}
+        >
+          ¿Estás seguro de que deseas autorizar esta operación? Esta acción no
+          puede ser revertida.
+        </DialogContent>
+        <DialogActions
+          sx={{
+            padding: 2,
+            gap: 1.5,
+            borderTop: `1px solid ${theme.surfaces.border}`,
+          }}
+        >
+          <Button
+            onClick={handleCloseAuthDialog}
+            variant="outlined"
+            sx={{
+              textTransform: "none",
+              fontSize: "0.95rem",
+              fontWeight: 500,
+              borderColor: theme.surfaces.border,
+              color: theme.palette.textSecondary,
+              px: 3,
+              "&:hover": {
+                borderColor: theme.palette.textPrimary,
+                backgroundColor: theme.surfaces.translucent,
+              },
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={() =>
+              handleConfirmAuthorize(
+                "logistica-autorizo-ingreso",
+                /* currentUser?.role === ProcessEventRole.LOGISTICA// TODO: hacer pruebas con el rol
+                  ? "logistica-autorizo-ingreso"
+                  : "calidad-autorizo-ingresoo", */
+              )
+            }
+            variant="contained"
+            startIcon={<CheckCircleIcon />}
+            disabled={isLoadingConfirm}
+            sx={{
+              textTransform: "none",
+              fontSize: "0.95rem",
+              fontWeight: 500,
+              backgroundColor: theme.palette.success?.main,
+              color: "#ffffff",
+              px: 3,
+              "&:hover": {
+                backgroundColor: theme.palette.success?.dark,
+              },
+            }}
+          >
+            Autorizar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   );
 };
