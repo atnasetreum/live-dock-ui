@@ -24,7 +24,6 @@ self.handlePush = (event) => {
   const tagId = data?.tagId ?? "live-dock-notification";
   const lang = data?.lang ?? "es-MX";
   const timestamp = data?.timestamp ?? 1 * 1000; // 3 segundos, en milisegundos
-  const requireInteraction = data?.requireInteraction ?? true;
   const actions = data?.actions ?? [];
   const metadata = data?.data ?? {};
   const visibleAt = Date.now();
@@ -34,52 +33,57 @@ self.handlePush = (event) => {
 
   self.cancelNotificationExpiration(tagId);
 
-  const options = {
-    body: `${body} \nFecha del evento: ${new Date(eventTime).toLocaleString("es-MX")}`,
+  const notificationOptions = {
+    body: `${body}\nFecha del evento: ${new Date(eventTime).toLocaleString("es-MX")}`,
     image,
     tag: tagId,
     data: {
       ...metadata,
       visibleAt,
     },
-    //icon: `${ROOT_IMG_FOLDER}/confirm-icon.webp`, //IMAGES[typeNotification]?.icon,
     lang,
     timestamp,
     vibrate: [100, 50, 100],
     renotify: true, // Si se recibe una nueva notificación con el mismo tag, se mostrará de nuevo y vibrará
+    requireInteraction: true, // La notificación permanecerá visible hasta que el usuario interactúe con ella
     silent: false,
-    requireInteraction,
     actions,
     lang: "es-MX",
     timestamp: new Date(eventTime).getTime(),
   };
 
-  const payloadDefault = {
+  const payloadMetric = {
     id: Number(metadata.id),
+    appKey: metadata.appKey,
     publicBackendUrl: metadata.publicBackendUrl,
     notifiedUserId: Number(metadata.notifiedUserId),
-    appKey: metadata.appKey,
     visibleAt,
   };
 
+  // Cuando el usuario no interactúa con la notificación, se considera que ha expirado
   const expirationPromise = new Promise((resolve) => {
-    const timerId = setTimeout(() => {
-      notificationExpirations.delete(tagId);
-      self
-        .notifyMetric({
-          ...payloadDefault,
-          eventType: "EXPIRED",
-        })
-        .finally(resolve);
-    }, NOTIFICATION_EXPIRE_MS);
-    notificationExpirations.set(tagId, { timerId, resolve });
+    if (requireInteraction) {
+      const timerId = setTimeout(() => {
+        notificationExpirations.delete(tagId);
+        self
+          .notifyMetric({
+            ...payloadMetric,
+            eventType: "EXPIRED",
+          })
+          .finally(resolve);
+      }, NOTIFICATION_EXPIRE_MS);
+      notificationExpirations.set(tagId, { timerId, resolve });
+    } else {
+      resolve();
+    }
   });
 
   event.waitUntil(
     Promise.all([
-      self.registration.showNotification(title, options),
+      self.registration.showNotification(title, notificationOptions),
+      // Cuando se muestra la notificación, se registra el evento de "NOTIFICATION_SHOWN"
       self.notifyMetric({
-        ...payloadDefault,
+        ...payloadMetric,
         eventType: "NOTIFICATION_SHOWN",
       }),
       expirationPromise,

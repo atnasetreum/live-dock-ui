@@ -19,17 +19,11 @@ import {
   Typography,
 } from "@mui/material";
 
+import { ProcessEventRole, ReceptionProcess, User } from "@/types";
 import { receptionProcessesService } from "@/services";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useSocket } from "@/common/SocketProvider";
 import { formatTime, Toast } from "@/utils";
-import {
-  ProcessEventOption,
-  ProcessEventRole,
-  ProcessState,
-  ReceptionProcess,
-  User,
-} from "@/types";
 
 interface ProcessEvent {
   id: number;
@@ -82,6 +76,7 @@ const ReceptionProcessTable = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoadingConfirm, setIsLoadingConfirm] = useState<boolean>(false);
   const [currentActionRole, setCurrentActionRole] = useState<string>("");
+  const [currentStatus, setCurrentStatus] = useState<string>("");
 
   const { theme } = useThemeConfig();
   const { socket } = useSocket();
@@ -126,35 +121,66 @@ const ReceptionProcessTable = () => {
     e: React.MouseEvent,
     id: number,
     actionRole: string,
+    currentStatus: string,
   ) => {
     e.stopPropagation();
     setSelectedProcessId(id);
     setOpenAuthDialog(true);
     setCurrentActionRole(actionRole);
+    setCurrentStatus(currentStatus);
   };
 
-  const handleConfirmAuthorize = (actionRole: string) => {
-    if (selectedProcessId !== null) {
-      setIsLoadingConfirm(true);
-      receptionProcessesService
-        .changeOfStatus({
-          id: selectedProcessId,
-          newState: "autorizada",
-          actionRole,
-          nextEvent: {
-            event: ProcessEventOption.LOGISTICA_AUTORIZA_INGRESO,
-            statusProcess:
-              ProcessState.CALIDAD_PENDIENTE_DE_CONFIRMACION_DE_ANALISIS,
-            eventRole: ProcessEventRole.LOGISTICA,
-          },
-        })
-        .then(() => {
-          setIsLoadingConfirm(false);
-          setOpenAuthDialog(false);
-          setSelectedProcessId(null);
-          Toast.success("Operación autorizada exitosamente");
-        });
+  const handleConfirmAuthorize = () => {
+    if (!selectedProcessId)
+      return Toast.error("No se ha seleccionado ningún proceso.");
+
+    if (!currentUser)
+      return Toast.error("No se ha identificado el usuario actual.");
+
+    setIsLoadingConfirm(true);
+
+    const newState =
+      currentActionRole === "autorizar" ? "autorizada" : "rechazada";
+
+    let currentRole = currentUser.role;
+    let actionRole = "";
+
+    //TODO: Eliminar esto
+    currentRole = ["LOGISTICA PENDIENTE DE AUTORIZACION"].includes(
+      currentStatus,
+    )
+      ? ProcessEventRole.LOGISTICA
+      : ProcessEventRole.CALIDAD;
+    //TODO: Eliminar esto
+
+    switch (currentRole) {
+      case ProcessEventRole.LOGISTICA:
+        if (currentStatus === "LOGISTICA PENDIENTE DE AUTORIZACION") {
+          actionRole = "logistica-autorizo-ingreso";
+        }
+        break;
+      case ProcessEventRole.CALIDAD:
+        if (currentStatus === "CALIDAD PROCESANDO") {
+          if (newState === "autorizada") {
+            actionRole = "calidad-aprobo-material";
+          } else if (newState === "rechazada") {
+            actionRole = "calidad-rechazo-material";
+          }
+        }
+        break;
     }
+
+    receptionProcessesService
+      .changeOfStatus({
+        id: selectedProcessId,
+        actionRole,
+      })
+      .then(() => {
+        setIsLoadingConfirm(false);
+        setOpenAuthDialog(false);
+        setSelectedProcessId(null);
+        Toast.success("Operación autorizada exitosamente");
+      });
   };
 
   const handleCloseAuthDialog = () => {
@@ -218,16 +244,18 @@ const ReceptionProcessTable = () => {
           data.map((receptionProcess) => {
             const isExpanded = expandedId === receptionProcess.id;
 
-            const currentStatus = receptionProcess.events?.[
+            const currentStatusRow = receptionProcess.events?.[
               receptionProcess.events.length - 1
             ]?.status.replace(/_/g, " ");
 
             const canAuthorize =
-              currentStatus?.endsWith("AUTORIZACION") &&
+              currentStatusRow?.endsWith("AUTORIZACION") &&
               currentUser?.role !== ProcessEventRole.LOGISTICA; // TODO: Cambiar !=== por ===
+
             const canDecision =
-              currentStatus?.endsWith("PROCESANDO") &&
+              currentStatusRow?.endsWith("PROCESANDO") &&
               currentUser?.role !== ProcessEventRole.CALIDAD; // TODO: Cambiar !=== por ===
+
             const hasActions = canAuthorize || canDecision;
 
             return (
@@ -322,7 +350,7 @@ const ReceptionProcessTable = () => {
                           lineHeight: 1.4,
                         }}
                       >
-                        {currentStatus ?? "Sin eventos"}
+                        {currentStatusRow ?? "Sin eventos"}
                       </Typography>
                     </Box>
                     <Box sx={{ display: { xs: "none", sm: "block" } }}>
@@ -401,6 +429,7 @@ const ReceptionProcessTable = () => {
                                   e,
                                   receptionProcess.id,
                                   "rechazar",
+                                  currentStatusRow,
                                 )
                               }
                               variant="contained"
@@ -428,6 +457,7 @@ const ReceptionProcessTable = () => {
                                   e,
                                   receptionProcess.id,
                                   "autorizar",
+                                  currentStatusRow,
                                 )
                               }
                               variant="contained"
@@ -552,14 +582,14 @@ const ReceptionProcessTable = () => {
                             variant="subtitle2"
                             sx={{ color: theme.palette.textPrimary }}
                           >
-                            Tiempo transcurrido:
+                            Tiempo transcurrido
                             {receptionProcess.events &&
                               receptionProcess.events.length > 0 && (
                                 <ElapsedTimeDisplay
                                   events={receptionProcess.events}
-                                  isProcessFinalized={receptionProcess.events[
-                                    receptionProcess.events.length - 1
-                                  ]?.event.includes("FINALIZO")}
+                                  isProcessFinalized={
+                                    currentStatusRow === "FINALIZO PROCESO"
+                                  }
                                 />
                               )}
                           </Typography>
@@ -913,14 +943,7 @@ const ReceptionProcessTable = () => {
             Cancelar
           </Button>
           <Button
-            onClick={() =>
-              handleConfirmAuthorize(
-                "logistica-autorizo-ingreso",
-                /* currentUser?.role === ProcessEventRole.LOGISTICA// TODO: hacer pruebas con el rol
-                  ? "logistica-autorizo-ingreso"
-                  : "calidad-autorizo-ingresoo", */
-              )
-            }
+            onClick={() => handleConfirmAuthorize()}
             variant="contained"
             startIcon={<CheckCircleIcon />}
             disabled={isLoadingConfirm}
@@ -936,7 +959,7 @@ const ReceptionProcessTable = () => {
               },
             }}
           >
-            Autorizar
+            Confirmar
           </Button>
         </DialogActions>
       </Dialog>

@@ -48,17 +48,7 @@ self.notifyMetric = async ({ publicBackendUrl, appKey, ...payload }) => {
 
   const clientInfo = await self.getClientInfo();
 
-  const payloadMetadata =
-    payload &&
-    payload.metadata &&
-    typeof payload.metadata === "object" &&
-    !Array.isArray(payload.metadata)
-      ? payload.metadata
-      : null;
-
-  const metadata = payloadMetadata
-    ? { ...payloadMetadata, clientInfo }
-    : clientInfo;
+  delete payload.eventTime;
 
   return fetch(url, {
     method: "POST",
@@ -68,7 +58,7 @@ self.notifyMetric = async ({ publicBackendUrl, appKey, ...payload }) => {
     },
     body: JSON.stringify({
       ...payload,
-      metadata: JSON.stringify(metadata),
+      metadata: JSON.stringify(clientInfo),
     }),
   });
 };
