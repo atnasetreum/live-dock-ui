@@ -35,7 +35,7 @@ self.handlePush = (event) => {
   self.cancelNotificationExpiration(tagId);
 
   const options = {
-    body: `${body} \n Fecha del evento: ${new Date(eventTime).toLocaleString("es-MX")}`,
+    body: `${body} \nFecha del evento: ${new Date(eventTime).toLocaleString("es-MX")}`,
     image,
     tag: tagId,
     data: {

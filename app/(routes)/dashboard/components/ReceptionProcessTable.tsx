@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
   Button,
@@ -81,6 +81,7 @@ const ReceptionProcessTable = () => {
   );
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoadingConfirm, setIsLoadingConfirm] = useState<boolean>(false);
+  const [currentActionRole, setCurrentActionRole] = useState<string>("");
 
   const { theme } = useThemeConfig();
   const { socket } = useSocket();
@@ -121,10 +122,15 @@ const ReceptionProcessTable = () => {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
-  const handleAuthorize = (e: React.MouseEvent, id: number) => {
+  const handleAuthorize = (
+    e: React.MouseEvent,
+    id: number,
+    actionRole: string,
+  ) => {
     e.stopPropagation();
     setSelectedProcessId(id);
     setOpenAuthDialog(true);
+    setCurrentActionRole(actionRole);
   };
 
   const handleConfirmAuthorize = (actionRole: string) => {
@@ -215,6 +221,14 @@ const ReceptionProcessTable = () => {
             const currentStatus = receptionProcess.events?.[
               receptionProcess.events.length - 1
             ]?.status.replace(/_/g, " ");
+
+            const canAuthorize =
+              currentStatus?.endsWith("AUTORIZACION") &&
+              currentUser?.role !== ProcessEventRole.LOGISTICA; // TODO: Cambiar !=== por ===
+            const canDecision =
+              currentStatus?.endsWith("PROCESANDO") &&
+              currentUser?.role !== ProcessEventRole.CALIDAD; // TODO: Cambiar !=== por ===
+            const hasActions = canAuthorize || canDecision;
 
             return (
               <Box
@@ -348,44 +362,95 @@ const ReceptionProcessTable = () => {
                       }}
                     >
                       <Typography
-                        variant="caption"
+                        variant="inherit"
                         sx={{ color: theme.palette.textSecondary }}
                       >
-                        Ver detalles (#{receptionProcess.id})
+                        #{receptionProcess.id}
                       </Typography>
-                      <ExpandMoreIcon
-                        sx={{
-                          color: theme.palette.textSecondary,
-                          transform: isExpanded
-                            ? "rotate(180deg)"
-                            : "rotate(0deg)",
-                          transition: "transform 200ms ease",
-                        }}
-                      />
                     </Stack>
-                    {currentStatus.endsWith("AUTORIZACION") &&
-                      currentUser?.role !== ProcessEventRole.LOGISTICA && ( // TODO: Cambiar !=== por ===
-                        <Button
-                          onClick={(e) =>
-                            handleAuthorize(e, receptionProcess.id)
-                          }
-                          variant="contained"
-                          size="small"
-                          fullWidth
-                          startIcon={<CheckCircleIcon />}
+                    <Box
+                      sx={{
+                        gridColumn: "1 / -1",
+                        display: "flex",
+                        justifyContent: {
+                          xs: "stretch",
+                          sm: "flex-end",
+                        },
+                        alignItems: "center",
+                        gap: 1,
+                        minHeight: { xs: 44, sm: 36 },
+                      }}
+                    >
+                      {hasActions && (
+                        <Stack
+                          direction={{ xs: "column", sm: "row" }}
+                          spacing={1}
                           sx={{
-                            textTransform: "none",
-                            fontSize: "0.875rem",
-                            backgroundColor: theme.palette.success?.main,
-                            gridColumn: { xs: "1 / -1", sm: "auto" },
-                            "&:hover": {
-                              backgroundColor: theme.palette.success?.dark,
+                            width: { xs: "100%", sm: "auto" },
+                            justifyContent: {
+                              xs: "stretch",
+                              sm: "flex-end",
                             },
+                            alignItems: "stretch",
                           }}
                         >
-                          Autorizar
-                        </Button>
+                          {canDecision && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "rechazar",
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<CloseIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.error?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.error?.dark,
+                                },
+                              }}
+                            >
+                              Rechazar
+                            </Button>
+                          )}
+                          {(canAuthorize || canDecision) && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "autorizar",
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<CheckCircleIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.success?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.success?.dark,
+                                },
+                              }}
+                            >
+                              {canAuthorize ? "Autorizar" : "Aprobar"}
+                            </Button>
+                          )}
+                        </Stack>
                       )}
+                    </Box>
                     <LinearProgress
                       variant="determinate"
                       value={
@@ -773,7 +838,7 @@ const ReceptionProcessTable = () => {
         )}
       </Stack>
 
-      {/* Dialog de Confirmación */}
+      {/* Dialog de Acción */}
       <Dialog
         open={openAuthDialog}
         onClose={handleCloseAuthDialog}
@@ -806,7 +871,8 @@ const ReceptionProcessTable = () => {
             borderBottom: `1px solid ${theme.surfaces.border}`,
           }}
         >
-          Confirmar Autorización
+          Confirmar{" "}
+          {currentActionRole === "autorizar" ? "autorización" : "rechazo"}
         </DialogTitle>
         <DialogContent
           sx={{
@@ -817,8 +883,9 @@ const ReceptionProcessTable = () => {
             lineHeight: 1.6,
           }}
         >
-          ¿Estás seguro de que deseas autorizar esta operación? Esta acción no
-          puede ser revertida.
+          ¿Estás seguro de que deseas{" "}
+          <b>{currentActionRole === "autorizar" ? "autorizar" : "rechazar"}</b>{" "}
+          esta operación? Esta acción no puede ser revertida.
         </DialogContent>
         <DialogActions
           sx={{

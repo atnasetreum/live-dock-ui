@@ -22,6 +22,10 @@ export type ThemeTokens = {
       main: string;
       dark: string;
     };
+    error?: {
+      main: string;
+      dark: string;
+    };
   };
   surfaces: {
     card: string;
@@ -79,6 +83,10 @@ export const darkTheme: ThemeTokens = {
     success: {
       main: "#4caf50",
       dark: "#388e3c",
+    },
+    error: {
+      main: "#f44336",
+      dark: "#d32f2f",
     },
   },
   surfaces: {
@@ -153,6 +161,10 @@ export const lightTheme: ThemeTokens = {
     success: {
       main: "#66bb6a",
       dark: "#2e7d32",
+    },
+    error: {
+      main: "#ef5350",
+      dark: "#c62828",
     },
   },
   surfaces: {
