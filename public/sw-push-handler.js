@@ -28,8 +28,9 @@ self.handlePush = (event) => {
   const metadata = data?.data ?? {};
   const visibleAt = Date.now();
   const image = data?.image ? `${ROOT_IMG_FOLDER}/${data.image}` : undefined;
+  const requireInteraction = data?.requireInteraction === true;
 
-  const { eventTime } = metadata;
+  const { eventTime, actionConfirm } = metadata;
 
   self.cancelNotificationExpiration(tagId);
 
@@ -45,7 +46,7 @@ self.handlePush = (event) => {
     timestamp,
     vibrate: [100, 50, 100],
     renotify: true, // Si se recibe una nueva notificación con el mismo tag, se mostrará de nuevo y vibrará
-    requireInteraction: true, // La notificación permanecerá visible hasta que el usuario interactúe con ella
+    requireInteraction, // La notificación permanecerá visible hasta que el usuario interactúe con ella
     silent: false,
     actions,
     lang: "es-MX",
@@ -58,12 +59,15 @@ self.handlePush = (event) => {
     publicBackendUrl: metadata.publicBackendUrl,
     notifiedUserId: Number(metadata.notifiedUserId),
     visibleAt,
+    actionConfirm: actionConfirm || "no-action",
   };
 
   // Cuando el usuario no interactúa con la notificación, se considera que ha expirado
   const expirationPromise = new Promise((resolve) => {
     if (requireInteraction) {
       const timerId = setTimeout(() => {
+        console.log("[EXPIRED] Vuelve a notificar al usuario");
+
         notificationExpirations.delete(tagId);
         self
           .notifyMetric({

@@ -8,11 +8,11 @@ export interface ReceptionProcess {
   createdBy: User;
   createdAt: string;
   updatedAt: string;
-  events: Event[];
+  events: EventData[];
   metrics: Metric[];
 }
 
-interface Event {
+export interface EventData {
   id: number;
   status: string;
   event: string;

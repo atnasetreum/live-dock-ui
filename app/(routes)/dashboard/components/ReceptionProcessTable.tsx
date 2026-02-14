@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import {
   Box,
   Button,
@@ -19,7 +20,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { ProcessEventRole, ReceptionProcess, User } from "@/types";
+import { EventData, ProcessEventRole, ReceptionProcess, User } from "@/types";
 import { receptionProcessesService } from "@/services";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useSocket } from "@/common/SocketProvider";
@@ -121,13 +122,13 @@ const ReceptionProcessTable = () => {
     e: React.MouseEvent,
     id: number,
     actionRole: string,
-    currentStatus: string,
+    currentStatusRow: string,
   ) => {
     e.stopPropagation();
     setSelectedProcessId(id);
     setOpenAuthDialog(true);
     setCurrentActionRole(actionRole);
-    setCurrentStatus(currentStatus);
+    setCurrentStatus(currentStatusRow);
   };
 
   const handleConfirmAuthorize = () => {
@@ -146,17 +147,26 @@ const ReceptionProcessTable = () => {
     let actionRole = "";
 
     //TODO: Eliminar esto
-    currentRole = ["LOGISTICA PENDIENTE DE AUTORIZACION"].includes(
-      currentStatus,
-    )
+    currentRole = [
+      "LOGISTICA PENDIENTE DE AUTORIZACION",
+      "LOGISTICA PENDIENTE DE CAPTURA PESO SAP",
+    ].includes(currentStatus)
       ? ProcessEventRole.LOGISTICA
-      : ProcessEventRole.CALIDAD;
+      : ["PRODUCCION PENDIENTE DE DESCARGA", "PRODUCCION DESCARGANDO"].includes(
+            currentStatus,
+          )
+        ? ProcessEventRole.PRODUCCION
+        : ProcessEventRole.CALIDAD;
     //TODO: Eliminar esto
 
     switch (currentRole) {
       case ProcessEventRole.LOGISTICA:
         if (currentStatus === "LOGISTICA PENDIENTE DE AUTORIZACION") {
           actionRole = "logistica-autorizo-ingreso";
+        } else if (
+          currentStatus === "LOGISTICA PENDIENTE DE CAPTURA PESO SAP"
+        ) {
+          actionRole = "logistica-capturo-peso-sap";
         }
         break;
       case ProcessEventRole.CALIDAD:
@@ -166,6 +176,15 @@ const ReceptionProcessTable = () => {
           } else if (newState === "rechazada") {
             actionRole = "calidad-rechazo-material";
           }
+        } else if (currentStatus === "CALIDAD PENDIENTE LIBERACION EN SAP") {
+          actionRole = "calidad-libero-sap";
+        }
+        break;
+      case ProcessEventRole.PRODUCCION:
+        if (currentStatus === "PRODUCCION PENDIENTE DE DESCARGA") {
+          actionRole = "produccion-descargando";
+        } else if (currentStatus === "PRODUCCION DESCARGANDO") {
+          actionRole = "descargado";
         }
         break;
     }
@@ -179,7 +198,7 @@ const ReceptionProcessTable = () => {
         setIsLoadingConfirm(false);
         setOpenAuthDialog(false);
         setSelectedProcessId(null);
-        Toast.success("Operación autorizada exitosamente");
+        Toast.success("Acción realizada con éxito.");
       });
   };
 
@@ -187,6 +206,15 @@ const ReceptionProcessTable = () => {
     setOpenAuthDialog(false);
     setSelectedProcessId(null);
     setIsLoadingConfirm(false);
+  };
+
+  const calculateProgress = (events: EventData[]): number => {
+    if (!events || events.length === 0) return 0;
+
+    const eventCount = events.length;
+    const maxEvents = 12;
+
+    return Math.min((eventCount / maxEvents) * 100, 100);
   };
 
   return (
@@ -256,7 +284,34 @@ const ReceptionProcessTable = () => {
               currentStatusRow?.endsWith("PROCESANDO") &&
               currentUser?.role !== ProcessEventRole.CALIDAD; // TODO: Cambiar !=== por ===
 
-            const hasActions = canAuthorize || canDecision;
+            const canDownload =
+              currentStatusRow?.endsWith("PENDIENTE DE DESCARGA") &&
+              currentUser?.role !== ProcessEventRole.PRODUCCION; // TODO: Cambiar !=== por ===
+
+            const canEndDownload =
+              currentStatusRow?.endsWith("PRODUCCION DESCARGANDO") &&
+              currentUser?.role !== ProcessEventRole.PRODUCCION; // TODO: Cambiar !=== por ===
+
+            const canCaptureWeight =
+              currentStatusRow?.endsWith(
+                "LOGISTICA PENDIENTE DE CAPTURA PESO SAP",
+              ) && currentUser?.role !== ProcessEventRole.LOGISTICA; // TODO: Cambiar !=== por ===
+
+            const canRelease =
+              currentStatusRow?.includes("PENDIENTE LIBERACION") &&
+              currentUser?.role !== ProcessEventRole.CALIDAD; // TODO: Cambiar !=== por ===
+
+            const hasActions =
+              canAuthorize ||
+              canDecision ||
+              canDownload ||
+              canEndDownload ||
+              canCaptureWeight ||
+              canRelease;
+
+            const progressValue = currentStatusRow?.includes("FINALIZO")
+              ? 100
+              : calculateProgress(receptionProcess.events);
 
             return (
               <Box
@@ -478,18 +533,124 @@ const ReceptionProcessTable = () => {
                               {canAuthorize ? "Autorizar" : "Aprobar"}
                             </Button>
                           )}
+                          {canDownload && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "descargando",
+                                  currentStatusRow,
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<PriorityHighIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.warning?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.warning?.dark,
+                                },
+                              }}
+                            >
+                              Notificar inicio de descarga
+                            </Button>
+                          )}
+                          {canEndDownload && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "descargado",
+                                  currentStatusRow,
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<PriorityHighIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.success?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.success?.dark,
+                                },
+                              }}
+                            >
+                              Notificar descarga completada
+                            </Button>
+                          )}
+                          {canCaptureWeight && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "captura-peso-sap",
+                                  currentStatusRow,
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<PriorityHighIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.success?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.success?.dark,
+                                },
+                              }}
+                            >
+                              Notificar peso capturado en SAP
+                            </Button>
+                          )}
+                          {canRelease && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "liberar-sap",
+                                  currentStatusRow,
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<PriorityHighIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.success?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.success?.dark,
+                                },
+                              }}
+                            >
+                              Notificar liberación de SAP
+                            </Button>
+                          )}
                         </Stack>
                       )}
                     </Box>
                     <LinearProgress
                       variant="determinate"
-                      value={
-                        receptionProcess.status === "Amarrado"
-                          ? 100
-                          : receptionProcess.status === "Zarpando"
-                            ? 60
-                            : 35
-                      }
+                      value={progressValue}
                       sx={{
                         gridColumn: "1 / -1",
                         height: 6,
@@ -497,7 +658,12 @@ const ReceptionProcessTable = () => {
                         backgroundColor: theme.linearProgressTrack,
                         "& .MuiLinearProgress-bar": {
                           borderRadius: 10,
-                          background: theme.gradients.progress,
+                          background:
+                            progressValue < 33
+                              ? theme.palette.error?.main
+                              : progressValue < 66
+                                ? theme.palette.warning?.main
+                                : theme.palette.success?.main,
                         },
                       }}
                     />
@@ -587,9 +753,9 @@ const ReceptionProcessTable = () => {
                               receptionProcess.events.length > 0 && (
                                 <ElapsedTimeDisplay
                                   events={receptionProcess.events}
-                                  isProcessFinalized={
-                                    currentStatusRow === "FINALIZO PROCESO"
-                                  }
+                                  isProcessFinalized={currentStatusRow.includes(
+                                    "FINALIZO",
+                                  )}
                                 />
                               )}
                           </Typography>
@@ -734,7 +900,39 @@ const ReceptionProcessTable = () => {
                                       display: "block",
                                     }}
                                   >
-                                    Fecha del evento
+                                    {eventItem.id > 0 && receptionProcess.events
+                                      ? (() => {
+                                          const currentIndex =
+                                            receptionProcess.events.findIndex(
+                                              (e) => e.id === eventItem.id,
+                                            );
+                                          if (currentIndex > 0) {
+                                            const prevEvent =
+                                              receptionProcess.events[
+                                                currentIndex - 1
+                                              ];
+                                            const prevTime = new Date(
+                                              prevEvent.createdAt,
+                                            ).getTime();
+                                            const currTime = new Date(
+                                              eventItem.createdAt,
+                                            ).getTime();
+                                            const diffMs = currTime - prevTime;
+                                            const hours = Math.floor(
+                                              diffMs / (1000 * 60 * 60),
+                                            );
+                                            const minutes = Math.floor(
+                                              (diffMs % (1000 * 60 * 60)) /
+                                                (1000 * 60),
+                                            );
+                                            const seconds = Math.floor(
+                                              (diffMs % (1000 * 60)) / 1000,
+                                            );
+                                            return `${hours}h ${minutes}m ${seconds}s desde anterior`;
+                                          }
+                                          return "Primer evento";
+                                        })()
+                                      : "--"}
                                   </Typography>
                                 </Box>
                               </Box>
@@ -901,8 +1099,7 @@ const ReceptionProcessTable = () => {
             borderBottom: `1px solid ${theme.surfaces.border}`,
           }}
         >
-          Confirmar{" "}
-          {currentActionRole === "autorizar" ? "autorización" : "rechazo"}
+          Confirmar acción
         </DialogTitle>
         <DialogContent
           sx={{
@@ -914,7 +1111,13 @@ const ReceptionProcessTable = () => {
           }}
         >
           ¿Estás seguro de que deseas{" "}
-          <b>{currentActionRole === "autorizar" ? "autorizar" : "rechazar"}</b>{" "}
+          <b>
+            {currentActionRole === "descargando"
+              ? "descargar"
+              : currentActionRole === "autorizar"
+                ? "autorizar"
+                : "rechazar"}
+          </b>{" "}
           esta operación? Esta acción no puede ser revertida.
         </DialogContent>
         <DialogActions
