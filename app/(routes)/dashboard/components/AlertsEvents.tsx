@@ -99,8 +99,8 @@ const AlertsEvents = () => {
       </Typography>
       <Divider sx={{ borderColor: theme.divider }} />
       <Stack spacing={2} mt={2}>
-        {alerts.map((alert) => (
-          <Box key={alert.title}>
+        {alerts.map((alert, idx) => (
+          <Box key={`alert-${idx}`}>
             <Stack
               direction="row"
               justifyContent="space-between"

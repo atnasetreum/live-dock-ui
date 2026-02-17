@@ -17,6 +17,8 @@ import ReactFlow, {
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
+
+import { ReceptionProcess } from "@/types";
 import {
   COLUMN_SPACING,
   LANE_LABEL_WIDTH,
@@ -104,7 +106,7 @@ const NodeHandles = ({
 }) => (
   <>
     {handlePositions.map((position) => (
-      <React.Fragment key={position}>
+      <div key={position}>
         <Handle
           id={`source-${position}`}
           type="source"
@@ -119,7 +121,7 @@ const NodeHandles = ({
           isConnectable={false}
           style={getHandleStyle(position, accent, surface)}
         />
-      </React.Fragment>
+      </div>
     ))}
   </>
 );
@@ -350,7 +352,24 @@ const nodeTypes = {
   diamond: DiamondNode,
 };
 
-const ProcessFlow = () => {
+const decisionMap = {
+  LOGISTICA_PENDIENTE_DE_CONFIRMACION_INGRESO: [
+    "supplier-arrive",
+    "security-create-progress",
+  ],
+  LOGISTICA_PENDIENTE_DE_AUTORIZACION: ["logistics-pending-authorization"],
+  CALIDAD_PROCESANDO: ["logistics-authorized", "quality-pending-test"],
+};
+
+interface Props {
+  receptionProcess: ReceptionProcess;
+}
+
+const ProcessFlow = ({ receptionProcess: { events } }: Props) => {
+  const lastStatus = React.useMemo(() => {
+    return events[events.length - 1].status;
+  }, [events]);
+
   const { theme } = useThemeConfig();
   const nodes = React.useMemo<Node[]>(() => staticNodes, []);
   const connectionColor = theme.name === "light" ? "#1c5cb6" : "#7fc0ff";
@@ -378,7 +397,7 @@ const ProcessFlow = () => {
           },
           labelStyle: {
             fill: connectionColor,
-            fontSize: 12,
+            fontSize: 28,
             fontWeight: 600,
           },
           markerEnd: {

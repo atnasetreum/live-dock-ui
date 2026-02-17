@@ -40,6 +40,7 @@ self.handlePush = (event) => {
     tag: tagId,
     data: {
       ...metadata,
+      actions,
       visibleAt,
     },
     lang,

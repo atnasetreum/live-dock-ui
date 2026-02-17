@@ -24,6 +24,10 @@ self.handleNotificationClick = (event) => {
 
   //const totalTimeSec = reactionTimeSec + systemDelaySec;
 
+  const actions = [...metadata.actions];
+
+  delete metadata.actions;
+
   const payloadMetric = {
     ...metadata,
     reactionTimeSec,
@@ -59,27 +63,29 @@ self.handleNotificationClick = (event) => {
     await clients.openWindow(targetUrl);
   }
 
-  switch (action) {
-    case "confirm":
-      console.log("Usuario confirmo la acción");
-      event.waitUntil(
-        Promise.all([
-          handleConfirmAction(),
+  if (actions.length) {
+    switch (action) {
+      case "confirm":
+        console.log("Usuario confirmo la acción");
+        event.waitUntil(
+          Promise.all([
+            handleConfirmAction(),
+            self.notifyMetric({
+              ...payloadMetric,
+              eventType: "ACTION_CLICKED_CONFIRM",
+            }),
+          ]),
+        );
+        break;
+      default:
+        console.log("Usuario hizo clic en la notificación");
+        event.waitUntil(
           self.notifyMetric({
             ...payloadMetric,
-            eventType: "ACTION_CLICKED_CONFIRM",
+            eventType: "NOTIFICATION_CLICKED_NOT_ACTION",
           }),
-        ]),
-      );
-      break;
-    default:
-      console.log("Usuario hizo clic en la notificación");
-      event.waitUntil(
-        self.notifyMetric({
-          ...payloadMetric,
-          eventType: "NOTIFICATION_CLICKED_NOT_ACTION",
-        }),
-      );
-      break;
+        );
+        break;
+    }
   }
 };

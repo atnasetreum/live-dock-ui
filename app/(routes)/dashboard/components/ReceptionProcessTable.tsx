@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
+import TimelineIcon from "@mui/icons-material/Timeline";
 import {
   Box,
   Button,
@@ -68,7 +69,11 @@ const ElapsedTimeDisplay = ({
   return <Typography variant="caption"> {elapsedTime}</Typography>;
 };
 
-const ReceptionProcessTable = () => {
+interface Props {
+  selectReceptionProcess: (receptionProcess: ReceptionProcess) => void;
+}
+
+const ReceptionProcessTable = ({ selectReceptionProcess }: Props) => {
   const [data, setData] = useState<ReceptionProcess[]>([]);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [openAuthDialog, setOpenAuthDialog] = useState(false);
@@ -455,15 +460,42 @@ const ReceptionProcessTable = () => {
                       sx={{
                         gridColumn: "1 / -1",
                         display: "flex",
-                        justifyContent: {
-                          xs: "stretch",
-                          sm: "flex-end",
-                        },
+                        justifyContent: hasActions
+                          ? {
+                              xs: "stretch",
+                              sm: "space-between",
+                            }
+                          : {
+                              xs: "stretch",
+                              sm: "flex-start",
+                            },
                         alignItems: "center",
                         gap: 1,
                         minHeight: { xs: 44, sm: 36 },
+                        flexDirection: { xs: "column", sm: "row" },
                       }}
                     >
+                      {/* Botón de Monitor en tiempo real */}
+                      <Button
+                        variant="contained"
+                        startIcon={<TimelineIcon />}
+                        sx={{
+                          textTransform: "none",
+                          fontWeight: 600,
+                          minHeight: { xs: 44, sm: 36 },
+                          width: { xs: "100%", sm: "auto" },
+                          backgroundImage: theme.gradients.primary,
+                          color: theme.buttons.containedText,
+                          boxShadow: theme.overlays.cardShadow,
+                        }}
+                        onClick={() => {
+                          toggleExpanded(receptionProcess.id);
+                          selectReceptionProcess(receptionProcess);
+                        }}
+                      >
+                        Monitor
+                      </Button>
+
                       {hasActions && (
                         <Stack
                           direction={{ xs: "column", sm: "row" }}

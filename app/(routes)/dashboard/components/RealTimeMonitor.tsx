@@ -16,6 +16,7 @@ import { TransitionProps } from "@mui/material/transitions";
 
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { laneConfig } from "./processFlowData";
+import { ReceptionProcess } from "@/types";
 import ProcessFlow from "./ProcessFlow";
 
 const Transition = React.forwardRef(function Transition(
@@ -25,7 +26,12 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const RealTimeMonitor = ({ handleClose }: { handleClose: () => void }) => {
+interface Props {
+  handleClose: () => void;
+  receptionProcess: ReceptionProcess;
+}
+
+const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
   const { theme } = useThemeConfig();
 
   const surface = theme.surfaces.panel;
@@ -56,7 +62,8 @@ const RealTimeMonitor = ({ handleClose }: { handleClose: () => void }) => {
       >
         <Toolbar sx={{ gap: 2, flexWrap: "wrap" }}>
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Flujo de proceso recepción de pipa con alcohol, agua, LESS y Colgate
+            Flujo del proceso # {receptionProcess.id} -{" "}
+            {receptionProcess.typeOfMaterial}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <IconButton onClick={handleClose} sx={{ color: textPrimary }}>
@@ -96,7 +103,7 @@ const RealTimeMonitor = ({ handleClose }: { handleClose: () => void }) => {
             <Divider sx={{ borderColor: border, mb: 3 }} />
 
             <Box>
-              <ProcessFlow />
+              <ProcessFlow receptionProcess={receptionProcess} />
             </Box>
           </Paper>
         </Stack>

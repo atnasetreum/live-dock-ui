@@ -18,6 +18,7 @@ import { receptionProcessesService } from "@/services";
 import AlertsEvents from "./components/AlertsEvents";
 import MainBanner from "./components/MainBanner";
 import { Toast } from "@/utils";
+import { ReceptionProcess } from "@/types";
 
 /* const stats = [
   {
@@ -79,6 +80,8 @@ const DashboardPage = () => {
   const [isPipaDialogOpen, setIsPipaDialogOpen] = useState(false);
   const [isPipaSubmitting, setIsPipaSubmitting] = useState(false);
   const [pipaMaterialType, setPipaMaterialType] = useState("");
+  const [receptionProcess, setReceptionProcess] =
+    useState<ReceptionProcess | null>(null);
 
   /*  useEffect(() => {
     if (!navigator.serviceWorker) return;
@@ -123,8 +126,14 @@ const DashboardPage = () => {
 
   return (
     <>
-      {realTimeMonitor && (
-        <RealTimeMonitor handleClose={() => setRealTimeMonitor(false)} />
+      {realTimeMonitor && receptionProcess && (
+        <RealTimeMonitor
+          handleClose={() => {
+            setRealTimeMonitor(false);
+            setReceptionProcess(null);
+          }}
+          receptionProcess={receptionProcess}
+        />
       )}
       <PipaIngresoDialog
         open={isPipaDialogOpen}
@@ -219,7 +228,12 @@ const DashboardPage = () => {
         </Stack> */}
 
         <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
-          <ReceptionProcessTable />
+          <ReceptionProcessTable
+            selectReceptionProcess={(receptionProcess: ReceptionProcess) => {
+              setReceptionProcess(receptionProcess);
+              setRealTimeMonitor(true);
+            }}
+          />
 
           <Stack spacing={3} sx={{ width: { xs: "100%", lg: 360 } }}>
             <AlertsEvents />
