@@ -9,13 +9,13 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
 
-import { useThemeConfig } from "@/theme/ThemeProvider";
-import { useSocket } from "@/common/SocketProvider";
-import { disconnectSocket } from "@/libs/socket";
-import { authService } from "@/services";
 import { webPushService } from "@/services/web-push.service";
+import { useThemeConfig } from "@/theme/ThemeProvider";
+import { useCurrentUser } from "@/common/UserContext";
+import { disconnectSocket } from "@/libs/socket";
+import { ProcessEventRole } from "@/types";
+import { authService } from "@/services";
 import { Toast } from "@/utils";
-import { ProcessEventRole, User } from "@/types";
 
 const statusChips = [
   { label: "Terminal activa", tone: "success" },
@@ -31,27 +31,13 @@ const MainBanner = ({
   onPipaIngreso: () => void;
 }) => {
   const { theme } = useThemeConfig();
-  const { socket } = useSocket();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isPushEnabled, setIsPushEnabled] = useState(false);
   const [isPushBusy, setIsPushBusy] = useState(false);
   const [pushPermission, setPushPermission] = useState<
     NotificationPermission | "unsupported"
   >("unsupported");
 
-  useEffect(() => {
-    if (!socket) return undefined;
-
-    const handleSessionsCurrentUser = (user: User) => {
-      setCurrentUser(user);
-    };
-
-    socket.on("sessions:current_user", handleSessionsCurrentUser);
-
-    return () => {
-      socket.off("sessions:current_user", handleSessionsCurrentUser);
-    };
-  }, [socket]);
+  const currentUser = useCurrentUser();
 
   useEffect(() => {
     const refreshPushStatus = async () => {

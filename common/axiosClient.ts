@@ -34,11 +34,11 @@ axiosClient.interceptors.request.use(
 
     config.withCredentials = true;
 
-    console.info(`[Frontend] Request ${requestId}`, {
+    /* console.info(`[Frontend] Request ${requestId}`, {
       url: config.url,
       method: config.method,
       timestamp: new Date().toISOString(),
-    });
+    }); */
 
     return config;
   },
@@ -52,10 +52,10 @@ const DEFAULT_ERROR_MESSAGE =
 axiosClient.interceptors.response.use(
   (response) => {
     const requestId = response.config.headers["X-Request-ID"];
-    console.info(`[Frontend] Response ${requestId}`, {
+    /* console.info(`[Frontend] Response ${requestId}`, {
       status: response.status,
       timestamp: new Date().toISOString(),
-    });
+    }); */
     return response;
   },
   (error) => {

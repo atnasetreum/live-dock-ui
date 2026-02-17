@@ -1,31 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import PendingActionsIcon from "@mui/icons-material/PendingActions";
-import InventoryIcon from "@mui/icons-material/Inventory";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import {
-  Box,
-  Chip,
-  Divider,
-  Grid,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
+//import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+//import { Box, Chip, Grid, Paper, Stack, Typography } from "@mui/material";
+import { Stack } from "@mui/material";
+//import PendingActionsIcon from "@mui/icons-material/PendingActions";
+//import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+//import InventoryIcon from "@mui/icons-material/Inventory";
 
 import ReceptionProcessTable from "./components/ReceptionProcessTable";
 import PipaIngresoDialog from "./components/PipaIngresoDialog";
 import RealTimeMonitor from "./components/RealTimeMonitor";
 import ConnectedUsers from "./components/ConnectedUsers";
-import { useThemeConfig } from "@/theme/ThemeProvider";
+//import { useThemeConfig } from "@/theme/ThemeProvider";
 import { receptionProcessesService } from "@/services";
+import AlertsEvents from "./components/AlertsEvents";
 import MainBanner from "./components/MainBanner";
 import { Toast } from "@/utils";
 
-const stats = [
+/* const stats = [
   {
     label: "Arribos programados",
     value: "3 pipas",
@@ -49,24 +43,6 @@ const stats = [
     value: "5 equipos",
     delta: "2 críticos",
     icon: PendingActionsIcon,
-  },
-];
-
-const alerts = [
-  {
-    title: "Inspección de seguridad",
-    detail: "Equipo RTG-14 requiere check eléctrico",
-    severity: "Alta",
-  },
-  {
-    title: "Demora en patio",
-    detail: "Bloque C supera window de 90 min",
-    severity: "Media",
-  },
-  {
-    title: "Tripulación sin credencial",
-    detail: "4 accesos pendientes de validar",
-    severity: "Baja",
   },
 ];
 
@@ -95,20 +71,14 @@ const trendSeries = [
     change: "2 criticos",
     series: [40, 36, 44, 52, 48, 56, 50],
   },
-];
+]; */
 
 const DashboardPage = () => {
-  const { theme } = useThemeConfig();
+  //const { theme } = useThemeConfig();
   const [realTimeMonitor, setRealTimeMonitor] = useState(false);
   const [isPipaDialogOpen, setIsPipaDialogOpen] = useState(false);
   const [isPipaSubmitting, setIsPipaSubmitting] = useState(false);
   const [pipaMaterialType, setPipaMaterialType] = useState("");
-
-  const severityColor = (level: string) => {
-    if (level === "Alta") return theme.chips.high;
-    if (level === "Media") return theme.chips.medium;
-    return theme.chips.low;
-  };
 
   /*  useEffect(() => {
     if (!navigator.serviceWorker) return;
@@ -170,7 +140,7 @@ const DashboardPage = () => {
           onPipaIngreso={handleOpenPipaDialog}
         />
 
-        <Stack spacing={2}>
+        {/* <Stack spacing={2}>
           <Typography variant="overline" sx={{ letterSpacing: 3 }}>
             Resumen operativo
           </Typography>
@@ -246,77 +216,18 @@ const DashboardPage = () => {
               </Grid>
             ))}
           </Grid>
-        </Stack>
+        </Stack> */}
 
         <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
           <ReceptionProcessTable />
 
           <Stack spacing={3} sx={{ width: { xs: "100%", lg: 360 } }}>
-            <Paper
-              sx={{
-                borderRadius: 4,
-                p: 3,
-                background: theme.surfaces.panel,
-                border: `1px solid ${theme.surfaces.border}`,
-                boxShadow: theme.overlays.panelShadow,
-              }}
-            >
-              <Typography variant="overline" sx={{ letterSpacing: 3 }}>
-                Alertas
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: 600,
-                  color: theme.palette.textPrimary,
-                }}
-                mb={1.5}
-              >
-                Alertas prioritarias
-              </Typography>
-              <Divider sx={{ borderColor: theme.divider }} />
-              <Stack spacing={2} mt={2}>
-                {alerts.map((alert) => (
-                  <Box key={alert.title}>
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <Typography
-                        variant="subtitle1"
-                        sx={{
-                          fontWeight: 600,
-                          color: theme.palette.textPrimary,
-                        }}
-                      >
-                        {alert.title}
-                      </Typography>
-                      <Chip
-                        label={alert.severity}
-                        size="small"
-                        sx={{
-                          backgroundColor: severityColor(alert.severity),
-                          color: theme.palette.textPrimary,
-                        }}
-                      />
-                    </Stack>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: theme.palette.textSecondary }}
-                    >
-                      {alert.detail}
-                    </Typography>
-                  </Box>
-                ))}
-              </Stack>
-            </Paper>
-
+            <AlertsEvents />
             <ConnectedUsers />
           </Stack>
         </Stack>
 
-        <Paper
+        {/* <Paper
           sx={{
             borderRadius: 4,
             p: { xs: 3, md: 4 },
@@ -425,7 +336,7 @@ const DashboardPage = () => {
               </Grid>
             ))}
           </Grid>
-        </Paper>
+        </Paper> */}
       </Stack>
     </>
   );

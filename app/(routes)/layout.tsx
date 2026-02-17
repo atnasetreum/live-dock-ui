@@ -6,10 +6,12 @@ import { Space_Grotesk } from "next/font/google";
 import { Box, Typography } from "@mui/material";
 
 import PushNotificationRequest from "./components/PushNotificationRequest";
+import { webPushService } from "@/services/web-push.service";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useSocket } from "@/common/SocketProvider";
+import { UserProvider } from "@/common/UserContext";
 import { GlowLayer } from "@/theme/tokens";
-import { webPushService } from "@/services/web-push.service";
+import { UsersOnDuty } from "@/types";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -35,6 +37,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<UsersOnDuty | null>(null);
 
   const { theme } = useThemeConfig();
   const { socket, isConnected } = useSocket();
@@ -68,6 +71,20 @@ export default function MainLayout({
 
     notifyPermission();
   }, []);
+
+  useEffect(() => {
+    if (!socket) return undefined;
+
+    const handleSessionsCurrentUser = (user: UsersOnDuty) => {
+      setCurrentUser(user);
+    };
+
+    socket.on("sessions:current_user", handleSessionsCurrentUser);
+
+    return () => {
+      socket.off("sessions:current_user", handleSessionsCurrentUser);
+    };
+  }, [socket]);
 
   const handleNotificationPermisson = (confirm: boolean) => {
     if (!confirm) return setIsOpen(false);
@@ -137,7 +154,30 @@ export default function MainLayout({
           }}
         >
           {isConnected ? (
-            <>{children}</>
+            currentUser ? (
+              <UserProvider currentUser={currentUser}>{children}</UserProvider>
+            ) : (
+              <Box
+                sx={{
+                  mt: 6,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  p: 4,
+                  borderRadius: 4,
+                  background: theme.surfaces.panel,
+                  border: `1px solid ${theme.surfaces.border}`,
+                  boxShadow: theme.overlays.panelShadow,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{ color: theme.palette.textSecondary }}
+                >
+                  Cargando datos del usuario en turno...
+                </Typography>
+              </Box>
+            )
           ) : (
             <Box
               sx={{

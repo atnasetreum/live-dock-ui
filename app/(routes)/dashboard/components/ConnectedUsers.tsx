@@ -30,6 +30,8 @@ const ConnectedUsers = () => {
 
     socket.on("sessions:current_users", handleSessionsReady);
 
+    socket.emit("sessions:get_current_users");
+
     return () => {
       socket.off("sessions:current_users", handleSessionsReady);
     };

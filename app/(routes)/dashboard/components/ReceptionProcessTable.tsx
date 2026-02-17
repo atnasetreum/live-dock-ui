@@ -20,9 +20,10 @@ import {
   Typography,
 } from "@mui/material";
 
-import { EventData, ProcessEventRole, ReceptionProcess, User } from "@/types";
+import { EventData, ProcessEventRole, ReceptionProcess } from "@/types";
 import { receptionProcessesService } from "@/services";
 import { useThemeConfig } from "@/theme/ThemeProvider";
+import { useCurrentUser } from "@/common/UserContext";
 import { useSocket } from "@/common/SocketProvider";
 import { formatTime, Toast } from "@/utils";
 
@@ -74,10 +75,10 @@ const ReceptionProcessTable = () => {
   const [selectedProcessId, setSelectedProcessId] = useState<number | null>(
     null,
   );
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoadingConfirm, setIsLoadingConfirm] = useState<boolean>(false);
   const [currentActionRole, setCurrentActionRole] = useState<string>("");
   const [currentStatus, setCurrentStatus] = useState<string>("");
+  const currentUser = useCurrentUser();
 
   const { theme } = useThemeConfig();
   const { socket } = useSocket();
@@ -97,21 +98,19 @@ const ReceptionProcessTable = () => {
       });
     };
 
-    const handleSessionsCurrentUser = (user: User) => {
-      setCurrentUser(user);
-    };
-
-    socket.on("sessions:current_user", handleSessionsCurrentUser);
     socket.on("reception-process:created", handleSessionsReady);
 
     return () => {
       socket.off("reception-process:created", handleSessionsReady);
-      socket.off("sessions:current_user", handleSessionsCurrentUser);
     };
   }, [socket]);
 
   useEffect(() => {
-    receptionProcessesService.findAll().then(setData);
+    receptionProcessesService
+      .findAll({
+        startDate: new Date().toISOString().split("T")[0], // Solo procesos del día actual
+      })
+      .then(setData);
   }, []);
 
   const toggleExpanded = (id: number) => {
@@ -451,6 +450,7 @@ const ReceptionProcessTable = () => {
                         #{receptionProcess.id}
                       </Typography>
                     </Stack>
+                    {/* Contenedor de botones */}
                     <Box
                       sx={{
                         gridColumn: "1 / -1",
@@ -648,6 +648,7 @@ const ReceptionProcessTable = () => {
                         </Stack>
                       )}
                     </Box>
+                    {/* Contenedor de botones */}
                     <LinearProgress
                       variant="determinate"
                       value={progressValue}

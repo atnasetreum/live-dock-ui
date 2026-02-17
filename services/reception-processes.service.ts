@@ -10,9 +10,12 @@ export const receptionProcessesService = {
     );
     return data;
   },
-  findAll: async () => {
+  findAll: async ({ startDate }: { startDate: string }) => {
     const { data } = await axiosClient.get<ReceptionProcess[]>(
       `${receptionProcessesService.baseUrl}`,
+      {
+        params: { startDate },
+      },
     );
     return data;
   },
@@ -27,5 +30,17 @@ export const receptionProcessesService = {
       `${receptionProcessesService.baseUrl}/change-of-status`,
       payload,
     );
+  },
+  findAllPriorityAlerts: async ({ startDate }: { startDate: string }) => {
+    const { data } = await axiosClient.get<
+      {
+        title: string;
+        detail: string;
+        severity: "Alta" | "Media" | "Baja";
+      }[]
+    >(`${receptionProcessesService.baseUrl}/priority-alerts`, {
+      params: { startDate },
+    });
+    return data;
   },
 };
