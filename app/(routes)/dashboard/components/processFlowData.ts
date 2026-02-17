@@ -145,13 +145,13 @@ export const processConnections: ProcessFlowEdge[] = [
     id: "edge-start-arrive",
     source: "supplier-start",
     target: "supplier-arrive",
-    dashed: true,
+    dashed: false,
   },
   {
     id: "edge-arrive-review",
     source: "supplier-arrive",
     target: "security-create-progress",
-    dashed: true,
+    dashed: false,
   },
   {
     id: "edge-review-logistics",

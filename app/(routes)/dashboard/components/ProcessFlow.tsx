@@ -148,7 +148,7 @@ const determineEdgeHandles = (
   return { sourceHandle: "source-top", targetHandle: "target-bottom" };
 };
 
-const buildNodes = () => {
+const buildNodes = (completedStepIds: Set<string>) => {
   const nodes: Node[] = laneConfig.map((lane) => ({
     id: `lane-${lane.id}`,
     type: "lane",
@@ -179,7 +179,10 @@ const buildNodes = () => {
           title: step.title,
           subtitle: step.subtitle,
           accent,
-          variant: step.emphasis ?? "solid",
+          variant:
+            completedStepIds.has(step.id) || step.emphasis === "solid"
+              ? "solid"
+              : "outlined",
           width: (step.span ?? 1) * COLUMN_SPACING - 36,
         },
         draggable: false,
@@ -225,8 +228,6 @@ const buildNodes = () => {
   return nodes;
 };
 
-const staticNodes = buildNodes();
-
 const LaneLabelNode = ({ data }: NodeProps<LaneNodeData>) => {
   const { theme } = useThemeConfig();
   return (
@@ -262,8 +263,7 @@ const ProcessNode = ({ data }: NodeProps<ProcessNodeData>) => {
         width: data.width,
         borderRadius: 3,
         border: `2px solid ${data.accent}`,
-        backgroundColor:
-          data.variant === "outlined" ? "transparent" : theme.surfaces.card,
+        backgroundColor: data.variant === "outlined" ? "transparent" : "red", //theme.surfaces.card,
         boxShadow:
           data.variant === "outlined" ? "none" : theme.overlays.cardShadow,
         display: "flex",
@@ -352,7 +352,7 @@ const nodeTypes = {
   diamond: DiamondNode,
 };
 
-const decisionMap = {
+const decisionMap: Record<string, string[]> = {
   LOGISTICA_PENDIENTE_DE_CONFIRMACION_INGRESO: [
     "supplier-arrive",
     "security-create-progress",
@@ -370,8 +370,16 @@ const ProcessFlow = ({ receptionProcess: { events } }: Props) => {
     return events[events.length - 1].status;
   }, [events]);
 
+  const completedStepIds = React.useMemo(
+    () => new Set(decisionMap[lastStatus] ?? []),
+    [lastStatus],
+  );
+
   const { theme } = useThemeConfig();
-  const nodes = React.useMemo<Node[]>(() => staticNodes, []);
+  const nodes = React.useMemo<Node[]>(
+    () => buildNodes(completedStepIds),
+    [completedStepIds],
+  );
   const connectionColor = theme.name === "light" ? "#1c5cb6" : "#7fc0ff";
 
   const edges = React.useMemo<Edge[]>(
@@ -393,7 +401,10 @@ const ProcessFlow = ({ receptionProcess: { events } }: Props) => {
           style: {
             stroke: connectionColor,
             strokeWidth: 2,
-            strokeDasharray: edge.dashed ? "6 4" : undefined,
+            strokeDasharray:
+              edge.dashed && !completedStepIds.has(edge.target)
+                ? "6 4"
+                : undefined,
           },
           labelStyle: {
             fill: connectionColor,
@@ -408,7 +419,7 @@ const ProcessFlow = ({ receptionProcess: { events } }: Props) => {
           },
         };
       }),
-    [connectionColor],
+    [completedStepIds, connectionColor],
   );
 
   return (
