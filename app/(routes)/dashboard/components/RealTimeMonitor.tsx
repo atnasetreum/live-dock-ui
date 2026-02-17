@@ -18,7 +18,6 @@ import { useThemeConfig } from "@/theme/ThemeProvider";
 import { laneConfig } from "./processFlowData";
 import { ReceptionProcess } from "@/types";
 import ProcessFlow from "./ProcessFlow";
-import { useSocket } from "@/common/SocketProvider";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children: React.ReactElement<unknown> },

@@ -25,7 +25,6 @@ import { EventData, ProcessEventRole, ReceptionProcess } from "@/types";
 import { receptionProcessesService } from "@/services";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useCurrentUser } from "@/common/UserContext";
-import { useSocket } from "@/common/SocketProvider";
 import { formatTime, Toast } from "@/utils";
 
 interface ProcessEvent {
@@ -71,10 +70,10 @@ const ElapsedTimeDisplay = ({
 
 interface Props {
   selectReceptionProcess: (receptionProcess: ReceptionProcess) => void;
+  data: ReceptionProcess[];
 }
 
-const ReceptionProcessTable = ({ selectReceptionProcess }: Props) => {
-  const [data, setData] = useState<ReceptionProcess[]>([]);
+const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [openAuthDialog, setOpenAuthDialog] = useState(false);
   const [selectedProcessId, setSelectedProcessId] = useState<number | null>(
@@ -86,38 +85,6 @@ const ReceptionProcessTable = ({ selectReceptionProcess }: Props) => {
   const currentUser = useCurrentUser();
 
   const { theme } = useThemeConfig();
-  const { socket } = useSocket();
-
-  useEffect(() => {
-    if (!socket) return undefined;
-
-    const handleSessionsReady = (payload: ReceptionProcess) => {
-      const currentId = payload.id;
-      setData((prev) => {
-        const exists = prev.some((item) => item.id === currentId);
-
-        if (exists) {
-          return prev.map((item) => (item.id === currentId ? payload : item));
-        } else {
-          return [payload, ...prev];
-        }
-      });
-    };
-
-    socket.on("reception-process:status_update", handleSessionsReady);
-
-    return () => {
-      socket.off("reception-process:status_update", handleSessionsReady);
-    };
-  }, [socket]);
-
-  useEffect(() => {
-    receptionProcessesService
-      .findAll({
-        startDate: new Date().toISOString().split("T")[0], // Solo procesos del día actual
-      })
-      .then(setData);
-  }, []);
 
   const toggleExpanded = (id: number) => {
     setExpandedId((prev) => (prev === id ? null : id));

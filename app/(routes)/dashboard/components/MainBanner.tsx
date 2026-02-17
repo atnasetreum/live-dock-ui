@@ -223,18 +223,15 @@ const MainBanner = ({
                 textTransform: "none",
                 fontWeight: 600,
                 minHeight: 44,
-                borderColor: theme.buttons.outlinedColor,
-                color: theme.buttons.outlinedColor,
-                "&:hover": {
-                  borderColor: theme.buttons.outlinedColor,
-                  backgroundColor: theme.surfaces.translucent,
-                },
+                backgroundImage: theme.gradients.primary,
+                color: theme.buttons.containedText,
+                boxShadow: theme.overlays.cardShadow,
               }}
             >
               Ingreso de pipa
             </Button>
           )}
-          <Button
+          {/* <Button
             variant="contained"
             startIcon={<TimelineIcon />}
             sx={{
@@ -248,7 +245,7 @@ const MainBanner = ({
             onClick={() => setRealTimeMonitor(true)}
           >
             Monitor en tiempo real
-          </Button>
+          </Button> */}
           <Button
             variant="outlined"
             startIcon={<LogoutIcon />}

@@ -83,23 +83,61 @@ const DashboardPage = () => {
   const [pipaMaterialType, setPipaMaterialType] = useState("");
   const [receptionProcess, setReceptionProcess] =
     useState<ReceptionProcess | null>(null);
+  const [data, setData] = useState<ReceptionProcess[]>([]);
 
   const { socket } = useSocket();
 
-  /*  useEffect(() => {
+  useEffect(() => {
+    receptionProcessesService
+      .findAll({
+        startDate: new Date().toISOString().split("T")[0], // Solo procesos del día actual
+      })
+      .then(setData);
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return undefined;
+
+    const handleSessionsReady = (payload: ReceptionProcess) => {
+      const currentId = payload.id;
+      setData((prev) => {
+        const exists = prev.some((item) => item.id === currentId);
+
+        if (exists) {
+          return prev.map((item) => (item.id === currentId ? payload : item));
+        } else {
+          return [payload, ...prev];
+        }
+      });
+    };
+
+    socket.on("reception-process:status_update", handleSessionsReady);
+
+    return () => {
+      socket.off("reception-process:status_update", handleSessionsReady);
+    };
+  }, [socket]);
+
+  useEffect(() => {
     if (!navigator.serviceWorker) return;
 
     navigator.serviceWorker.addEventListener("message", (event) => {
       if (event.data?.type === "confirm-clicked") {
         const payload = event.data.data;
 
-        setRealTimeMonitor(true);
+        const currentReceptionProcess =
+          data.find((item) => item.id === payload.id) ?? null;
+
+        if (currentReceptionProcess) {
+          setRealTimeMonitor(true);
+          setReceptionProcess(currentReceptionProcess);
+        }
 
         // actualizar estado, router, modal, etc.
         console.log("Pipa desde notificación", payload);
       }
     });
-  }, []); */
+  }, [data]);
 
   const handleOpenPipaDialog = () => {
     setIsPipaDialogOpen(true);
@@ -250,6 +288,7 @@ const DashboardPage = () => {
 
         <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
           <ReceptionProcessTable
+            data={data}
             selectReceptionProcess={(
               currentReceptionProcess: ReceptionProcess,
             ) => {
