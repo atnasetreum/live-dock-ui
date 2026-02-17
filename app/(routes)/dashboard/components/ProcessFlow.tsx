@@ -177,7 +177,7 @@ const buildNodes = (completedStepIds: Set<string>) => {
         },
         data: {
           title: step.title,
-          subtitle: step.subtitle,
+          subtitle: !completedStepIds.has(step.id) ? step.subtitle : undefined,
           accent,
           variant:
             completedStepIds.has(step.id) || step.emphasis === "solid"
@@ -263,7 +263,10 @@ const ProcessNode = ({ data }: NodeProps<ProcessNodeData>) => {
         width: data.width,
         borderRadius: 3,
         border: `2px solid ${data.accent}`,
-        backgroundColor: data.variant === "outlined" ? "transparent" : "red", //theme.surfaces.card,
+        backgroundColor:
+          data.variant === "outlined"
+            ? "transparent"
+            : theme.palette.success?.main,
         boxShadow:
           data.variant === "outlined" ? "none" : theme.overlays.cardShadow,
         display: "flex",
@@ -271,7 +274,7 @@ const ProcessNode = ({ data }: NodeProps<ProcessNodeData>) => {
         justifyContent: "center",
         textAlign: "center",
         px: 1.5,
-        color: theme.palette.textPrimary,
+        color: data.variant === "outlined" ? theme.palette.textPrimary : "#fff",
         position: "relative",
       }}
     >
@@ -358,24 +361,70 @@ const decisionMap: Record<string, string[]> = {
     "security-create-progress",
   ],
   LOGISTICA_PENDIENTE_DE_AUTORIZACION: ["logistics-pending-authorization"],
-  CALIDAD_PROCESANDO: ["logistics-authorized", "quality-pending-test"],
+  CALIDAD_PENDIENTE_DE_CONFIRMACION_DE_ANALISIS: ["logistics-authorized"],
+  CALIDAD_PROCESANDO: ["quality-pending-test"],
+  FINALIZO_PROCESO_POR_RECHAZO: ["decision-ok"],
+  PRODUCCION_PENDIENTE_DE_CONFIRMACION_PARA_DESCARGA: [
+    "production-pending-download",
+  ],
+  PRODUCCION_PENDIENTE_DE_DESCARGA: ["production-pending-download"],
+  PRODUCCION_DESCARGANDO: ["production-downloading"],
+  LOGISTICA_PENDIENTE_DE_CONFIRMACION_CAPTURA_PESO_SAP: [
+    "production-downloaded",
+  ],
+  LOGISTICA_PENDIENTE_DE_CAPTURA_PESO_SAP: ["logistics-pending-sap"],
+  CALIDAD_PENDIENTE_CONFIRMACION_LIBERACION_SAP: ["logistics-captured-sap"],
+  CALIDAD_PENDIENTE_LIBERACION_EN_SAP: ["quality-pending-release"],
+  FINALIZO_PROCESO: ["quality-release"],
+};
+
+const previousStepsMap = processConnections.reduce<Record<string, string[]>>(
+  (acc, edge) => {
+    if (!acc[edge.target]) {
+      acc[edge.target] = [];
+    }
+    acc[edge.target].push(edge.source);
+    return acc;
+  },
+  {},
+);
+
+const buildCompletedStepIds = (lastStatus: string) => {
+  const completed = new Set<string>();
+  const stack = [...(decisionMap[lastStatus] ?? [])];
+
+  while (stack.length > 0) {
+    const currentStepId = stack.pop();
+    if (!currentStepId || completed.has(currentStepId)) {
+      continue;
+    }
+
+    completed.add(currentStepId);
+
+    const previousStepIds = previousStepsMap[currentStepId] ?? [];
+    previousStepIds.forEach((stepId) => {
+      if (!completed.has(stepId)) {
+        stack.push(stepId);
+      }
+    });
+  }
+
+  return completed;
 };
 
 interface Props {
   receptionProcess: ReceptionProcess;
+  lastStatus: string;
 }
 
-const ProcessFlow = ({ receptionProcess: { events } }: Props) => {
-  const lastStatus = React.useMemo(() => {
-    return events[events.length - 1].status;
-  }, [events]);
+const ProcessFlow = ({ lastStatus }: Props) => {
+  const { theme } = useThemeConfig();
 
   const completedStepIds = React.useMemo(
-    () => new Set(decisionMap[lastStatus] ?? []),
+    () => buildCompletedStepIds(lastStatus),
     [lastStatus],
   );
 
-  const { theme } = useThemeConfig();
   const nodes = React.useMemo<Node[]>(
     () => buildNodes(completedStepIds),
     [completedStepIds],

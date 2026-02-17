@@ -30,6 +30,7 @@ export type ThemeTokens = {
       main: string;
       dark: string;
     };
+    errorTranslucent: string;
   };
   surfaces: {
     card: string;
@@ -96,6 +97,7 @@ export const darkTheme: ThemeTokens = {
       main: "#f44336",
       dark: "#d32f2f",
     },
+    errorTranslucent: "rgba(244,67,54,0.2)",
   },
   surfaces: {
     card: "rgba(7,11,32,0.72)",
@@ -178,6 +180,7 @@ export const lightTheme: ThemeTokens = {
       main: "#ef5350",
       dark: "#c62828",
     },
+    errorTranslucent: "rgba(244,67,54,0.2)",
   },
   surfaces: {
     card: "rgba(255,255,255,0.9)",

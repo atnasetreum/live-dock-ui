@@ -95,6 +95,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess }: Props) => {
       const currentId = payload.id;
       setData((prev) => {
         const exists = prev.some((item) => item.id === currentId);
+
         if (exists) {
           return prev.map((item) => (item.id === currentId ? payload : item));
         } else {
@@ -103,10 +104,10 @@ const ReceptionProcessTable = ({ selectReceptionProcess }: Props) => {
       });
     };
 
-    socket.on("reception-process:created", handleSessionsReady);
+    socket.on("reception-process:status_update", handleSessionsReady);
 
     return () => {
-      socket.off("reception-process:created", handleSessionsReady);
+      socket.off("reception-process:status_update", handleSessionsReady);
     };
   }, [socket]);
 
@@ -476,25 +477,27 @@ const ReceptionProcessTable = ({ selectReceptionProcess }: Props) => {
                       }}
                     >
                       {/* Botón de Monitor en tiempo real */}
-                      <Button
-                        variant="contained"
-                        startIcon={<TimelineIcon />}
-                        sx={{
-                          textTransform: "none",
-                          fontWeight: 600,
-                          minHeight: { xs: 44, sm: 36 },
-                          width: { xs: "100%", sm: "auto" },
-                          backgroundImage: theme.gradients.primary,
-                          color: theme.buttons.containedText,
-                          boxShadow: theme.overlays.cardShadow,
-                        }}
-                        onClick={() => {
-                          toggleExpanded(receptionProcess.id);
-                          selectReceptionProcess(receptionProcess);
-                        }}
-                      >
-                        Monitor
-                      </Button>
+                      {!currentStatusRow.includes("FINALIZO") && (
+                        <Button
+                          variant="contained"
+                          startIcon={<TimelineIcon />}
+                          sx={{
+                            textTransform: "none",
+                            fontWeight: 600,
+                            minHeight: { xs: 44, sm: 36 },
+                            width: { xs: "100%", sm: "auto" },
+                            backgroundImage: theme.gradients.primary,
+                            color: theme.buttons.containedText,
+                            boxShadow: theme.overlays.cardShadow,
+                          }}
+                          onClick={() => {
+                            toggleExpanded(receptionProcess.id);
+                            selectReceptionProcess(receptionProcess);
+                          }}
+                        >
+                          Monitor
+                        </Button>
+                      )}
 
                       {hasActions && (
                         <Stack

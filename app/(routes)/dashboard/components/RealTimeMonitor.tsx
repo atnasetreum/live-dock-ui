@@ -18,6 +18,7 @@ import { useThemeConfig } from "@/theme/ThemeProvider";
 import { laneConfig } from "./processFlowData";
 import { ReceptionProcess } from "@/types";
 import ProcessFlow from "./ProcessFlow";
+import { useSocket } from "@/common/SocketProvider";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children: React.ReactElement<unknown> },
@@ -33,10 +34,15 @@ interface Props {
 
 const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
   const { theme } = useThemeConfig();
+  const { events } = receptionProcess;
 
   const surface = theme.surfaces.panel;
   const border = theme.surfaces.border;
   const textPrimary = theme.palette.textPrimary;
+
+  const lastStatus = React.useMemo(() => {
+    return events[events.length - 1]?.status ?? "SIN_EVENTOS";
+  }, [events]);
 
   return (
     <Dialog
@@ -65,6 +71,18 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
             Flujo del proceso # {receptionProcess.id} -{" "}
             {receptionProcess.typeOfMaterial}
           </Typography>
+          <Chip
+            size="small"
+            label={lastStatus.replaceAll("_", " ")}
+            sx={{
+              fontWeight: 600,
+              color: textPrimary,
+              backgroundColor: !lastStatus.includes("RECHAZO")
+                ? theme.surfaces.translucent
+                : theme.palette.errorTranslucent,
+              border: `1px solid ${border}`,
+            }}
+          />
           <Box sx={{ flexGrow: 1 }} />
           <IconButton onClick={handleClose} sx={{ color: textPrimary }}>
             <CloseIcon />
@@ -103,7 +121,10 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
             <Divider sx={{ borderColor: border, mb: 3 }} />
 
             <Box>
-              <ProcessFlow receptionProcess={receptionProcess} />
+              <ProcessFlow
+                receptionProcess={receptionProcess}
+                lastStatus={lastStatus}
+              />
             </Box>
           </Paper>
         </Stack>

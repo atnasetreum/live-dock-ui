@@ -38,7 +38,6 @@ const AlertsEvents = () => {
       detail: string;
       severity: "Alta" | "Media" | "Baja";
     }) => {
-      console.log({ event });
       setAlerts((prev) => [event, ...prev]);
     };
 

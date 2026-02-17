@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 //import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 //import { Box, Chip, Grid, Paper, Stack, Typography } from "@mui/material";
@@ -16,9 +16,10 @@ import ConnectedUsers from "./components/ConnectedUsers";
 //import { useThemeConfig } from "@/theme/ThemeProvider";
 import { receptionProcessesService } from "@/services";
 import AlertsEvents from "./components/AlertsEvents";
+import { useSocket } from "@/common/SocketProvider";
 import MainBanner from "./components/MainBanner";
-import { Toast } from "@/utils";
 import { ReceptionProcess } from "@/types";
+import { Toast } from "@/utils";
 
 /* const stats = [
   {
@@ -83,6 +84,8 @@ const DashboardPage = () => {
   const [receptionProcess, setReceptionProcess] =
     useState<ReceptionProcess | null>(null);
 
+  const { socket } = useSocket();
+
   /*  useEffect(() => {
     if (!navigator.serviceWorker) return;
 
@@ -123,6 +126,24 @@ const DashboardPage = () => {
       setIsPipaSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (!socket) return undefined;
+
+    const handleSessionsReady = (payload: ReceptionProcess) => {
+      const currentId = payload.id;
+
+      if (currentId === receptionProcess?.id) {
+        setReceptionProcess(payload);
+      }
+    };
+
+    socket.on("reception-process:status_update", handleSessionsReady);
+
+    return () => {
+      socket.off("reception-process:status_update", handleSessionsReady);
+    };
+  }, [socket, receptionProcess]);
 
   return (
     <>
@@ -229,8 +250,10 @@ const DashboardPage = () => {
 
         <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
           <ReceptionProcessTable
-            selectReceptionProcess={(receptionProcess: ReceptionProcess) => {
-              setReceptionProcess(receptionProcess);
+            selectReceptionProcess={(
+              currentReceptionProcess: ReceptionProcess,
+            ) => {
+              setReceptionProcess(currentReceptionProcess);
               setRealTimeMonitor(true);
             }}
           />
