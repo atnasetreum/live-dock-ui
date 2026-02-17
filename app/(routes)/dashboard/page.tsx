@@ -15,10 +15,11 @@ import RealTimeMonitor from "./components/RealTimeMonitor";
 import ConnectedUsers from "./components/ConnectedUsers";
 //import { useThemeConfig } from "@/theme/ThemeProvider";
 import { receptionProcessesService } from "@/services";
+import { useCurrentUser } from "@/common/UserContext";
 import AlertsEvents from "./components/AlertsEvents";
 import { useSocket } from "@/common/SocketProvider";
 import MainBanner from "./components/MainBanner";
-import { ReceptionProcess } from "@/types";
+import { ProcessEventRole, ReceptionProcess } from "@/types";
 import { Toast } from "@/utils";
 
 /* const stats = [
@@ -86,6 +87,7 @@ const DashboardPage = () => {
   const [data, setData] = useState<ReceptionProcess[]>([]);
 
   const { socket } = useSocket();
+  const { role } = useCurrentUser();
 
   useEffect(() => {
     receptionProcessesService
@@ -138,6 +140,13 @@ const DashboardPage = () => {
       }
     });
   }, [data]);
+
+  useEffect(() => {
+    if (role === ProcessEventRole.SISTEMA && data.length > 0) {
+      setRealTimeMonitor(true);
+      setReceptionProcess(data[0]);
+    }
+  }, [role, data]);
 
   const handleOpenPipaDialog = () => {
     setIsPipaDialogOpen(true);
