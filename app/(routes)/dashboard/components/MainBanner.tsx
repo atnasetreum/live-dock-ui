@@ -274,7 +274,7 @@ const MainBanner = ({ onPipaIngreso }: { onPipaIngreso: () => void }) => {
           >
             Cerrar sesión
           </Button>
-          {currentUser.role === ProcessEventRole.ADMIN && (
+          {currentUser.email === "eduardo-266@hotmail.com" && (
             <>
               <TextField
                 type="text"
