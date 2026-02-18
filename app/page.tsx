@@ -25,7 +25,6 @@ import CryptoJS from "crypto-js";
 
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { authService } from "@/services";
-import { Toast } from "@/utils";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
