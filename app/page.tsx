@@ -127,6 +127,7 @@ const LoginPage = () => {
     await authService
       .login(emailEncrypted, passwordEncrypted)
       .then(() => {
+        alert("Login exitoso");
         window.location.href = "/dashboard";
       })
       .catch(() => setIsSubmitting(false));
