@@ -1,6 +1,6 @@
 const ROOT_IMG_FOLDER = "/push-notifications";
 
-const NOTIFICATION_EXPIRE_MS = 10 * 1000; // 10 segundos para pruebas, luego se puede ajustar a un tiempo más largo como 5 minutos (5 * 60 * 1000)
+const NOTIFICATION_EXPIRE_MS = 2 * 60 * 1000; // 10 segundos para pruebas, luego se puede ajustar a un tiempo más largo como 2 minutos (2 * 60 * 1000)
 
 const notificationExpirations = new Map();
 
@@ -23,7 +23,7 @@ self.handlePush = (event) => {
   const body = data?.body ?? "¡Tienes una nueva notificación!";
   const tagId = data?.tagId ?? "live-dock-notification";
   const lang = data?.lang ?? "es-MX";
-  const timestamp = data?.timestamp ?? 1 * 1000; // 3 segundos, en milisegundos
+  const timestamp = data?.timestamp ?? 1 * 1000;
   const actions = data?.actions ?? [];
   const metadata = data?.data ?? {};
   const visibleAt = Date.now();

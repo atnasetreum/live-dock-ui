@@ -209,8 +209,7 @@ const MainBanner = ({
             variant="body1"
             sx={{ color: theme.palette.textSecondary }}
           >
-            Seguimiento en tiempo real de flota, recursos y alertas críticas
-            para tu terminal.
+            Seguimiento en tiempo real para la recepción de material.
           </Typography>
         </Box>
         <Stack spacing={2} width={{ xs: "100%", md: "auto" }}>

@@ -222,12 +222,6 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
           >
             Operaciones de hoy
           </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: theme.palette.textSecondary }}
-          >
-            Seguimiento del proceso de recepción de pipa en tiempo real.
-          </Typography>
         </Box>
         <Chip
           label="Tiempo real"

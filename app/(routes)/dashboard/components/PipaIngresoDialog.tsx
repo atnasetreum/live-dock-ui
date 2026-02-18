@@ -90,7 +90,8 @@ const PipaIngresoDialog = ({
       </DialogTitle>
       <DialogContent sx={{ px: 2.5 }}>
         <Typography sx={{ color: theme.palette.textSecondary }}>
-          Esta accion creara un nuevo proceso de recepcion. Deseas continuar?
+          Esta accion creara un nuevo proceso de recepcion.{" "}
+          <center>¿Deseas continuar?</center>
         </Typography>
         <FormControl
           fullWidth
@@ -136,20 +137,6 @@ const PipaIngresoDialog = ({
             <MenuItem value="COLGATE">COLGATE</MenuItem>
           </Select>
         </FormControl>
-        <Box
-          sx={{
-            mt: 2,
-            p: 1.5,
-            borderRadius: 2,
-            backgroundColor: theme.surfaces.translucent,
-            border: `1px solid ${theme.surfaces.border}`,
-          }}
-        >
-          <Typography variant="caption" sx={{ color: theme.listSecondary }}>
-            Se registrara el inicio del proceso y quedara disponible en el
-            tablero de seguimiento.
-          </Typography>
-        </Box>
       </DialogContent>
       <DialogActions
         sx={{
