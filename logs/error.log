@@ -1,0 +1,82 @@
+2026-02-18T08:25:54: TypeError: fetch failed
+2026-02-18T08:25:54:     at nc (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:14238)
+2026-02-18T08:25:54:     at handler (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:15180)
+2026-02-18T08:25:54:     at <unknown> (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35806)
+2026-02-18T08:25:54:     at <unknown> (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35793)
+2026-02-18T08:25:54:     at async tm (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:32144) {
+2026-02-18T08:25:54:   [cause]: AggregateError: 
+2026-02-18T08:25:54:       at ignore-listed frames {
+2026-02-18T08:25:54:     code: 'ECONNREFUSED'
+2026-02-18T08:25:54:   }
+2026-02-18T08:25:54: }
+2026-02-18T08:26:17: TypeError: fetch failed
+2026-02-18T08:26:17:     at nc (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:14238)
+2026-02-18T08:26:17:     at handler (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:15180)
+2026-02-18T08:26:17:     at <unknown> (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35806)
+2026-02-18T08:26:17:     at <unknown> (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35793)
+2026-02-18T08:26:17:     at async tm (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:32144) {
+2026-02-18T08:26:17:   [cause]: AggregateError: 
+2026-02-18T08:26:17:       at ignore-listed frames {
+2026-02-18T08:26:17:     code: 'ECONNREFUSED'
+2026-02-18T08:26:17:   }
+2026-02-18T08:26:17: }
+2026-02-18T08:26:35: TypeError: fetch failed
+2026-02-18T08:26:35:     at nc (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:14238)
+2026-02-18T08:26:35:     at handler (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:15180)
+2026-02-18T08:26:35:     at <unknown> (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35806)
+2026-02-18T08:26:35:     at <unknown> (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35793)
+2026-02-18T08:26:35:     at async tm (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:32144) {
+2026-02-18T08:26:35:   [cause]: AggregateError: 
+2026-02-18T08:26:35:       at ignore-listed frames {
+2026-02-18T08:26:35:     code: 'ECONNREFUSED'
+2026-02-18T08:26:35:   }
+2026-02-18T08:26:35: }
+2026-02-18T08:26:36: TypeError: fetch failed
+2026-02-18T08:26:36:     at nc (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:14238)
+2026-02-18T08:26:36:     at handler (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:15180)
+2026-02-18T08:26:36:     at <unknown> (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35806)
+2026-02-18T08:26:36:     at <unknown> (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35793)
+2026-02-18T08:26:36:     at async tm (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:32144) {
+2026-02-18T08:26:36:   [cause]: AggregateError: 
+2026-02-18T08:26:36:       at ignore-listed frames {
+2026-02-18T08:26:36:     code: 'ECONNREFUSED'
+2026-02-18T08:26:36:   }
+2026-02-18T08:26:36: }
+2026-02-18T08:32:00: SyntaxError: Unexpected token 'M', "Method Not Allowed" is not valid JSON
+2026-02-18T08:32:00:     at JSON.parse (<anonymous>)
+2026-02-18T08:32:00:     at async nc (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:14264)
+2026-02-18T08:32:00:     at async handler (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:15174)
+2026-02-18T08:32:00:     at async (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35784)
+2026-02-18T08:32:00:     at async tm (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:32144)
+2026-02-18T08:32:35: SyntaxError: Unexpected token 'M', "Method Not Allowed" is not valid JSON
+2026-02-18T08:32:35:     at JSON.parse (<anonymous>)
+2026-02-18T08:32:35:     at async nc (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:14264)
+2026-02-18T08:32:35:     at async handler (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:15174)
+2026-02-18T08:32:35:     at async (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35784)
+2026-02-18T08:32:35:     at async tm (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:32144)
+2026-02-18T08:32:53: SyntaxError: Unexpected token 'M', "Method Not Allowed" is not valid JSON
+2026-02-18T08:32:53:     at JSON.parse (<anonymous>)
+2026-02-18T08:32:53:     at async nc (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:14264)
+2026-02-18T08:32:53:     at async handler (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:15174)
+2026-02-18T08:32:53:     at async (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35784)
+2026-02-18T08:32:53:     at async tm (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:32144)
+2026-02-18T08:34:00: TypeError: fetch failed
+2026-02-18T08:34:00:     at nc (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:14285)
+2026-02-18T08:34:00:     at handler (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:24:15188)
+2026-02-18T08:34:00:     at <unknown> (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35806)
+2026-02-18T08:34:00:     at <unknown> (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:35793)
+2026-02-18T08:34:00:     at async tm (C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\server\edge\chunks\[root-of-the-server]__07202d7d._.js:13:32144) {
+2026-02-18T08:34:00:   [cause]: AggregateError: 
+2026-02-18T08:34:00:       at ignore-listed frames {
+2026-02-18T08:34:00:     code: 'ECONNREFUSED'
+2026-02-18T08:34:00:   }
+2026-02-18T08:34:00: }
+2026-02-18T08:41:45: Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+2026-02-18T08:41:45:     at ignore-listed frames
+2026-02-18T08:41:46: Error: ENOENT: no such file or directory, open 'C:\Users\eduar\proyects\creatoris\live-dock\live-dock-ui\.next\prerender-manifest.json'
+2026-02-18T08:41:46:     at ignore-listed frames {
+2026-02-18T08:41:46:   errno: -4058,
+2026-02-18T08:41:46:   code: 'ENOENT',
+2026-02-18T08:41:46:   syscall: 'open',
+2026-02-18T08:41:46:   path: 'C:\\Users\\eduar\\proyects\\creatoris\\live-dock\\live-dock-ui\\.next\\prerender-manifest.json'
+2026-02-18T08:41:46: }

@@ -51,8 +51,8 @@ const DEFAULT_ERROR_MESSAGE =
 // Interceptor de response: manejo de errores centralizado
 axiosClient.interceptors.response.use(
   (response) => {
-    const requestId = response.config.headers["X-Request-ID"];
-    /* console.info(`[Frontend] Response ${requestId}`, {
+    /*const requestId = response.config.headers["X-Request-ID"];
+     console.info(`[Frontend] Response ${requestId}`, {
       status: response.status,
       timestamp: new Date().toISOString(),
     }); */
@@ -60,11 +60,11 @@ axiosClient.interceptors.response.use(
   },
   (error) => {
     // Aquí puedes loggear, auditar o normalizar errores
-    const requestId = error.config?.headers?.["X-Request-ID"];
+    /* const requestId = error.config?.headers?.["X-Request-ID"];
     console.error(`[Frontend] Error ${requestId}`, {
       message: error.message,
       timestamp: new Date().toISOString(),
-    });
+    }); */
 
     const message =
       error?.response?.data?.message || error.message || DEFAULT_ERROR_MESSAGE;
@@ -80,8 +80,6 @@ axiosClient.interceptors.response.use(
     }
 
     Toast.error(message);
-
-    console.error("API Error:", error.response?.data || error.message);
     return Promise.reject(error);
   },
 );

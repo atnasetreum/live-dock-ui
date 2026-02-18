@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 import { headersDefault } from "./common/axiosClient";
 
-let idx = 0;
+//let idx = 0;
 
 export async function middleware(request: NextRequest) {
   const url = request.nextUrl;
@@ -21,12 +21,14 @@ export async function middleware(request: NextRequest) {
   // token valido = 0
   // token invalido = 1
 
-  idx++;
+  //idx++;
 
-  console.log({ idx, url: request.url, pathname });
+  const fetchUrl = process.env.NEXT_PUBLIC_API_URL + "/auth/check-token";
+
+  //console.log({ idx, url: request.url, fetchUrl });
 
   const data = await (
-    await fetch(process.env.NEXT_PUBLIC_API_URL + "/auth/check-token", {
+    await fetch(fetchUrl, {
       method: "POST",
       headers: {
         ...headersDefault,
