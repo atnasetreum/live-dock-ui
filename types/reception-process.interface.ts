@@ -2,7 +2,7 @@ import { User } from "./users.interfaces";
 
 export interface ReceptionProcess {
   id: number;
-  status: string;
+  status: ReceptionProcessStatus;
   typeOfMaterial: string;
   isActive: boolean;
   createdBy: User;
@@ -46,4 +46,10 @@ export enum ProcessState {
   CALIDAD_PENDIENTE_DE_CONFIRMACION_DE_ANALISIS = "CALIDAD_PENDIENTE_DE_CONFIRMACION_DE_ANALISIS",
   CALIDAD_APROBO = "CALIDAD APROBO",
   CALIDAD_RECHAZO = "CALIDAD_RECHAZO",
+}
+
+export enum ReceptionProcessStatus {
+  EN_PROGRESO = "EN_PROGRESO",
+  RECHAZADO = "RECHAZADO",
+  FINALIZADO = "FINALIZADO",
 }

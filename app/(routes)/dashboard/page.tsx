@@ -19,7 +19,11 @@ import { useCurrentUser } from "@/common/UserContext";
 import AlertsEvents from "./components/AlertsEvents";
 import { useSocket } from "@/common/SocketProvider";
 import MainBanner from "./components/MainBanner";
-import { ProcessEventRole, ReceptionProcess } from "@/types";
+import {
+  ProcessEventRole,
+  ReceptionProcess,
+  ReceptionProcessStatus,
+} from "@/types";
 import { Toast } from "@/utils";
 
 /* const stats = [
@@ -125,14 +129,19 @@ const DashboardPage = () => {
 
     navigator.serviceWorker.addEventListener("message", (event) => {
       if (event.data?.type === "confirm-clicked") {
+        setRealTimeMonitor(false);
+        setReceptionProcess(null);
+
         const payload = event.data.data;
 
         const currentReceptionProcess =
           data.find((item) => item.id === payload.id) ?? null;
 
         if (currentReceptionProcess) {
-          setRealTimeMonitor(true);
-          setReceptionProcess(currentReceptionProcess);
+          setTimeout(() => {
+            setRealTimeMonitor(true);
+            setReceptionProcess(currentReceptionProcess);
+          }, 500);
         }
 
         // actualizar estado, router, modal, etc.
@@ -141,10 +150,48 @@ const DashboardPage = () => {
     });
   }, [data]);
 
+  const findLastSystemEvent = (currentData: ReceptionProcess[]) => {
+    /* const currentReceptionProcess = currentData
+      .filter(
+        ({ status }) =>
+          ![
+            ReceptionProcessStatus.RECHAZADO,
+            ReceptionProcessStatus.FINALIZADO,
+          ].includes(status),
+      )
+      .sort(
+        ({ events: eventsA }, { events: eventsB }) =>
+          new Date(eventsB[eventsB.length - 1].createdAt).getTime() -
+          new Date(eventsA[eventsA.length - 1].createdAt).getTime(),
+      )[0];
+
+    if (!currentReceptionProcess) {
+      setRealTimeMonitor(false);
+      setReceptionProcess(null);
+      return;
+    } */
+
+    const lastReceptionProcess = currentData.filter(
+      ({ status }) =>
+        ![
+          ReceptionProcessStatus.RECHAZADO,
+          ReceptionProcessStatus.FINALIZADO,
+        ].includes(status),
+    );
+
+    if (!lastReceptionProcess.length) {
+      setRealTimeMonitor(false);
+      setReceptionProcess(null);
+      return;
+    }
+
+    setRealTimeMonitor(true);
+    setReceptionProcess(lastReceptionProcess[lastReceptionProcess.length - 1]);
+  };
+
   useEffect(() => {
     if (role === ProcessEventRole.SISTEMA && data.length > 0) {
-      setRealTimeMonitor(true);
-      setReceptionProcess(data[0]);
+      findLastSystemEvent(data);
     }
   }, [role, data]);
 

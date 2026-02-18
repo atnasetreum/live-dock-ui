@@ -8,6 +8,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { keyframes } from "@mui/system";
 import {
   Box,
   Button,
@@ -20,7 +21,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { keyframes } from "@mui/system";
+import CryptoJS from "crypto-js";
 
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { authService } from "@/services";
@@ -47,9 +48,16 @@ type FormState = {
 };
 
 const initialState: FormState = {
-  email: "user-vigilancia@example.com",
-  password: "123",
+  email: "",
+  password: "",
 };
+
+const NODE_ENV = process.env.NODE_ENV || "development";
+
+if (NODE_ENV === "development") {
+  initialState.email = "user-vigilancia@example.com";
+  initialState.password = "123";
+}
 
 type FormSubmitHandler = NonNullable<ComponentProps<"form">["onSubmit"]>;
 
@@ -103,21 +111,25 @@ const LoginPage = () => {
   const handleSubmit: FormSubmitHandler = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
-    // Fake delay to mimic a network request.
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+
+    const appKey = process.env.NEXT_PUBLIC_APP_KEY!;
+
+    const emailEncrypted = CryptoJS.AES.encrypt(
+      formState.email,
+      appKey,
+    ).toString();
+
+    const passwordEncrypted = CryptoJS.AES.encrypt(
+      formState.password,
+      appKey,
+    ).toString();
 
     await authService
-      .login(formState.email, formState.password)
-      .then(({ message }) => {
-        Toast.success(message);
-        setTimeout(() => {
-          //Navegar a la página principal del panel de control
-          window.location.href = "/dashboard";
-        }, 1500);
+      .login(emailEncrypted, passwordEncrypted)
+      .then(() => {
+        window.location.href = "/dashboard";
       })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
+      .catch(() => setIsSubmitting(false));
   };
 
   return (

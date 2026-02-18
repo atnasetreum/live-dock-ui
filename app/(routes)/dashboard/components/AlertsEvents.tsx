@@ -41,17 +41,17 @@ const AlertsEvents = () => {
       setAlerts((prev) => [event, ...prev]);
     };
 
-    socket.on(`LOGISTICA:events-process-updated`, handleEventsProcessUpdated);
+    /* socket.on(`LOGISTICA:events-process-updated`, handleEventsProcessUpdated);
     socket.on(`CALIDAD:events-process-updated`, handleEventsProcessUpdated);
-    socket.on(`PRODUCCION:events-process-updated`, handleEventsProcessUpdated);
+    socket.on(`PRODUCCION:events-process-updated`, handleEventsProcessUpdated); */
 
-    /* socket.on(
+    socket.on(
       `${currentUser.role}:events-process-updated`,
       handleEventsProcessUpdated,
-    ); */
+    );
 
     return () => {
-      socket.off(
+      /* socket.off(
         `LOGISTICA:events-process-updated`,
         handleEventsProcessUpdated,
       );
@@ -59,11 +59,11 @@ const AlertsEvents = () => {
       socket.off(
         `PRODUCCION:events-process-updated`,
         handleEventsProcessUpdated,
-      );
-      /* socket.off(
+      ); */
+      socket.off(
         `${currentUser.role}:events-process-updated`,
         handleEventsProcessUpdated,
-      ); */
+      );
     };
   }, [socket, currentUser]);
 
