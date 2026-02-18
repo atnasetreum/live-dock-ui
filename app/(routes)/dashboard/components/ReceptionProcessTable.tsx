@@ -115,11 +115,11 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
     const newState =
       currentActionRole === "autorizar" ? "autorizada" : "rechazada";
 
-    let currentRole = currentUser.role;
+    const currentRole = currentUser.role;
     let actionRole = "";
 
     //TODO: Eliminar esto
-    currentRole = [
+    /* currentRole = [
       "LOGISTICA PENDIENTE DE AUTORIZACION",
       "LOGISTICA PENDIENTE DE CAPTURA PESO SAP",
     ].includes(currentStatus)
@@ -128,7 +128,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
             currentStatus,
           )
         ? ProcessEventRole.PRODUCCION
-        : ProcessEventRole.CALIDAD;
+        : ProcessEventRole.CALIDAD; */
     //TODO: Eliminar esto
 
     switch (currentRole) {
@@ -244,28 +244,28 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
 
             const canAuthorize =
               currentStatusRow?.endsWith("AUTORIZACION") &&
-              currentUser?.role !== ProcessEventRole.LOGISTICA; // TODO: Cambiar !=== por ===
+              currentUser?.role === ProcessEventRole.LOGISTICA; // TODO: Cambiar !=== por ===
 
             const canDecision =
               currentStatusRow?.endsWith("PROCESANDO") &&
-              currentUser?.role !== ProcessEventRole.CALIDAD; // TODO: Cambiar !=== por ===
+              currentUser?.role === ProcessEventRole.CALIDAD; // TODO: Cambiar !=== por ===
 
             const canDownload =
               currentStatusRow?.endsWith("PENDIENTE DE DESCARGA") &&
-              currentUser?.role !== ProcessEventRole.PRODUCCION; // TODO: Cambiar !=== por ===
+              currentUser?.role === ProcessEventRole.PRODUCCION; // TODO: Cambiar !=== por ===
 
             const canEndDownload =
               currentStatusRow?.endsWith("PRODUCCION DESCARGANDO") &&
-              currentUser?.role !== ProcessEventRole.PRODUCCION; // TODO: Cambiar !=== por ===
+              currentUser?.role === ProcessEventRole.PRODUCCION; // TODO: Cambiar !=== por ===
 
             const canCaptureWeight =
               currentStatusRow?.endsWith(
                 "LOGISTICA PENDIENTE DE CAPTURA PESO SAP",
-              ) && currentUser?.role !== ProcessEventRole.LOGISTICA; // TODO: Cambiar !=== por ===
+              ) && currentUser?.role === ProcessEventRole.LOGISTICA; // TODO: Cambiar !=== por ===
 
             const canRelease =
               currentStatusRow?.includes("PENDIENTE LIBERACION") &&
-              currentUser?.role !== ProcessEventRole.CALIDAD; // TODO: Cambiar !=== por ===
+              currentUser?.role === ProcessEventRole.CALIDAD; // TODO: Cambiar !=== por ===
 
             const hasActions =
               canAuthorize ||
