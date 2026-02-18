@@ -94,6 +94,7 @@ export default function MainLayout({
         const registration = await navigator.serviceWorker.ready;
 
         console.log("Notification permission granted.");
+
         webPushService.getPublicKey().then((publicKey) => {
           registration.pushManager
             .subscribe({

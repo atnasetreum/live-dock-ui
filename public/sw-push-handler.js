@@ -19,7 +19,7 @@ self.cancelNotificationExpiration = (notificationTag) => {
 self.handlePush = (event) => {
   const data = event.data ? event.data.json() : {};
 
-  const title = data?.title ?? "Notificación de Live Dock";
+  const title = data?.title ?? "Notificación de prueba";
   const body = data?.body ?? "¡Tienes una nueva notificación!";
   const tagId = data?.tagId ?? "live-dock-notification";
   const lang = data?.lang ?? "es-MX";
@@ -30,7 +30,7 @@ self.handlePush = (event) => {
   const image = data?.image ? `${ROOT_IMG_FOLDER}/${data.image}` : undefined;
   const requireInteraction = data?.requireInteraction === true;
 
-  const { eventTime, actionConfirm } = metadata;
+  const { isTest, eventTime, actionConfirm } = metadata;
 
   self.cancelNotificationExpiration(tagId);
 
@@ -54,6 +54,14 @@ self.handlePush = (event) => {
     timestamp: new Date(eventTime).getTime(),
   };
 
+  if (isTest) {
+    console.log("[TEST MODE] Payload de la notificación");
+    event.waitUntil(
+      self.registration.showNotification(title, notificationOptions),
+    );
+    return;
+  }
+
   const payloadMetric = {
     id: Number(metadata.id),
     appKey: metadata.appKey,
@@ -65,7 +73,7 @@ self.handlePush = (event) => {
 
   // Cuando el usuario no interactúa con la notificación, se considera que ha expirado
   const expirationPromise = new Promise((resolve) => {
-    if (requireInteraction) {
+    if (requireInteraction && !isTest) {
       const timerId = setTimeout(() => {
         console.log("[EXPIRED] Vuelve a notificar al usuario");
 

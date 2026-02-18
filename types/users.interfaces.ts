@@ -4,6 +4,7 @@ export enum ProcessEventRole {
   CALIDAD = "CALIDAD",
   PRODUCCION = "PRODUCCION",
   SISTEMA = "SISTEMA",
+  ADMIN = "ADMIN",
 }
 
 export interface User {

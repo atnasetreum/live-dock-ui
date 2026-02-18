@@ -212,10 +212,7 @@ const DashboardPage = () => {
         onMaterialTypeChange={setPipaMaterialType}
       />
       <Stack spacing={4}>
-        <MainBanner
-          setRealTimeMonitor={setRealTimeMonitor}
-          onPipaIngreso={handleOpenPipaDialog}
-        />
+        <MainBanner onPipaIngreso={handleOpenPipaDialog} />
 
         {/* <Stack spacing={2}>
           <Typography variant="overline" sx={{ letterSpacing: 3 }}>
