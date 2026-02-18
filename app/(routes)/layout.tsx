@@ -105,8 +105,8 @@ export default function MainLayout({
               console.log("Push subscription successful:", subscription);
               webPushService.createSubscribe(subscription).then(() => {
                 // Notification test
-                registration.showNotification("LiveDock", {
-                  body: "¡Notificaciones push activadas correctamente!",
+                registration.showNotification("Test", {
+                  body: "¡Notificaciones  activadas correctamente!",
                   icon: "/icons/icon-192x192.png",
                   badge: "/push-notifications/badge.png",
                 });
