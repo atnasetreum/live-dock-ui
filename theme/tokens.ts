@@ -18,6 +18,10 @@ export type ThemeTokens = {
     pageBackground: string;
     textPrimary: string;
     textSecondary: string;
+    primary?: {
+      main: string;
+      dark: string;
+    };
     success?: {
       main: string;
       dark: string;
@@ -85,6 +89,10 @@ export const darkTheme: ThemeTokens = {
     pageBackground: "linear-gradient(135deg, #040a1c, #0f2557 38%, #17507b)",
     textPrimary: "#ffffff",
     textSecondary: "rgba(255,255,255,0.78)",
+    primary: {
+      main: "#1c6fe8",
+      dark: "#155ab5",
+    },
     success: {
       main: "#4caf50",
       dark: "#388e3c",
@@ -168,6 +176,10 @@ export const lightTheme: ThemeTokens = {
     pageBackground: "linear-gradient(135deg, #fefefe, #e6f0ff 42%, #d3f3ff)",
     textPrimary: "#0b1b2d",
     textSecondary: "rgba(11,27,45,0.72)",
+    primary: {
+      main: "#2563eb",
+      dark: "#1e40af",
+    },
     success: {
       main: "#66bb6a",
       dark: "#2e7d32",

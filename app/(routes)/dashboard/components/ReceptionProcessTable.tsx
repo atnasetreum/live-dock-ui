@@ -20,6 +20,15 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import {
+  Timeline,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineItem,
+  TimelineOppositeContent,
+  TimelineSeparator,
+} from "@mui/lab";
 
 import { EventData, ProcessEventRole, ReceptionProcess } from "@/types";
 import { receptionProcessesService } from "@/services";
@@ -765,184 +774,260 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                             }}
                           />
                         </Stack>
-                        <Stack spacing={1.25} mt={1.5}>
-                          {receptionProcess.events?.length ? (
-                            receptionProcess.events.map((eventItem) => (
-                              <Box
-                                key={eventItem.id}
-                                sx={{
-                                  display: "grid",
-                                  gridTemplateColumns: {
-                                    xs: "1fr",
-                                    sm: "minmax(220px, 2fr) minmax(140px, 1fr) minmax(140px, 1fr)",
-                                  },
-                                  gap: { xs: 1.5, sm: 2 },
-                                  alignItems: "start",
-                                  padding: { xs: 1.5, sm: 2 },
-                                  borderRadius: 1.5,
-                                  backgroundColor: theme.surfaces.translucent,
-                                }}
-                              >
-                                <Stack spacing={1}>
-                                  <Box>
+                        {receptionProcess.events?.length ? (
+                          <Timeline
+                            sx={{
+                              mt: 1.5,
+                              mb: 0,
+                              px: 0,
+                              [`& .MuiTimelineItem-root:before`]: {
+                                flex: 0,
+                                padding: 0,
+                              },
+                            }}
+                          >
+                            {receptionProcess.events.map((eventItem, index) => {
+                              const prevEvent =
+                                index > 0
+                                  ? receptionProcess.events[index - 1]
+                                  : undefined;
+                              const timeSincePrevious = prevEvent
+                                ? (() => {
+                                    const prevTime = new Date(
+                                      prevEvent.createdAt,
+                                    ).getTime();
+                                    const currTime = new Date(
+                                      eventItem.createdAt,
+                                    ).getTime();
+                                    const diffMs = currTime - prevTime;
+                                    const hours = Math.floor(
+                                      diffMs / (1000 * 60 * 60),
+                                    );
+                                    const minutes = Math.floor(
+                                      (diffMs % (1000 * 60 * 60)) / (1000 * 60),
+                                    );
+                                    const seconds = Math.floor(
+                                      (diffMs % (1000 * 60)) / 1000,
+                                    );
+                                    return `${hours}h ${minutes}m ${seconds}s desde anterior`;
+                                  })()
+                                : "Primer evento";
+
+                              return (
+                                <TimelineItem key={eventItem.id}>
+                                  <TimelineOppositeContent
+                                    sx={{
+                                      display: { xs: "none", sm: "block" },
+                                      flex: 0.35,
+                                      px: 1,
+                                      color: theme.palette.textSecondary,
+                                    }}
+                                  >
                                     <Typography
                                       variant="caption"
                                       sx={{
-                                        color: theme.palette.textSecondary,
                                         textTransform: "uppercase",
                                         letterSpacing: 0.5,
                                         fontSize: "0.7rem",
                                       }}
                                     >
-                                      Evento
+                                      Fecha
                                     </Typography>
                                     <Typography
                                       variant="body2"
                                       sx={{
-                                        fontWeight: 600,
                                         color: theme.palette.textPrimary,
                                         mt: 0.25,
-                                        lineHeight: 1.4,
-                                      }}
-                                    >
-                                      {eventItem.event.replace(/_/g, " ")}
-                                    </Typography>
-                                  </Box>
-                                  <Box>
-                                    <Typography
-                                      variant="caption"
-                                      sx={{
-                                        color: theme.palette.textSecondary,
-                                        textTransform: "uppercase",
-                                        letterSpacing: 0.5,
-                                        fontSize: "0.7rem",
-                                      }}
-                                    >
-                                      Estatus
-                                    </Typography>
-                                    <Typography
-                                      variant="body2"
-                                      sx={{
                                         fontWeight: 500,
-                                        color: theme.palette.textPrimary,
-                                        mt: 0.25,
                                       }}
                                     >
-                                      {eventItem.status?.replace(/_/g, " ")}
+                                      {formatTime(eventItem.createdAt)}
                                     </Typography>
-                                  </Box>
-                                </Stack>
-                                <Box>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      color: theme.palette.textSecondary,
-                                      textTransform: "uppercase",
-                                      letterSpacing: 0.5,
-                                      fontSize: "0.7rem",
-                                    }}
-                                  >
-                                    Responsable
-                                  </Typography>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{
-                                      color: theme.palette.textPrimary,
-                                      mt: 0.25,
-                                      fontWeight: 500,
-                                    }}
-                                  >
-                                    {eventItem.role !==
-                                      ProcessEventRole.SISTEMA &&
-                                      eventItem.createdBy.name}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      color: theme.palette.textSecondary,
-                                      mt: 0.5,
-                                      display: "block",
-                                    }}
-                                  >
-                                    {eventItem.role}
-                                  </Typography>
-                                </Box>
-                                <Box>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      color: theme.palette.textSecondary,
-                                      textTransform: "uppercase",
-                                      letterSpacing: 0.5,
-                                      fontSize: "0.7rem",
-                                    }}
-                                  >
-                                    Fecha
-                                  </Typography>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{
-                                      color: theme.palette.textPrimary,
-                                      mt: 0.25,
-                                      fontWeight: 500,
-                                    }}
-                                  >
-                                    {formatTime(eventItem.createdAt)}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      color: theme.palette.textSecondary,
-                                      mt: 0.5,
-                                      display: "block",
-                                    }}
-                                  >
-                                    {eventItem.id > 0 && receptionProcess.events
-                                      ? (() => {
-                                          const currentIndex =
-                                            receptionProcess.events.findIndex(
-                                              (e) => e.id === eventItem.id,
-                                            );
-                                          if (currentIndex > 0) {
-                                            const prevEvent =
-                                              receptionProcess.events[
-                                                currentIndex - 1
-                                              ];
-                                            const prevTime = new Date(
-                                              prevEvent.createdAt,
-                                            ).getTime();
-                                            const currTime = new Date(
-                                              eventItem.createdAt,
-                                            ).getTime();
-                                            const diffMs = currTime - prevTime;
-                                            const hours = Math.floor(
-                                              diffMs / (1000 * 60 * 60),
-                                            );
-                                            const minutes = Math.floor(
-                                              (diffMs % (1000 * 60 * 60)) /
-                                                (1000 * 60),
-                                            );
-                                            const seconds = Math.floor(
-                                              (diffMs % (1000 * 60)) / 1000,
-                                            );
-                                            return `${hours}h ${minutes}m ${seconds}s desde anterior`;
-                                          }
-                                          return "Primer evento";
-                                        })()
-                                      : "--"}
-                                  </Typography>
-                                </Box>
-                              </Box>
-                            ))
-                          ) : (
-                            <Typography
-                              variant="body2"
-                              sx={{ color: theme.palette.textSecondary }}
-                            >
-                              Sin eventos registrados.
-                            </Typography>
-                          )}
-                        </Stack>
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        mt: 0.5,
+                                        display: "block",
+                                      }}
+                                    >
+                                      {timeSincePrevious}
+                                    </Typography>
+                                  </TimelineOppositeContent>
+                                  <TimelineSeparator>
+                                    <TimelineDot
+                                      sx={{
+                                        backgroundColor:
+                                          theme.palette.primary?.main,
+                                        boxShadow: theme.overlays.cardShadow,
+                                      }}
+                                    />
+                                    {index <
+                                      receptionProcess.events.length - 1 && (
+                                      <TimelineConnector
+                                        sx={{
+                                          backgroundColor:
+                                            theme.surfaces.border,
+                                        }}
+                                      />
+                                    )}
+                                  </TimelineSeparator>
+                                  <TimelineContent sx={{ px: 1, pb: 2 }}>
+                                    <Box
+                                      sx={{
+                                        padding: { xs: 1.5, sm: 2 },
+                                        borderRadius: 1.5,
+                                        backgroundColor:
+                                          theme.surfaces.translucent,
+                                        border: `1px solid ${theme.surfaces.border}`,
+                                      }}
+                                    >
+                                      <Stack spacing={1.25}>
+                                        <Box>
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              color:
+                                                theme.palette.textSecondary,
+                                              textTransform: "uppercase",
+                                              letterSpacing: 0.5,
+                                              fontSize: "0.7rem",
+                                            }}
+                                          >
+                                            Evento
+                                          </Typography>
+                                          <Typography
+                                            variant="body2"
+                                            sx={{
+                                              fontWeight: 600,
+                                              color: theme.palette.textPrimary,
+                                              mt: 0.25,
+                                              lineHeight: 1.4,
+                                            }}
+                                          >
+                                            {eventItem.event.replace(/_/g, " ")}
+                                          </Typography>
+                                        </Box>
+                                        <Box>
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              color:
+                                                theme.palette.textSecondary,
+                                              textTransform: "uppercase",
+                                              letterSpacing: 0.5,
+                                              fontSize: "0.7rem",
+                                            }}
+                                          >
+                                            Estatus
+                                          </Typography>
+                                          <Typography
+                                            variant="body2"
+                                            sx={{
+                                              fontWeight: 500,
+                                              color: theme.palette.textPrimary,
+                                              mt: 0.25,
+                                            }}
+                                          >
+                                            {eventItem.status?.replace(
+                                              /_/g,
+                                              " ",
+                                            )}
+                                          </Typography>
+                                        </Box>
+                                        <Box>
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              color:
+                                                theme.palette.textSecondary,
+                                              textTransform: "uppercase",
+                                              letterSpacing: 0.5,
+                                              fontSize: "0.7rem",
+                                            }}
+                                          >
+                                            Responsable
+                                          </Typography>
+                                          <Typography
+                                            variant="body2"
+                                            sx={{
+                                              color: theme.palette.textPrimary,
+                                              mt: 0.25,
+                                              fontWeight: 500,
+                                            }}
+                                          >
+                                            {eventItem.role !==
+                                              ProcessEventRole.SISTEMA &&
+                                              eventItem.createdBy.name}
+                                          </Typography>
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              color:
+                                                theme.palette.textSecondary,
+                                              mt: 0.5,
+                                              display: "block",
+                                            }}
+                                          >
+                                            {eventItem.role}
+                                          </Typography>
+                                        </Box>
+                                        <Box
+                                          sx={{
+                                            display: {
+                                              xs: "block",
+                                              sm: "none",
+                                            },
+                                          }}
+                                        >
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              color:
+                                                theme.palette.textSecondary,
+                                              textTransform: "uppercase",
+                                              letterSpacing: 0.5,
+                                              fontSize: "0.7rem",
+                                            }}
+                                          >
+                                            Fecha
+                                          </Typography>
+                                          <Typography
+                                            variant="body2"
+                                            sx={{
+                                              color: theme.palette.textPrimary,
+                                              mt: 0.25,
+                                              fontWeight: 500,
+                                            }}
+                                          >
+                                            {formatTime(eventItem.createdAt)}
+                                          </Typography>
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              color:
+                                                theme.palette.textSecondary,
+                                              mt: 0.5,
+                                              display: "block",
+                                            }}
+                                          >
+                                            {timeSincePrevious}
+                                          </Typography>
+                                        </Box>
+                                      </Stack>
+                                    </Box>
+                                  </TimelineContent>
+                                </TimelineItem>
+                              );
+                            })}
+                          </Timeline>
+                        ) : (
+                          <Typography
+                            variant="body2"
+                            sx={{ color: theme.palette.textSecondary, mt: 1.5 }}
+                          >
+                            Sin eventos registrados.
+                          </Typography>
+                        )}
                       </Box>
                       {/* // Metricas */}
                       {/* <Box
