@@ -1111,9 +1111,15 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
           <b>
             {currentActionRole === "descargando"
               ? "descargar"
-              : currentActionRole === "autorizar"
-                ? "autorizar"
-                : "rechazar"}
+              : currentActionRole === "descargado"
+                ? "marcar como descargado"
+                : currentActionRole === "captura-peso-sap"
+                  ? "notificar captura de peso en SAP"
+                  : currentActionRole === "liberar-sap"
+                    ? "notificar liberación en SAP"
+                    : currentActionRole === "autorizar"
+                      ? "autorizar"
+                      : "rechazar"}
           </b>{" "}
           esta operación? Esta acción no puede ser revertida.
         </DialogContent>

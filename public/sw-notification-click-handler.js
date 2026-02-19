@@ -64,13 +64,14 @@ self.handleNotificationClick = (event) => {
       case "confirm":
         console.log("Usuario confirmo la acción");
         event.waitUntil(
-          Promise.all([
-            handleConfirmAction(),
-            self.notifyMetric({
+          self
+            .notifyMetric({
               ...payloadMetric,
               eventType: "ACTION_CLICKED_CONFIRM",
+            })
+            .then(() => {
+              return handleConfirmAction();
             }),
-          ]),
         );
         break;
       default:
