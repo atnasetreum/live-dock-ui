@@ -745,7 +745,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                             variant="subtitle2"
                             sx={{ color: theme.palette.textPrimary }}
                           >
-                            Tiempo transcurrido
+                            Transcurrido
                             {receptionProcess.events &&
                               receptionProcess.events.length > 0 && (
                                 <ElapsedTimeDisplay
