@@ -5,26 +5,28 @@ self.handleNotificationClose = (event) => {
 
   const metadata = event.notification.data || {};
 
-  console.log({ metadata });
-
   const accionAt = Date.now();
 
-  const { visibleAt } = metadata;
+  const { visibleAt, eventTime } = metadata;
 
+  //Tiempo reacción = acciónAt - visibleAt
   const visibleTimeMs = accionAt - visibleAt;
-  const visibleTimeSec = Math.floor(visibleTimeMs / 1000);
+  const reactionTimeSec = Math.floor(visibleTimeMs / 1000);
 
-  console.log({ closeInSec: visibleTimeSec });
+  //Tiempo atraso = visibleAt - eventAt
+  const eventAt = new Date(eventTime).getTime();
+  const delayTimeMs = visibleAt - eventAt;
+  const systemDelaySec = Math.floor(delayTimeMs / 1000);
 
   console.log("Notificación cerrada por el usuario ❌", metadata);
 
   const payloadMetric = {
-    /* ...metadata,
-    reactionTimeSec: visibleTimeSec,
-    accionAt: new Date(accionAt).toISOString(), */
     id: metadata.id,
+    reactionTimeSec,
+    systemDelaySec,
     notifiedUserId: metadata.notifiedUserId,
     visibleAt,
+    accionAt: new Date(accionAt).toISOString(),
     actionConfirm: metadata.actionConfirm,
     eventType: "NOTIFICATION_CLOSED",
     publicBackendUrl: metadata.publicBackendUrl,
