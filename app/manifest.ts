@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "LiveDock Control",
-    short_name: "LiveDock",
+    name: "Mesa de control",
+    short_name: "Mesa de control",
     description:
-      "Panel de control operativo para gestión portuaria en tiempo real",
+      "Supervisa cada etapa de recepción, registra eventos críticos y da seguimiento en tiempo real desde un panel central para vigilancia y operación.",
     scope: "/",
     start_url: "/",
     display: "standalone",
@@ -14,10 +14,15 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: "portrait",
     icons: [
       {
+        src: "/icon-pwa.png",
+        sizes: "any",
+        type: "image/png",
+      },
+      /* {
         src: "/icon.svg",
         sizes: "any",
         type: "image/svg+xml",
-      },
+      }, */
     ],
   };
 }
