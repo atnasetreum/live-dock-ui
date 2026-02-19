@@ -25,11 +25,7 @@ import { disconnectSocket } from "@/libs/socket";
 import { ProcessEventRole } from "@/types";
 import { Toast } from "@/utils";
 
-const statusChips = [
-  { label: "Terminal activa", tone: "success" },
-  { label: "Turno 08:00 - 18:00", tone: "neutral" },
-  { label: "Clima estable", tone: "info" },
-];
+const statusChips = [{ label: "Monitoreo en tiempo real", tone: "info" }];
 
 const MainBanner = ({ onPipaIngreso }: { onPipaIngreso: () => void }) => {
   const { theme } = useThemeConfig();
@@ -212,7 +208,7 @@ const MainBanner = ({ onPipaIngreso }: { onPipaIngreso: () => void }) => {
             variant="body1"
             sx={{ color: theme.palette.textSecondary }}
           >
-            Seguimiento en tiempo real para la recepción de material.
+            Seguimiento en tiempo real del flujo de recepción de pipas.
           </Typography>
         </Box>
         <Stack spacing={2} width={{ xs: "100%", md: "auto" }}>
@@ -230,7 +226,7 @@ const MainBanner = ({ onPipaIngreso }: { onPipaIngreso: () => void }) => {
                 boxShadow: theme.overlays.cardShadow,
               }}
             >
-              Ingreso de pipa
+              Registrar ingreso de pipa
             </Button>
           )}
           {/* <Button
@@ -278,7 +274,7 @@ const MainBanner = ({ onPipaIngreso }: { onPipaIngreso: () => void }) => {
             <>
               <TextField
                 type="text"
-                placeholder="User ID"
+                placeholder="ID de usuario"
                 value={userId}
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^0-9]/g, "");
@@ -320,7 +316,7 @@ const MainBanner = ({ onPipaIngreso }: { onPipaIngreso: () => void }) => {
                   },
                 }}
               >
-                Test Notifications
+                Probar notificaciones
               </Button>
             </>
           )}

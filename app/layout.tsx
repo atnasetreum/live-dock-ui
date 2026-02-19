@@ -17,15 +17,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LiveDock Control - Panel Operativo Portuario",
+  title: "Mesa de control",
   description:
-    "Panel de control en tiempo real para gestión de operaciones portuarias",
-  applicationName: "LiveDock Control",
+    "Supervisa cada etapa de recepción, registra eventos críticos y da seguimiento en tiempo real desde un panel central para vigilancia y operación.",
+  applicationName: "Mesa de control",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "LiveDock Control",
+    title: "Mesa de control",
   },
 };
 
@@ -44,7 +44,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="hydrated">
+    <html lang="es" className="hydrated">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
