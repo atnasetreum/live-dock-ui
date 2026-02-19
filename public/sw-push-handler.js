@@ -1,6 +1,6 @@
 const ROOT_IMG_FOLDER = "/push-notifications";
 
-const NOTIFICATION_EXPIRE_MS = 10 * 1000; // 10 segundos para pruebas, luego se puede ajustar a un tiempo más largo como 2 minutos (2 * 60 * 1000)
+const NOTIFICATION_EXPIRE_MS = 2 * 60 * 1000; // 10 segundos para pruebas, luego se puede ajustar a un tiempo más largo como 2 minutos (2 * 60 * 1000)
 
 const notificationExpirations = new Map();
 
