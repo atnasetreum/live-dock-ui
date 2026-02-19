@@ -43,10 +43,19 @@ self.getClientInfo = async () => {
   }
 };
 
-self.notifyMetric = async ({ publicBackendUrl, appKey, ...payload }) => {
+self.notifyMetric = async ({
+  publicBackendUrl,
+  appKey,
+  eventType,
+  ...payload
+}) => {
   const url = `${publicBackendUrl}/reception-process/notify-metric`;
 
   const clientInfo = await self.getClientInfo();
+
+  if (eventType === "NOTIFICATION_CLOSED" && !clientInfo.mobile) {
+    return; // No enviar métricas de cierre para desktop
+  }
 
   delete payload.eventTime;
 
@@ -58,6 +67,7 @@ self.notifyMetric = async ({ publicBackendUrl, appKey, ...payload }) => {
     },
     body: JSON.stringify({
       ...payload,
+      eventType,
       metadata: JSON.stringify(clientInfo),
     }),
   });
