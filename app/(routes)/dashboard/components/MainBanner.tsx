@@ -248,12 +248,11 @@ const MainBanner = ({ onPipaIngreso }: { onPipaIngreso: () => void }) => {
             variant="outlined"
             startIcon={<LogoutIcon />}
             onClick={() => {
-              authService.logout().then(({ message }) => {
-                Toast.success(message);
+              authService.logout().then(() => {
+                disconnectSocket();
                 setTimeout(() => {
-                  disconnectSocket();
                   window.location.replace("/");
-                }, 1500);
+                }, 50);
               });
             }}
             sx={{
