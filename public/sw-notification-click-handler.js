@@ -1,6 +1,4 @@
 self.handleNotificationClick = (event) => {
-  //event.notification.close();
-
   if (self.cancelNotificationExpiration) {
     self.cancelNotificationExpiration(event.notification.tag);
   }
@@ -66,6 +64,7 @@ self.handleNotificationClick = (event) => {
   if (actions.length) {
     switch (action) {
       case "confirm":
+        event.notification.close();
         console.log("Usuario confirmo la acción");
         event.waitUntil(
           Promise.all([
@@ -78,6 +77,7 @@ self.handleNotificationClick = (event) => {
         );
         break;
       default:
+        event.notification.close();
         console.log("Usuario hizo clic en la notificación");
         event.waitUntil(
           self.notifyMetric({
