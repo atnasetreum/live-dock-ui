@@ -5,11 +5,11 @@ self.handleNotificationClose = (event) => {
 
   const metadata = event.notification.data || {};
 
-  const closedAt = Date.now();
+  const accionAt = Date.now();
 
   const { visibleAt } = metadata;
 
-  const visibleTimeMs = closedAt - visibleAt;
+  const visibleTimeMs = accionAt - visibleAt;
   const visibleTimeSec = Math.floor(visibleTimeMs / 1000);
 
   console.log({ closeInSec: visibleTimeSec });
