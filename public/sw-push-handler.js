@@ -1,21 +1,5 @@
 const ROOT_IMG_FOLDER = "/push-notifications";
 
-const NOTIFICATION_EXPIRE_MS = 2 * 60 * 1000; // 10 segundos para pruebas, luego se puede ajustar a un tiempo más largo como 2 minutos (2 * 60 * 1000)
-
-const notificationExpirations = new Map();
-
-self.cancelNotificationExpiration = (notificationTag) => {
-  const entry = notificationExpirations.get(notificationTag);
-
-  if (!entry) {
-    return;
-  }
-
-  clearTimeout(entry.timerId);
-  entry.resolve();
-  notificationExpirations.delete(notificationTag);
-};
-
 self.handlePush = (event) => {
   const data = event.data ? event.data.json() : {};
 
@@ -32,11 +16,9 @@ self.handlePush = (event) => {
 
   const { isTest, eventTime, actionConfirm } = metadata;
 
-  self.cancelNotificationExpiration(tagId);
-
   const notificationOptions = {
     body: `${body}\nFecha del evento: ${new Date(eventTime).toLocaleString("es-MX")}`,
-    icon: `/icon-pwa.png`,
+    //icon: `/icon-pwa.png`,
     image,
     tag: tagId,
     data: {
@@ -72,26 +54,6 @@ self.handlePush = (event) => {
     actionConfirm: actionConfirm || "no-action",
   };
 
-  // Cuando el usuario no interactúa con la notificación, se considera que ha expirado
-  const expirationPromise = new Promise((resolve) => {
-    if (requireInteraction && !isTest) {
-      const timerId = setTimeout(() => {
-        console.log("[EXPIRED] Vuelve a notificar al usuario");
-
-        notificationExpirations.delete(tagId);
-        self
-          .notifyMetric({
-            ...payloadMetric,
-            eventType: "EXPIRED",
-          })
-          .finally(resolve);
-      }, NOTIFICATION_EXPIRE_MS);
-      notificationExpirations.set(tagId, { timerId, resolve });
-    } else {
-      resolve();
-    }
-  });
-
   event.waitUntil(
     Promise.all([
       self.registration.showNotification(title, notificationOptions),
@@ -100,7 +62,6 @@ self.handlePush = (event) => {
         ...payloadMetric,
         eventType: "NOTIFICATION_SHOWN",
       }),
-      expirationPromise,
     ]),
   );
 };
