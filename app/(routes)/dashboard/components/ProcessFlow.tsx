@@ -373,7 +373,7 @@ const decisionMap: Record<string, string[]> = {
     "production-downloaded",
   ],
   LOGISTICA_PENDIENTE_DE_CAPTURA_PESO_SAP: ["logistics-pending-sap"],
-  CALIDAD_PENDIENTE_CONFIRMACION_LIBERACION_SAP: ["logistics-captured-sap"],
+  CALIDAD_PENDIENTE_DE_CONFIRMACION_LIBERACION_SAP: ["logistics-captured-sap"],
   CALIDAD_PENDIENTE_LIBERACION_EN_SAP: ["quality-pending-release"],
   FINALIZO_PROCESO: ["quality-release"],
 };
