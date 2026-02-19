@@ -203,27 +203,39 @@ const LoginPage = () => {
             }}
           >
             <Typography variant="overline" sx={{ letterSpacing: 4 }}>
-              LIVE DOCK
+              CENTRO OPERATIVO
             </Typography>
             <Typography variant="h2" sx={{ fontWeight: 600, lineHeight: 1.1 }}>
-              Impulsa tus operaciones portuarias con accesos seguros
+              Controla el acceso operativo y la recepción de material
             </Typography>
             <Typography
               variant="body1"
               sx={{ maxWidth: 520, color: theme.palette.textSecondary }}
             >
-              Centraliza autorizaciones, visibilidad en tiempo real y métricas
-              de desempeño en una sola plataforma. El módulo de acceso conecta a
-              tus equipos con la data crítica en segundos.
+              Supervisa cada etapa de recepción, registra eventos críticos y da
+              seguimiento en tiempo real desde un panel central para vigilancia
+              y operación.
             </Typography>
             <Divider sx={{ borderColor: theme.divider, maxWidth: 320 }} />
-            <Stack direction="row" spacing={3} flexWrap="wrap">
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                columnGap: 4,
+                rowGap: 2,
+                maxWidth: 640,
+              }}
+            >
               {[
-                { label: "99.98% uptime", emphasis: "Disponibilidad" },
-                { label: "Auditorías SOC2", emphasis: "Confiable" },
-                { label: "< 60s onboarding", emphasis: "Ágil" },
+                { label: "Tiempo real", emphasis: "Operación" },
+                { label: "Registro de etapa", emphasis: "Recepción" },
+                { label: "Control por roles", emphasis: "Seguridad" },
+                {
+                  label: "Historial auditable",
+                  emphasis: "Análisis",
+                },
               ].map((stat) => (
-                <Box key={stat.label}>
+                <Box key={stat.label} sx={{ minWidth: 0 }}>
                   <Typography
                     variant="caption"
                     sx={{ color: theme.palette.textSecondary }}
@@ -235,7 +247,7 @@ const LoginPage = () => {
                   </Typography>
                 </Box>
               ))}
-            </Stack>
+            </Box>
           </Box>
 
           <Paper
@@ -279,7 +291,7 @@ const LoginPage = () => {
                 >
                   <Chip
                     icon={<LockOutlinedIcon fontSize="small" />}
-                    label="Acceso seguro"
+                    label="Vigilancia y trazabilidad centralizadas"
                     size="small"
                     sx={{
                       fontWeight: 600,
@@ -290,21 +302,15 @@ const LoginPage = () => {
                       },
                     }}
                   />
-                  <Typography
-                    variant="caption"
-                    sx={{ color: theme.palette.textSecondary }}
-                  >
-                    SOC2 + SSO listo
-                  </Typography>
                 </Stack>
                 <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                  Acceso a LiveDock Control
+                  Ingreso
                 </Typography>
                 <Typography
                   variant="body2"
                   sx={{ color: theme.palette.textSecondary }}
                 >
-                  Ingresa tus credenciales
+                  Accede al panel de control.
                 </Typography>
               </Box>
 
