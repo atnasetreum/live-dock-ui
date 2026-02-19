@@ -24,7 +24,7 @@ import {
   ReceptionProcess,
   ReceptionProcessStatus,
 } from "@/types";
-import { Toast } from "@/utils";
+import { getCurrentDate, Toast } from "@/utils";
 
 /* const stats = [
   {
@@ -96,7 +96,7 @@ const DashboardPage = () => {
   useEffect(() => {
     receptionProcessesService
       .findAll({
-        startDate: new Date().toISOString().split("T")[0], // Solo procesos del día actual
+        startDate: getCurrentDate(), // Solo procesos del día actual
       })
       .then(setData);
   }, []);

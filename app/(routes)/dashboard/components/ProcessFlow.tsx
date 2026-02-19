@@ -516,7 +516,9 @@ const ProcessFlow = ({ lastStatus }: Props) => {
           elementsSelectable={false}
           proOptions={{ hideAttribution: true }}
           style={{ background: theme.surfaces.panel }}
-          fitViewOptions={{ padding: 0.2 }}
+          fitViewOptions={{ padding: 0.2, minZoom: 0.6 }}
+          //fitViewOptions={{ padding: 0.1, minZoom: 1.5, maxZoom: 2.5 }}
+          //defaultViewport={{ x: 0, y: 0, zoom: 1.5 }}
         >
           <Background color={theme.surfaces.border} gap={48} size={2} />
           <Controls showInteractive={false} position="bottom-right" />

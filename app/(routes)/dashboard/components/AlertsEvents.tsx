@@ -8,6 +8,7 @@ import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useCurrentUser } from "@/common/UserContext";
 import { useSocket } from "@/common/SocketProvider";
 import { receptionProcessesService } from "@/services";
+import { getCurrentDate } from "@/utils";
 
 const AlertsEvents = () => {
   const { theme } = useThemeConfig();
@@ -25,7 +26,7 @@ const AlertsEvents = () => {
   useEffect(() => {
     receptionProcessesService
       .findAllPriorityAlerts({
-        startDate: new Date().toISOString().split("T")[0],
+        startDate: getCurrentDate(), // Solo alertas del día actual
       })
       .then(setAlerts);
   }, []);
