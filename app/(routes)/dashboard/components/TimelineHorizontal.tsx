@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
+
 import { Box, Chip, Stack, Typography } from "@mui/material";
 
-import { ReceptionProcess } from "@/types";
 import { useThemeConfig } from "@/theme/ThemeProvider";
+import { ReceptionProcess } from "@/types";
 import { formatTime } from "@/utils";
 
 interface Props {
@@ -10,6 +12,10 @@ interface Props {
 const TimelineHorizontal = ({ receptionProcess }: Props) => {
   const { theme } = useThemeConfig();
   const events = receptionProcess.events ?? [];
+  const isProcessFinalized =
+    receptionProcess.status === "FINALIZADO" ||
+    receptionProcess.status === "RECHAZADO";
+  const [elapsedTime, setElapsedTime] = useState<string>("--");
 
   const laneTitleColors = [
     theme.palette.primary?.main,
@@ -36,6 +42,41 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
     events: sortedEvents.filter((eventItem) => eventItem.role === role),
   }));
 
+  useEffect(() => {
+    const calculateElapsedTime = () => {
+      if (!events.length) {
+        setElapsedTime("--");
+        return;
+      }
+
+      const times = events
+        .map((eventItem) => new Date(eventItem.createdAt).getTime())
+        .filter((time) => Number.isFinite(time));
+
+      if (!times.length) {
+        setElapsedTime("--");
+        return;
+      }
+
+      const firstEventTime = Math.min(...times);
+      const lastEventTime = isProcessFinalized
+        ? Math.max(...times)
+        : Date.now();
+      const diffMs = Math.max(0, lastEventTime - firstEventTime);
+
+      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+      setElapsedTime(`${hours}h ${minutes}m ${seconds}s`);
+    };
+
+    calculateElapsedTime();
+    const interval = setInterval(calculateElapsedTime, 1000);
+
+    return () => clearInterval(interval);
+  }, [events, isProcessFinalized]);
+
   return (
     <Box
       sx={{
@@ -44,6 +85,22 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
         backgroundColor: theme.surfaces.panel,
         border: `1px solid ${theme.surfaces.border}`,
         overflow: "hidden",
+        //Movimiento
+        "@keyframes timelinePulse": {
+          "0%": {
+            transform: "scale(1)",
+            boxShadow: `0 0 0 0 ${theme.palette.primary?.main}33`,
+          },
+          "50%": {
+            transform: "scale(1.02)",
+            boxShadow: `0 0 0 8px ${theme.palette.primary?.main}00`,
+          },
+          "100%": {
+            transform: "scale(1)",
+            boxShadow: `0 0 0 0 ${theme.palette.primary?.main}00`,
+          },
+        },
+        //Movimiento
       }}
     >
       <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -53,6 +110,24 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
         >
           Eventos
         </Typography>
+        <Stack alignItems="center" spacing={0} sx={{ minWidth: 90 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: theme.palette.textSecondary,
+              textTransform: "uppercase",
+            }}
+          >
+            Tiempo transcurrido
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{ color: theme.palette.textPrimary, fontWeight: 600 }}
+            aria-live="polite"
+          >
+            {elapsedTime}
+          </Typography>
+        </Stack>
         <Chip
           label={`${events.length} eventos`}
           size="small"
@@ -134,6 +209,9 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                             boxShadow: isLatestEvent
                               ? theme.overlays.cardShadow
                               : "none",
+                            animation: isLatestEvent
+                              ? "timelinePulse 1.1s ease-in-out infinite"
+                              : "none",
                           }}
                         />
                         {!isLastInLane && (
@@ -161,6 +239,10 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                           boxShadow: isLatestEvent
                             ? theme.overlays.cardShadow
                             : "none",
+                          animation: isLatestEvent
+                            ? "timelinePulse 1.1s ease-in-out infinite"
+                            : "none",
+                          transformOrigin: "center",
                         }}
                       >
                         <Stack spacing={1}>
