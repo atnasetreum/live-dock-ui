@@ -35,6 +35,7 @@ import { receptionProcessesService } from "@/services";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useCurrentUser } from "@/common/UserContext";
 import { formatTime, Toast } from "@/utils";
+import TimeLineEvents from "./TimeLineEvents";
 
 interface ProcessEvent {
   id: number;
@@ -247,33 +248,35 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
           data.map((receptionProcess) => {
             const isExpanded = expandedId === receptionProcess.id;
 
-            const currentStatusRow = receptionProcess.events?.[
-              receptionProcess.events.length - 1
-            ]?.status.replace(/_/g, " ");
+            const currentStatusRaw =
+              receptionProcess.events?.[receptionProcess.events.length - 1]
+                ?.status;
+
+            const formattedStatus = currentStatusRaw?.replace(/_/g, " ");
 
             const canAuthorize =
-              currentStatusRow?.endsWith("AUTORIZACION") &&
+              formattedStatus?.endsWith("AUTORIZACION") &&
               currentUser?.role === ProcessEventRole.LOGISTICA; // TODO: Cambiar !=== por ===
 
             const canDecision =
-              currentStatusRow?.endsWith("PROCESANDO") &&
+              formattedStatus?.endsWith("PROCESANDO") &&
               currentUser?.role === ProcessEventRole.CALIDAD; // TODO: Cambiar !=== por ===
 
             const canDownload =
-              currentStatusRow?.endsWith("PENDIENTE DE DESCARGA") &&
+              formattedStatus?.endsWith("PENDIENTE DE DESCARGA") &&
               currentUser?.role === ProcessEventRole.PRODUCCION; // TODO: Cambiar !=== por ===
 
             const canEndDownload =
-              currentStatusRow?.endsWith("PRODUCCION DESCARGANDO") &&
+              formattedStatus?.endsWith("PRODUCCION DESCARGANDO") &&
               currentUser?.role === ProcessEventRole.PRODUCCION; // TODO: Cambiar !=== por ===
 
             const canCaptureWeight =
-              currentStatusRow?.endsWith(
+              formattedStatus?.endsWith(
                 "LOGISTICA PENDIENTE DE CAPTURA PESO SAP",
               ) && currentUser?.role === ProcessEventRole.LOGISTICA; // TODO: Cambiar !=== por ===
 
             const canRelease =
-              currentStatusRow?.includes("PENDIENTE LIBERACION") &&
+              formattedStatus?.includes("PENDIENTE LIBERACION") &&
               currentUser?.role === ProcessEventRole.CALIDAD; // TODO: Cambiar !=== por ===
 
             const hasActions =
@@ -284,7 +287,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
               canCaptureWeight ||
               canRelease;
 
-            const progressValue = currentStatusRow?.includes("FINALIZO")
+            const progressValue = formattedStatus?.includes("FINALIZO")
               ? 100
               : calculateProgress(receptionProcess.events);
 
@@ -380,7 +383,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                           lineHeight: 1.4,
                         }}
                       >
-                        {currentStatusRow ?? "Sin eventos"}
+                        {formattedStatus ?? "Sin eventos"}
                       </Typography>
                     </Box>
                     <Box sx={{ display: { xs: "none", sm: "block" } }}>
@@ -447,7 +450,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                       }}
                     >
                       {/* Botón de Monitor en tiempo real */}
-                      {!currentStatusRow.includes("FINALIZO") && (
+                      {!formattedStatus.includes("FINALIZO") && (
                         <Button
                           variant="contained"
                           startIcon={<TimelineIcon />}
@@ -489,7 +492,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                   e,
                                   receptionProcess.id,
                                   "rechazar",
-                                  currentStatusRow,
+                                  formattedStatus,
                                 )
                               }
                               variant="contained"
@@ -517,7 +520,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                   e,
                                   receptionProcess.id,
                                   "autorizar",
-                                  currentStatusRow,
+                                  formattedStatus,
                                 )
                               }
                               variant="contained"
@@ -545,7 +548,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                   e,
                                   receptionProcess.id,
                                   "descargando",
-                                  currentStatusRow,
+                                  formattedStatus,
                                 )
                               }
                               variant="contained"
@@ -573,7 +576,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                   e,
                                   receptionProcess.id,
                                   "descargado",
-                                  currentStatusRow,
+                                  formattedStatus,
                                 )
                               }
                               variant="contained"
@@ -601,7 +604,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                   e,
                                   receptionProcess.id,
                                   "captura-peso-sap",
-                                  currentStatusRow,
+                                  formattedStatus,
                                 )
                               }
                               variant="contained"
@@ -629,7 +632,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                   e,
                                   receptionProcess.id,
                                   "liberar-sap",
-                                  currentStatusRow,
+                                  formattedStatus,
                                 )
                               }
                               variant="contained"
@@ -731,304 +734,10 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                         </Box>
                       </Stack>
 
-                      <Box
-                        sx={{
-                          padding: 1.5,
-                          borderRadius: 2,
-                          backgroundColor: theme.surfaces.panel,
-                          border: `1px solid ${theme.surfaces.border}`,
-                        }}
-                      >
-                        <Stack
-                          direction="row"
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ color: theme.palette.textPrimary }}
-                          >
-                            Eventos
-                          </Typography>
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ color: theme.palette.textPrimary }}
-                          >
-                            Transcurrido
-                            {receptionProcess.events &&
-                              receptionProcess.events.length > 0 && (
-                                <ElapsedTimeDisplay
-                                  events={receptionProcess.events}
-                                  isProcessFinalized={currentStatusRow.includes(
-                                    "FINALIZO",
-                                  )}
-                                />
-                              )}
-                          </Typography>
-                          <Chip
-                            label={`${receptionProcess.events?.length ?? 0} eventos`}
-                            size="small"
-                            sx={{
-                              backgroundColor: theme.surfaces.translucent,
-                              color: theme.palette.textSecondary,
-                            }}
-                          />
-                        </Stack>
-                        {receptionProcess.events?.length ? (
-                          <Timeline
-                            sx={{
-                              mt: 1.5,
-                              mb: 0,
-                              px: 0,
-                              [`& .MuiTimelineItem-root:before`]: {
-                                flex: 0,
-                                padding: 0,
-                              },
-                            }}
-                          >
-                            {receptionProcess.events.map((eventItem, index) => {
-                              const prevEvent =
-                                index > 0
-                                  ? receptionProcess.events[index - 1]
-                                  : undefined;
-                              const timeSincePrevious = prevEvent
-                                ? (() => {
-                                    const prevTime = new Date(
-                                      prevEvent.createdAt,
-                                    ).getTime();
-                                    const currTime = new Date(
-                                      eventItem.createdAt,
-                                    ).getTime();
-                                    const diffMs = currTime - prevTime;
-                                    const hours = Math.floor(
-                                      diffMs / (1000 * 60 * 60),
-                                    );
-                                    const minutes = Math.floor(
-                                      (diffMs % (1000 * 60 * 60)) / (1000 * 60),
-                                    );
-                                    const seconds = Math.floor(
-                                      (diffMs % (1000 * 60)) / 1000,
-                                    );
-                                    return `${hours}h ${minutes}m ${seconds}s desde anterior`;
-                                  })()
-                                : "Primer evento";
-
-                              return (
-                                <TimelineItem key={eventItem.id}>
-                                  <TimelineOppositeContent
-                                    sx={{
-                                      display: { xs: "none", sm: "block" },
-                                      flex: 0.35,
-                                      px: 1,
-                                      color: theme.palette.textSecondary,
-                                    }}
-                                  >
-                                    <Typography
-                                      variant="caption"
-                                      sx={{
-                                        textTransform: "uppercase",
-                                        letterSpacing: 0.5,
-                                        fontSize: "0.7rem",
-                                      }}
-                                    >
-                                      Fecha
-                                    </Typography>
-                                    <Typography
-                                      variant="body2"
-                                      sx={{
-                                        color: theme.palette.textPrimary,
-                                        mt: 0.25,
-                                        fontWeight: 500,
-                                      }}
-                                    >
-                                      {formatTime(eventItem.createdAt)}
-                                    </Typography>
-                                    <Typography
-                                      variant="caption"
-                                      sx={{
-                                        mt: 0.5,
-                                        display: "block",
-                                      }}
-                                    >
-                                      {timeSincePrevious}
-                                    </Typography>
-                                  </TimelineOppositeContent>
-                                  <TimelineSeparator>
-                                    <TimelineDot
-                                      sx={{
-                                        backgroundColor:
-                                          theme.palette.primary?.main,
-                                        boxShadow: theme.overlays.cardShadow,
-                                      }}
-                                    />
-                                    {index <
-                                      receptionProcess.events.length - 1 && (
-                                      <TimelineConnector
-                                        sx={{
-                                          backgroundColor:
-                                            theme.surfaces.border,
-                                        }}
-                                      />
-                                    )}
-                                  </TimelineSeparator>
-                                  <TimelineContent sx={{ px: 1, pb: 2 }}>
-                                    <Box
-                                      sx={{
-                                        padding: { xs: 1.5, sm: 2 },
-                                        borderRadius: 1.5,
-                                        backgroundColor:
-                                          theme.surfaces.translucent,
-                                        border: `1px solid ${theme.surfaces.border}`,
-                                      }}
-                                    >
-                                      <Stack spacing={1.25}>
-                                        <Box>
-                                          <Typography
-                                            variant="caption"
-                                            sx={{
-                                              color:
-                                                theme.palette.textSecondary,
-                                              textTransform: "uppercase",
-                                              letterSpacing: 0.5,
-                                              fontSize: "0.7rem",
-                                            }}
-                                          >
-                                            Evento
-                                          </Typography>
-                                          <Typography
-                                            variant="body2"
-                                            sx={{
-                                              fontWeight: 600,
-                                              color: theme.palette.textPrimary,
-                                              mt: 0.25,
-                                              lineHeight: 1.4,
-                                            }}
-                                          >
-                                            {eventItem.event.replace(/_/g, " ")}
-                                          </Typography>
-                                        </Box>
-                                        <Box>
-                                          <Typography
-                                            variant="caption"
-                                            sx={{
-                                              color:
-                                                theme.palette.textSecondary,
-                                              textTransform: "uppercase",
-                                              letterSpacing: 0.5,
-                                              fontSize: "0.7rem",
-                                            }}
-                                          >
-                                            Estatus
-                                          </Typography>
-                                          <Typography
-                                            variant="body2"
-                                            sx={{
-                                              fontWeight: 500,
-                                              color: theme.palette.textPrimary,
-                                              mt: 0.25,
-                                            }}
-                                          >
-                                            {eventItem.status?.replace(
-                                              /_/g,
-                                              " ",
-                                            )}
-                                          </Typography>
-                                        </Box>
-                                        <Box>
-                                          <Typography
-                                            variant="caption"
-                                            sx={{
-                                              color:
-                                                theme.palette.textSecondary,
-                                              textTransform: "uppercase",
-                                              letterSpacing: 0.5,
-                                              fontSize: "0.7rem",
-                                            }}
-                                          >
-                                            Responsable
-                                          </Typography>
-                                          <Typography
-                                            variant="body2"
-                                            sx={{
-                                              color: theme.palette.textPrimary,
-                                              mt: 0.25,
-                                              fontWeight: 500,
-                                            }}
-                                          >
-                                            {eventItem.role !==
-                                              ProcessEventRole.SISTEMA &&
-                                              eventItem.createdBy.name}
-                                          </Typography>
-                                          <Typography
-                                            variant="caption"
-                                            sx={{
-                                              color:
-                                                theme.palette.textSecondary,
-                                              mt: 0.5,
-                                              display: "block",
-                                            }}
-                                          >
-                                            {eventItem.role}
-                                          </Typography>
-                                        </Box>
-                                        <Box
-                                          sx={{
-                                            display: {
-                                              xs: "block",
-                                              sm: "none",
-                                            },
-                                          }}
-                                        >
-                                          <Typography
-                                            variant="caption"
-                                            sx={{
-                                              color:
-                                                theme.palette.textSecondary,
-                                              textTransform: "uppercase",
-                                              letterSpacing: 0.5,
-                                              fontSize: "0.7rem",
-                                            }}
-                                          >
-                                            Fecha
-                                          </Typography>
-                                          <Typography
-                                            variant="body2"
-                                            sx={{
-                                              color: theme.palette.textPrimary,
-                                              mt: 0.25,
-                                              fontWeight: 500,
-                                            }}
-                                          >
-                                            {formatTime(eventItem.createdAt)}
-                                          </Typography>
-                                          <Typography
-                                            variant="caption"
-                                            sx={{
-                                              color:
-                                                theme.palette.textSecondary,
-                                              mt: 0.5,
-                                              display: "block",
-                                            }}
-                                          >
-                                            {timeSincePrevious}
-                                          </Typography>
-                                        </Box>
-                                      </Stack>
-                                    </Box>
-                                  </TimelineContent>
-                                </TimelineItem>
-                              );
-                            })}
-                          </Timeline>
-                        ) : (
-                          <Typography
-                            variant="body2"
-                            sx={{ color: theme.palette.textSecondary, mt: 1.5 }}
-                          >
-                            Sin eventos registrados.
-                          </Typography>
-                        )}
-                      </Box>
+                      <TimeLineEvents
+                        receptionProcess={receptionProcess}
+                        currentStatus={currentStatusRaw}
+                      />
                       {/* // Metricas */}
                       {/* <Box
                       sx={{

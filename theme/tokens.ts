@@ -30,6 +30,14 @@ export type ThemeTokens = {
       main: string;
       dark: string;
     };
+    info?: {
+      main: string;
+      dark: string;
+    };
+    secondary?: {
+      main: string;
+      dark: string;
+    };
     error?: {
       main: string;
       dark: string;
@@ -100,6 +108,14 @@ export const darkTheme: ThemeTokens = {
     warning: {
       main: "#ff9800",
       dark: "#f57c00",
+    },
+    info: {
+      main: "#38bdf8",
+      dark: "#0284c7",
+    },
+    secondary: {
+      main: "#ec4899",
+      dark: "#be185d",
     },
     error: {
       main: "#f44336",
@@ -187,6 +203,14 @@ export const lightTheme: ThemeTokens = {
     warning: {
       main: "#ffa726",
       dark: "#ef6c00",
+    },
+    info: {
+      main: "#0ea5e9",
+      dark: "#0284c7",
+    },
+    secondary: {
+      main: "#db2777",
+      dark: "#be185d",
     },
     error: {
       main: "#ef5350",

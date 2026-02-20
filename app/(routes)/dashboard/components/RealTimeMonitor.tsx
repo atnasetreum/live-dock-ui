@@ -90,42 +90,20 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
       </AppBar>
 
       <Box
-        sx={{ px: { xs: 2, md: 4 }, py: { xs: 3, md: 5 }, overflowY: "auto" }}
+        sx={{
+          px: { xs: 2, md: 4 },
+          py: { xs: 3, md: 5 },
+          overflowY: "auto",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
       >
-        <Stack spacing={1}>
-          <Paper
-            sx={{
-              p: { xs: 2, md: 3 },
-              borderRadius: 4,
-              border: `1px solid ${border}`,
-              backgroundColor: surface,
-              boxShadow: theme.overlays.panelShadow,
-            }}
-          >
-            <Stack direction={{ xs: "column", md: "row" }} spacing={2} mb={3}>
-              {laneConfig.map((lane) => (
-                <Chip
-                  key={lane.id}
-                  label={lane.label}
-                  sx={{
-                    fontWeight: 600,
-                    color: textPrimary,
-                    borderLeft: `6px solid ${lane.accent}`,
-                    backgroundColor: theme.surfaces.translucent,
-                  }}
-                />
-              ))}
-            </Stack>
-
-            <Divider sx={{ borderColor: border, mb: 3 }} />
-
-            <Box>
-              <ProcessFlow
-                receptionProcess={receptionProcess}
-                lastStatus={lastStatus}
-              />
-            </Box>
-          </Paper>
+        <Stack spacing={1} sx={{ flex: 1 }}>
+          <ProcessFlow
+            receptionProcess={receptionProcess}
+            lastStatus={lastStatus}
+          />
         </Stack>
       </Box>
     </Dialog>
