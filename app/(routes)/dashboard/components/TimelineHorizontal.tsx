@@ -144,8 +144,7 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
       <Box
         sx={{
           mt: 2,
-          overflowX: "auto",
-          pb: 1,
+          overflowX: "hidden",
         }}
       >
         <Stack
@@ -153,15 +152,14 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
           spacing={2}
           sx={{
             width: "100%",
-            minWidth: "max-content",
           }}
         >
           {lanes.map((lane, laneIndex) => (
             <Box
               key={lane.role}
               sx={{
-                minWidth: 220,
-                flex: "1 0 220px",
+                minWidth: 0,
+                flex: "1 1 0",
                 borderRadius: 2,
                 border: `1px solid ${theme.surfaces.border}`,
                 backgroundColor: theme.surfaces.translucent,
@@ -320,7 +318,7 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                           </Stack>
 
                           <Typography
-                            variant="h5"
+                            variant="body1"
                             sx={{
                               fontWeight: 600,
                               color: theme.palette.textPrimary,

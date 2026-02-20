@@ -151,6 +151,32 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
     () => [42, 56, 48, 68, 74, 62, 81, 72, 90, 76, 84, 96],
     [],
   );
+  const filterFieldSx = {
+    "& .MuiInputLabel-root": {
+      color: theme.palette.textPrimary,
+    },
+    "& .MuiInputLabel-root.Mui-focused": {
+      color: theme.palette.primary?.main,
+    },
+    "& .MuiInputBase-root": {
+      color: theme.palette.textPrimary,
+      backgroundColor: theme.surfaces.translucent,
+      borderRadius: 2,
+    },
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderColor: theme.surfaces.border,
+    },
+    "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+      borderColor: theme.palette.primary?.main,
+    },
+    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: theme.palette.primary?.main,
+    },
+    "& .MuiInputBase-input::placeholder": {
+      color: theme.palette.textSecondary,
+      opacity: 0.7,
+    },
+  };
 
   return (
     <Box
@@ -290,10 +316,11 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
               size="small"
               autoComplete="off"
               placeholder="Ej: 10-16 FEB"
+              sx={filterFieldSx}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormControl fullWidth size="small">
+            <FormControl fullWidth size="small" sx={filterFieldSx}>
               <InputLabel id="shift-label">Turno</InputLabel>
               <Select
                 labelId="shift-label"
@@ -309,7 +336,7 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
             </FormControl>
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormControl fullWidth size="small">
+            <FormControl fullWidth size="small" sx={filterFieldSx}>
               <InputLabel id="material-label">Material</InputLabel>
               <Select
                 labelId="material-label"
@@ -333,6 +360,7 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
               size="small"
               autoComplete="off"
               placeholder="ID, operador, rampa"
+              sx={filterFieldSx}
             />
           </Grid>
         </Grid>
