@@ -13,6 +13,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   Divider,
   IconButton,
   InputAdornment,
@@ -171,6 +172,11 @@ const LoginPage = () => {
           filter: `blur(${theme.glows.secondary.blur}px)`,
           animation: `${floatSecondary} 22s ease-in-out infinite`,
         },
+        "@media (prefers-reduced-motion: reduce)": {
+          "&::before, &::after": {
+            animation: "none",
+          },
+        },
       }}
     >
       <Box
@@ -205,7 +211,11 @@ const LoginPage = () => {
             <Typography variant="overline" sx={{ letterSpacing: 4 }}>
               CENTRO OPERATIVO
             </Typography>
-            <Typography variant="h2" sx={{ fontWeight: 600, lineHeight: 1.1 }}>
+            <Typography
+              component="h1"
+              variant="h2"
+              sx={{ fontWeight: 600, lineHeight: 1.1 }}
+            >
               Controla el acceso operativo y la recepción de material
             </Typography>
             <Typography
@@ -317,6 +327,7 @@ const LoginPage = () => {
               <TextField
                 label="Correo corporativo"
                 type="email"
+                name="email"
                 required
                 autoComplete="email"
                 value={formState.email}
@@ -330,6 +341,9 @@ const LoginPage = () => {
                         <AlternateEmailIcon fontSize="small" />
                       </InputAdornment>
                     ),
+                    inputProps: {
+                      spellCheck: false,
+                    },
                   },
                 }}
               />
@@ -337,6 +351,7 @@ const LoginPage = () => {
               <TextField
                 label="Contraseña"
                 type={showPassword ? "text" : "password"}
+                name="password"
                 required
                 autoComplete="current-password"
                 value={formState.password}
@@ -381,7 +396,12 @@ const LoginPage = () => {
               <Button
                 type="submit"
                 variant="contained"
-                endIcon={<ArrowForwardIcon />}
+                startIcon={
+                  isSubmitting ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : undefined
+                }
+                endIcon={isSubmitting ? undefined : <ArrowForwardIcon />}
                 disabled={isSubmitting}
                 sx={{
                   py: 1.4,

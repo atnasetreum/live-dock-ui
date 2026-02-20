@@ -84,7 +84,10 @@ const AlertsEvents = () => {
         boxShadow: theme.overlays.panelShadow,
       }}
     >
-      <Typography variant="overline" sx={{ letterSpacing: 3 }}>
+      <Typography
+        variant="overline"
+        sx={{ letterSpacing: 3, color: theme.palette.textSecondary }}
+      >
         Alertas
       </Typography>
       <Typography
@@ -99,39 +102,48 @@ const AlertsEvents = () => {
       </Typography>
       <Divider sx={{ borderColor: theme.divider }} />
       <Stack spacing={2} mt={2}>
-        {alerts.map((alert, idx) => (
-          <Box key={`alert-${idx}`}>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  fontWeight: 600,
-                  color: theme.palette.textPrimary,
-                }}
+        {alerts.length ? (
+          alerts.map((alert, idx) => (
+            <Box key={`alert-${idx}`}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
               >
-                {alert.title}
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 600,
+                    color: theme.palette.textPrimary,
+                  }}
+                >
+                  {alert.title}
+                </Typography>
+                <Chip
+                  label={alert.severity}
+                  size="small"
+                  sx={{
+                    backgroundColor: severityColor(alert.severity),
+                    color: theme.palette.textPrimary,
+                  }}
+                />
+              </Stack>
+              <Typography
+                variant="body2"
+                sx={{ color: theme.palette.textSecondary }}
+              >
+                {alert.detail}
               </Typography>
-              <Chip
-                label={alert.severity}
-                size="small"
-                sx={{
-                  backgroundColor: severityColor(alert.severity),
-                  color: theme.palette.textPrimary,
-                }}
-              />
-            </Stack>
-            <Typography
-              variant="body2"
-              sx={{ color: theme.palette.textSecondary }}
-            >
-              {alert.detail}
-            </Typography>
-          </Box>
-        ))}
+            </Box>
+          ))
+        ) : (
+          <Typography
+            variant="body2"
+            sx={{ color: theme.palette.textSecondary }}
+          >
+            No hay alertas prioritarias.
+          </Typography>
+        )}
       </Stack>
     </Paper>
   );

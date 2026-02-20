@@ -58,31 +58,40 @@ const ConnectedUsers = () => {
         Equipo en turno
       </Typography>
       <List disablePadding>
-        {users.map((user) => (
-          <ListItem key={user.id} sx={{ px: 0 }}>
-            <ListItemAvatar>
-              <Avatar
-                sx={{
-                  bgcolor: theme.avatarBackground,
-                  color: theme.palette.textPrimary,
+        {users.length ? (
+          users.map((user) => (
+            <ListItem key={user.id} sx={{ px: 0 }}>
+              <ListItemAvatar>
+                <Avatar
+                  sx={{
+                    bgcolor: theme.avatarBackground,
+                    color: theme.palette.textPrimary,
+                  }}
+                >
+                  {user.name[0].toLocaleUpperCase()}
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={user.name}
+                primaryTypographyProps={{
+                  sx: { color: theme.palette.textPrimary },
                 }}
-              >
-                {user.name[0].toLocaleUpperCase()}
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText
-              primary={user.name}
-              primaryTypographyProps={{
-                sx: { color: theme.palette.textPrimary },
-              }}
-              /* secondary={`Rol ${roles[index] || roles[roles.length - 1]}`} */
-              secondary={user.context.join(", ")}
-              secondaryTypographyProps={{
-                sx: { color: theme.listSecondary },
-              }}
-            />
-          </ListItem>
-        ))}
+                /* secondary={`Rol ${roles[index] || roles[roles.length - 1]}`} */
+                secondary={user.context.join(", ")}
+                secondaryTypographyProps={{
+                  sx: { color: theme.listSecondary },
+                }}
+              />
+            </ListItem>
+          ))
+        ) : (
+          <Typography
+            variant="body2"
+            sx={{ color: theme.palette.textSecondary }}
+          >
+            Sin usuarios conectados.
+          </Typography>
+        )}
       </List>
     </Paper>
   );

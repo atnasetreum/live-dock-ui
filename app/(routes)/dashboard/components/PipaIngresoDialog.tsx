@@ -3,6 +3,7 @@
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -127,6 +128,7 @@ const PipaIngresoDialog = ({
           </InputLabel>
           <Select
             labelId="pipa-material-type-label"
+            name="materialType"
             value={materialType}
             label="Tipo de material"
             onChange={(event) => onMaterialTypeChange(event.target.value)}
@@ -170,6 +172,11 @@ const PipaIngresoDialog = ({
           onClick={onConfirm}
           disabled={isSubmitting || !materialType}
           fullWidth
+          startIcon={
+            isSubmitting ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : undefined
+          }
           sx={{
             textTransform: "none",
             fontWeight: 600,
@@ -179,7 +186,7 @@ const PipaIngresoDialog = ({
             boxShadow: theme.overlays.cardShadow,
           }}
         >
-          {isSubmitting ? "Procesando..." : "Confirmar"}
+          {isSubmitting ? "Procesando…" : "Confirmar"}
         </Button>
       </DialogActions>
     </Dialog>

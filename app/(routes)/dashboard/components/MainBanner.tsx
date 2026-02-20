@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-//import TimelineIcon from "@mui/icons-material/Timeline";
+import TimelineIcon from "@mui/icons-material/Timeline";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
@@ -27,7 +27,12 @@ import { Toast } from "@/utils";
 
 const statusChips = [{ label: "Monitoreo en tiempo real", tone: "info" }];
 
-const MainBanner = ({ onPipaIngreso }: { onPipaIngreso: () => void }) => {
+type MainBannerProps = {
+  onPipaIngreso: () => void;
+  onOpenDashboard?: () => void;
+};
+
+const MainBanner = ({ onPipaIngreso, onOpenDashboard }: MainBannerProps) => {
   const { theme } = useThemeConfig();
   const [isPushEnabled, setIsPushEnabled] = useState(false);
   const [isPushBusy, setIsPushBusy] = useState(false);
@@ -195,6 +200,7 @@ const MainBanner = ({ onPipaIngreso }: { onPipaIngreso: () => void }) => {
             BIENVENIDO
           </Typography>
           <Typography
+            component="h1"
             variant="h3"
             sx={{
               fontWeight: 600,
@@ -212,6 +218,27 @@ const MainBanner = ({ onPipaIngreso }: { onPipaIngreso: () => void }) => {
           </Typography>
         </Box>
         <Stack spacing={2} width={{ xs: "100%", md: "auto" }}>
+          {onOpenDashboard && (
+            <Button
+              variant="contained"
+              startIcon={<TimelineIcon />}
+              onClick={onOpenDashboard}
+              sx={{
+                textTransform: "none",
+                fontWeight: 600,
+                minHeight: 44,
+                backgroundImage: theme.gradients.primary,
+                color: theme.buttons.containedText,
+                boxShadow: theme.overlays.cardShadow,
+                "&:hover": {
+                  backgroundImage: theme.gradients.primary,
+                  boxShadow: theme.overlays.panelShadow,
+                },
+              }}
+            >
+              Dashboard en tiempo real
+            </Button>
+          )}
           {currentUser.role === ProcessEventRole.VIGILANCIA && (
             <Button
               variant="outlined"
@@ -272,8 +299,10 @@ const MainBanner = ({ onPipaIngreso }: { onPipaIngreso: () => void }) => {
           {currentUser.email === "eduardo-266@hotmail.com" && (
             <>
               <TextField
+                label="ID de usuario"
                 type="text"
-                placeholder="ID de usuario"
+                name="userId"
+                placeholder="Ej: 12345…"
                 value={userId}
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^0-9]/g, "");
@@ -289,6 +318,9 @@ const MainBanner = ({ onPipaIngreso }: { onPipaIngreso: () => void }) => {
                       borderColor: theme.buttons.outlinedColor,
                     },
                   },
+                }}
+                inputProps={{
+                  inputMode: "numeric",
                 }}
               />
               <Button

@@ -9,6 +9,7 @@ import TimelineIcon from "@mui/icons-material/Timeline";
 import {
   Box,
   Button,
+  ButtonBase,
   Chip,
   Collapse,
   Dialog,
@@ -251,7 +252,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                   overflow: "hidden",
                 }}
               >
-                <Box
+                <ButtonBase
                   sx={{
                     width: "100%",
                     textAlign: "left",
@@ -262,18 +263,14 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                     "&:hover": {
                       backgroundColor: theme.surfaces.panel,
                     },
+                    "&.Mui-focusVisible": {
+                      outline: `2px solid ${theme.forms.borderFocus}`,
+                      outlineOffset: 2,
+                    },
                   }}
                   onClick={() => toggleExpanded(receptionProcess.id)}
-                  role="button"
-                  tabIndex={0}
                   aria-expanded={isExpanded}
                   aria-controls={`reception-process-${receptionProcess.id}`}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      toggleExpanded(receptionProcess.id);
-                    }
-                  }}
                 >
                   <Box
                     sx={{
@@ -627,7 +624,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                       }}
                     />
                   </Box>
-                </Box>
+                </ButtonBase>
                 <Collapse
                   in={isExpanded}
                   timeout="auto"

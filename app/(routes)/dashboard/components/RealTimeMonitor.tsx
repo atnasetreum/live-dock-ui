@@ -79,7 +79,11 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
             }}
           />
           <Box sx={{ flexGrow: 1 }} />
-          <IconButton onClick={handleClose} sx={{ color: textPrimary }}>
+          <IconButton
+            onClick={handleClose}
+            aria-label="Cerrar monitor"
+            sx={{ color: textPrimary }}
+          >
             <CloseIcon />
           </IconButton>
         </Toolbar>

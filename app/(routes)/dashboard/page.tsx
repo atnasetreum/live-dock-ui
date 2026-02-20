@@ -25,6 +25,7 @@ import {
   ReceptionProcessStatus,
 } from "@/types";
 import { getCurrentDate, Toast } from "@/utils";
+import DashboardBI from "./components/DashboardBI";
 
 /* const stats = [
   {
@@ -83,6 +84,7 @@ const trendSeries = [
 const DashboardPage = () => {
   //const { theme } = useThemeConfig();
   const [realTimeMonitor, setRealTimeMonitor] = useState(false);
+  const [isDashboardBIOpen, setIsDashboardBIOpen] = useState(false);
   const [isPipaDialogOpen, setIsPipaDialogOpen] = useState(false);
   const [isPipaSubmitting, setIsPipaSubmitting] = useState(false);
   const [pipaMaterialType, setPipaMaterialType] = useState("");
@@ -241,27 +243,34 @@ const DashboardPage = () => {
 
   return (
     <>
-      {realTimeMonitor && receptionProcess && (
-        <RealTimeMonitor
-          handleClose={() => {
-            setRealTimeMonitor(false);
-            setReceptionProcess(null);
-          }}
-          receptionProcess={receptionProcess}
+      <>
+        {realTimeMonitor && receptionProcess && (
+          <RealTimeMonitor
+            handleClose={() => {
+              setRealTimeMonitor(false);
+              setReceptionProcess(null);
+            }}
+            receptionProcess={receptionProcess}
+          />
+        )}
+        <PipaIngresoDialog
+          open={isPipaDialogOpen}
+          isSubmitting={isPipaSubmitting}
+          materialType={pipaMaterialType}
+          onClose={handleClosePipaDialog}
+          onConfirm={handleConfirmPipaIngreso}
+          onMaterialTypeChange={setPipaMaterialType}
         />
-      )}
-      <PipaIngresoDialog
-        open={isPipaDialogOpen}
-        isSubmitting={isPipaSubmitting}
-        materialType={pipaMaterialType}
-        onClose={handleClosePipaDialog}
-        onConfirm={handleConfirmPipaIngreso}
-        onMaterialTypeChange={setPipaMaterialType}
-      />
-      <Stack spacing={4}>
-        <MainBanner onPipaIngreso={handleOpenPipaDialog} />
+        {isDashboardBIOpen ? (
+          <DashboardBI onClose={() => setIsDashboardBIOpen(false)} />
+        ) : (
+          <Stack spacing={4}>
+            <MainBanner
+              onPipaIngreso={handleOpenPipaDialog}
+              onOpenDashboard={() => setIsDashboardBIOpen(true)}
+            />
 
-        {/* <Stack spacing={2}>
+            {/* <Stack spacing={2}>
           <Typography variant="overline" sx={{ letterSpacing: 3 }}>
             Resumen operativo
           </Typography>
@@ -339,24 +348,24 @@ const DashboardPage = () => {
           </Grid>
         </Stack> */}
 
-        <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
-          <ReceptionProcessTable
-            data={data}
-            selectReceptionProcess={(
-              currentReceptionProcess: ReceptionProcess,
-            ) => {
-              setReceptionProcess(currentReceptionProcess);
-              setRealTimeMonitor(true);
-            }}
-          />
+            <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
+              <ReceptionProcessTable
+                data={data}
+                selectReceptionProcess={(
+                  currentReceptionProcess: ReceptionProcess,
+                ) => {
+                  setReceptionProcess(currentReceptionProcess);
+                  setRealTimeMonitor(true);
+                }}
+              />
 
-          <Stack spacing={3} sx={{ width: { xs: "100%", lg: 360 } }}>
-            <AlertsEvents />
-            <ConnectedUsers />
-          </Stack>
-        </Stack>
+              <Stack spacing={3} sx={{ width: { xs: "100%", lg: 360 } }}>
+                <AlertsEvents />
+                <ConnectedUsers />
+              </Stack>
+            </Stack>
 
-        {/* <Paper
+            {/* <Paper
           sx={{
             borderRadius: 4,
             p: { xs: 3, md: 4 },
@@ -466,7 +475,9 @@ const DashboardPage = () => {
             ))}
           </Grid>
         </Paper> */}
-      </Stack>
+          </Stack>
+        )}
+      </>
     </>
   );
 };

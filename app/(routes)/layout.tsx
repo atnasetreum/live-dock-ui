@@ -173,9 +173,10 @@ export default function MainLayout({
               >
                 <Typography
                   variant="h6"
+                  aria-live="polite"
                   sx={{ color: theme.palette.textSecondary }}
                 >
-                  Cargando datos del usuario en turno...
+                  Cargando datos del usuario en turno…
                 </Typography>
               </Box>
             )
@@ -195,9 +196,10 @@ export default function MainLayout({
             >
               <Typography
                 variant="h6"
+                aria-live="polite"
                 sx={{ color: theme.palette.textSecondary }}
               >
-                Conectando al servidor de datos en tiempo real...
+                Conectando al servidor de datos en tiempo real…
               </Typography>
             </Box>
           )}

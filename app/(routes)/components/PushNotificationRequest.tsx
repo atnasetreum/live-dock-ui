@@ -47,7 +47,6 @@ function PushNotificationRequest({
         </Button>
         <Button
           onClick={() => handleClose(true)}
-          autoFocus
           variant="contained"
           color="info"
         >

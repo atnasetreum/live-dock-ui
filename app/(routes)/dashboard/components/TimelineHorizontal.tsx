@@ -92,15 +92,15 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
         "@keyframes timelinePulse": {
           "0%": {
             transform: "scale(1)",
-            boxShadow: `0 0 0 0 ${theme.palette.primary?.main}33`,
+            opacity: 1,
           },
           "50%": {
             transform: "scale(1.02)",
-            boxShadow: `0 0 0 8px ${theme.palette.primary?.main}00`,
+            opacity: 0.85,
           },
           "100%": {
             transform: "scale(1)",
-            boxShadow: `0 0 0 0 ${theme.palette.primary?.main}00`,
+            opacity: 1,
           },
         },
         //Movimiento
@@ -179,7 +179,7 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                   textTransform: "uppercase",
                   letterSpacing: 0.6,
                   fontWeight: 700,
-                  fontSize: "0.75rem",
+                  fontSize: "1rem",
                   color: theme.buttons.containedText,
                   textAlign: "center",
                 }}
@@ -215,6 +215,9 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                             animation: isLatestEvent
                               ? "timelinePulse 1.1s ease-in-out infinite"
                               : "none",
+                            "@media (prefers-reduced-motion: reduce)": {
+                              animation: "none",
+                            },
                           }}
                         />
                         {!isLastInLane && (
@@ -245,6 +248,9 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                           animation: isLatestEvent
                             ? "timelinePulse 1.1s ease-in-out infinite"
                             : "none",
+                          "@media (prefers-reduced-motion: reduce)": {
+                            animation: "none",
+                          },
                           transformOrigin: "center",
                         }}
                       >
@@ -261,7 +267,7 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                                 color: theme.palette.textSecondary,
                                 textTransform: "uppercase",
                                 letterSpacing: 0.5,
-                                fontSize: "0.7rem",
+                                fontSize: "0.9rem",
                               }}
                             >
                               {formatTime(eventItem.createdAt)}
@@ -314,20 +320,20 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                           </Stack>
 
                           <Typography
-                            variant="body2"
+                            variant="h5"
                             sx={{
                               fontWeight: 600,
                               color: theme.palette.textPrimary,
                               lineHeight: 1.4,
                             }}
                           >
-                            {eventItem.event.replace(/_/g, " ")}
+                            {eventItem.status?.replace(/_/g, " ")}
                           </Typography>
                           <Typography
                             variant="caption"
                             sx={{ color: theme.palette.textSecondary }}
                           >
-                            {eventItem.status?.replace(/_/g, " ")}
+                            {eventItem.event.replace(/_/g, " ")}
                           </Typography>
                         </Stack>
                       </Box>
