@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import { Box, Chip, Stack, Typography } from "@mui/material";
 
@@ -11,7 +11,10 @@ interface Props {
 }
 const TimelineHorizontal = ({ receptionProcess }: Props) => {
   const { theme } = useThemeConfig();
-  const events = receptionProcess.events ?? [];
+  const events = useMemo(
+    () => receptionProcess.events ?? [],
+    [receptionProcess.events],
+  );
   const isProcessFinalized =
     receptionProcess.status === "FINALIZADO" ||
     receptionProcess.status === "RECHAZADO";

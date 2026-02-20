@@ -414,15 +414,15 @@ const buildCompletedStepIds = (lastStatus: string) => {
 
 interface Props {
   receptionProcess: ReceptionProcess;
-  lastStatus: string;
+  currentStatus: string;
 }
 
-const ProcessFlowDesktop = ({ lastStatus }: Props) => {
+const ProcessFlowDesktop = ({ currentStatus }: Props) => {
   const { theme } = useThemeConfig();
 
   const completedStepIds = React.useMemo(
-    () => buildCompletedStepIds(lastStatus),
-    [lastStatus],
+    () => buildCompletedStepIds(currentStatus),
+    [currentStatus],
   );
 
   const nodes = React.useMemo<Node[]>(

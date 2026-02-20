@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
@@ -20,15 +20,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import {
-  Timeline,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineItem,
-  TimelineOppositeContent,
-  TimelineSeparator,
-} from "@mui/lab";
 
 import { EventData, ProcessEventRole, ReceptionProcess } from "@/types";
 import { receptionProcessesService } from "@/services";
@@ -36,47 +27,6 @@ import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useCurrentUser } from "@/common/UserContext";
 import { formatTime, Toast } from "@/utils";
 import TimeLineEvents from "./TimeLineEvents";
-
-interface ProcessEvent {
-  id: number;
-  event: string;
-  createdAt: string;
-}
-
-const ElapsedTimeDisplay = ({
-  events,
-  isProcessFinalized,
-}: {
-  events: ProcessEvent[];
-  isProcessFinalized: boolean;
-}) => {
-  const [elapsedTime, setElapsedTime] = useState<string>("");
-
-  useEffect(() => {
-    const calculateElapsedTime = () => {
-      if (!events || events.length === 0) return;
-
-      const firstEventTime = new Date(events[0].createdAt).getTime();
-      const lastEventTime = isProcessFinalized
-        ? new Date(events[events.length - 1].createdAt).getTime()
-        : new Date().getTime();
-      const diffMs = lastEventTime - firstEventTime;
-
-      const hours = Math.floor(diffMs / (1000 * 60 * 60));
-      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-      setElapsedTime(`${hours}h ${minutes}m ${seconds}s`);
-    };
-
-    calculateElapsedTime();
-    const interval = setInterval(calculateElapsedTime, 1000);
-
-    return () => clearInterval(interval);
-  }, [events, isProcessFinalized]);
-
-  return <Typography variant="caption"> {elapsedTime}</Typography>;
-};
 
 interface Props {
   selectReceptionProcess: (receptionProcess: ReceptionProcess) => void;

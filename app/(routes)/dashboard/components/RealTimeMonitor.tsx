@@ -4,9 +4,7 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Dialog from "@mui/material/Dialog";
-import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Paper from "@mui/material/Paper";
 import Slide from "@mui/material/Slide";
 import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
@@ -15,7 +13,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import { TransitionProps } from "@mui/material/transitions";
 
 import { useThemeConfig } from "@/theme/ThemeProvider";
-import { laneConfig } from "./processFlowData";
 import { ReceptionProcess } from "@/types";
 import ProcessFlow from "./ProcessFlow";
 
@@ -35,7 +32,6 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
   const { theme } = useThemeConfig();
   const { events } = receptionProcess;
 
-  const surface = theme.surfaces.panel;
   const border = theme.surfaces.border;
   const textPrimary = theme.palette.textPrimary;
 
@@ -102,7 +98,7 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
         <Stack spacing={1} sx={{ flex: 1 }}>
           <ProcessFlow
             receptionProcess={receptionProcess}
-            lastStatus={lastStatus}
+            currentStatus={lastStatus}
           />
         </Stack>
       </Box>
