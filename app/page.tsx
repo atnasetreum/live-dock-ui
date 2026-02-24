@@ -66,21 +66,45 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { theme } = useThemeConfig();
+  const isDark = theme.name === "dark";
+  const glassSurface = isDark
+    ? "rgba(9, 18, 45, 0.62)"
+    : "rgba(255, 255, 255, 0.52)";
+  const glassBorder = isDark
+    ? "rgba(255, 255, 255, 0.22)"
+    : "rgba(255, 255, 255, 0.7)";
+  const glassHighlight = isDark
+    ? "rgba(255, 255, 255, 0.38)"
+    : "rgba(255, 255, 255, 0.9)";
+  const labelGlass = isDark
+    ? theme.forms.labelBackground
+    : "rgba(255, 255, 255, 0.72)";
 
   const textFieldSx = {
     "& .MuiOutlinedInput-root": {
       borderRadius: 2,
-      backgroundColor: theme.forms.fieldBackground,
+      backgroundColor: isDark
+        ? "rgba(12, 22, 54, 0.45)"
+        : "rgba(255, 255, 255, 0.62)",
+      backdropFilter: "blur(12px) saturate(130%)",
+      WebkitBackdropFilter: "blur(12px) saturate(130%)",
       color: theme.forms.inputColor,
       "& fieldset": {
-        borderColor: theme.forms.border,
+        borderColor: isDark
+          ? "rgba(255, 255, 255, 0.3)"
+          : "rgba(11, 27, 45, 0.14)",
       },
       "&:hover fieldset": {
-        borderColor: theme.forms.borderHover,
+        borderColor: isDark
+          ? "rgba(255, 255, 255, 0.52)"
+          : "rgba(11, 27, 45, 0.26)",
       },
       "&.Mui-focused fieldset": {
-        borderColor: theme.forms.borderFocus,
-        boxShadow: theme.forms.focusShadow,
+        borderColor: isDark ? "rgba(255, 255, 255, 0.8)" : "#0b1b2d",
+        zIndex: 0,
+        boxShadow: isDark
+          ? "0 0 0 1px rgba(255,255,255,0.35)"
+          : "0 0 0 1px rgba(11,27,45,0.2)",
       },
     },
     "& .MuiInputAdornment-root, & .MuiInputLabel-root": {
@@ -88,12 +112,18 @@ const LoginPage = () => {
       transition: "color 120ms ease",
     },
     "& .MuiInputLabel-root": {
+      zIndex: 1,
       px: 0.75,
+      py: 0.1,
+      lineHeight: 1.1,
+      display: "inline-flex",
+      alignItems: "center",
       borderRadius: 1,
-      backgroundColor: theme.forms.labelBackground,
+      backgroundColor: labelGlass,
     },
     "& .MuiInputLabel-root.MuiInputLabel-shrink": {
-      backgroundColor: theme.forms.labelBackground,
+      backgroundColor: labelGlass,
+      transform: "translate(14px, -6px) scale(0.85)",
     },
     "& .MuiInputLabel-root.Mui-focused": {
       color: theme.forms.adornmentColor,
@@ -269,11 +299,17 @@ const LoginPage = () => {
               alignSelf: "center",
               borderRadius: 4,
               p: { xs: 3, sm: 4 },
-              background: theme.surfaces.glass,
-              border: `1px solid ${theme.surfaces.border}`,
-              boxShadow: theme.overlays.glassShadow,
+              backgroundColor: glassSurface,
+              backgroundImage: isDark
+                ? "linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0) 55%)"
+                : "linear-gradient(135deg, rgba(255,255,255,0.75), rgba(255,255,255,0.2) 55%)",
+              border: `1px solid ${glassBorder}`,
+              boxShadow: isDark
+                ? "0 35px 90px rgba(2, 7, 21, 0.7)"
+                : "0 30px 80px rgba(13, 38, 76, 0.22)",
               color: theme.palette.textPrimary,
-              backdropFilter: "blur(16px)",
+              backdropFilter: "blur(26px) saturate(140%)",
+              WebkitBackdropFilter: "blur(26px) saturate(140%)",
               position: "relative",
               overflow: "hidden",
               "::before": {
@@ -282,12 +318,21 @@ const LoginPage = () => {
                 inset: 0,
                 borderRadius: 4,
                 padding: "1px",
-                background:
-                  "linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0))",
+                background: `linear-gradient(135deg, ${glassHighlight}, rgba(255,255,255,0))`,
                 mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
                 maskComposite: "exclude",
                 pointerEvents: "none",
                 opacity: 0.8,
+              },
+              "::after": {
+                content: '""',
+                position: "absolute",
+                inset: 0,
+                borderRadius: 4,
+                background:
+                  "radial-gradient(circle at 15% 20%, rgba(255,255,255,0.25), transparent 55%), radial-gradient(circle at 80% 0%, rgba(255,255,255,0.18), transparent 45%)",
+                opacity: isDark ? 0.3 : 0.4,
+                pointerEvents: "none",
               },
             }}
           >
