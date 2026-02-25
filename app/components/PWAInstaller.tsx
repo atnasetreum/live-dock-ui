@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+import { Toast } from "@/utils";
+
 export default function PWAInstaller() {
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -15,6 +17,16 @@ export default function PWAInstaller() {
         .catch((error) => {
           console.error("[PWA] Error al registrar Service Worker:", error);
         });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        if (event.data?.type === "NEW_VERSION") {
+          Toast.info("Nueva versión instalada");
+        }
+      });
     }
   }, []);
 

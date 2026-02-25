@@ -12,7 +12,6 @@ import { useSocket } from "@/common/SocketProvider";
 import { UserProvider } from "@/common/UserContext";
 import { GlowLayer } from "@/theme/tokens";
 import { UsersOnDuty } from "@/types";
-import { Toast } from "@/utils";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -42,18 +41,6 @@ export default function MainLayout({
 
   const { theme } = useThemeConfig();
   const { socket, isConnected } = useSocket();
-
-  useEffect(() => {
-    if (navigator.serviceWorker) {
-      navigator.serviceWorker.addEventListener("message", (event) => {
-        console.log({ event });
-        if (event.data?.type === "NEW_VERSION") {
-          alert(event.data.message);
-          Toast.info("Nueva versión instalada");
-        }
-      });
-    }
-  }, []);
 
   useEffect(() => {
     if (!socket) return undefined;
