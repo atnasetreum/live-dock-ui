@@ -131,10 +131,11 @@ const DashboardPage = () => {
 
     navigator.serviceWorker.addEventListener("message", (event) => {
       if (event.data?.type === "confirm-clicked") {
-        setRealTimeMonitor(false);
+        const payload = event.data.data;
+
+        /*  setRealTimeMonitor(false);
         setReceptionProcess(null);
 
-        const payload = event.data.data;
 
         const currentReceptionProcess =
           data.find((item) => item.id === payload.id) ?? null;
@@ -144,7 +145,7 @@ const DashboardPage = () => {
             setRealTimeMonitor(true);
             setReceptionProcess(currentReceptionProcess);
           }, 500);
-        }
+        } */
 
         // actualizar estado, router, modal, etc.
         console.log("Pipa desde notificación", payload);
