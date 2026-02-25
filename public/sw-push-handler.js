@@ -20,7 +20,7 @@ self.handlePush = (event) => {
     body: `${body}\nFecha del evento: ${new Date(eventTime).toLocaleString("es-MX")}`,
     //icon: `/icon-pwa.png`,
     image,
-    tag: tagId,
+    tag: "tagId",
     data: {
       ...metadata,
       actions,
