@@ -24,7 +24,7 @@ export default function PWAInstaller() {
     if (navigator.serviceWorker) {
       navigator.serviceWorker.addEventListener("message", (event) => {
         if (event.data?.type === "NEW_VERSION") {
-          Toast.info("Nueva versión instalada");
+          Toast.info(event.data.message);
         }
       });
     }
