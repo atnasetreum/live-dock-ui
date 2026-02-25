@@ -28,10 +28,6 @@ self.handlePush = (event) => {
     },
     lang,
     timestamp,
-    /* vibrate: [
-      100, 30, 100, 30, 100, 150, 200, 30, 200, 30, 200, 150, 100, 30, 100, 30,
-      100,
-    ], */
     renotify: true, // Si se recibe una nueva notificación con el mismo tag, se mostrará de nuevo y vibrará
     requireInteraction, // La notificación permanecerá visible hasta que el usuario interactúe con ella
     silent: false,
@@ -59,31 +55,7 @@ self.handlePush = (event) => {
 
   event.waitUntil(
     Promise.all([
-      self.registration.showNotification("Prueba Vibración", {
-        body: "¡Notificación con vibración divertida!",
-
-        vibrate: [
-          100,
-          30,
-          100,
-          30,
-          100, // ráfaga rápida (como alarma)
-          500,
-          200, // vibración larga + pausa
-          300,
-          100,
-          300,
-          100, // dos golpes fuertes
-          1000,
-          500, // vibración muy larga + pausa
-          200,
-          50,
-          200,
-          50,
-          200, // cierre con ritmo juguetón
-        ],
-        tag: "demo-vibracion",
-      }),
+      self.registration.showNotification(title, notificationOptions),
       // Cuando se muestra la notificación, se registra el evento de "NOTIFICATION_SHOWN"
       self.notifyMetric({
         ...payloadMetric,

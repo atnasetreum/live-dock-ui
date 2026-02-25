@@ -6,6 +6,19 @@ importScripts("/sw-notification-close-handler.js");
 self.addEventListener("install", () => {
   console.log("[SW] Service Worker instalado");
   self.skipWaiting();
+  event.waitUntil(
+    (async () => {
+      const clientsList = await self.clients.matchAll({
+        includeUncontrolled: true,
+      });
+      for (const client of clientsList) {
+        client.postMessage({
+          type: "NEW_VERSION",
+          message: "Nueva versión instalada correctamente",
+        });
+      }
+    })(),
+  );
 });
 
 self.addEventListener("activate", (event) => {

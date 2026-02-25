@@ -43,6 +43,17 @@ export default function MainLayout({
   const { socket, isConnected } = useSocket();
 
   useEffect(() => {
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        if (event.data?.type === "NEW_VERSION") {
+          alert(event.data.message);
+          // Aquí puedes usar un toast de tu UI framework en lugar de alert()
+        }
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     if (!socket) return undefined;
 
     const handleSessionsReady = (_: unknown, callback: unknown) => {
