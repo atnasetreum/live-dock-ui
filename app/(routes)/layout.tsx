@@ -46,6 +46,7 @@ export default function MainLayout({
   useEffect(() => {
     if (navigator.serviceWorker) {
       navigator.serviceWorker.addEventListener("message", (event) => {
+        console.log({ event });
         if (event.data?.type === "NEW_VERSION") {
           alert(event.data.message);
           Toast.info("Nueva versión instalada");
