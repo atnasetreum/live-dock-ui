@@ -133,6 +133,19 @@ const DashboardPage = () => {
       if (event.data?.type === "confirm-clicked") {
         const payload = event.data.data;
 
+        const element = document.getElementById(
+          `reception-process-${payload.id}`,
+        );
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+          element.style.backgroundColor = "rgba(76, 175, 80, 0.1)";
+          element.style.transition = "background-color 300ms ease";
+
+          setTimeout(() => {
+            element.style.backgroundColor = "";
+          }, 3000);
+        }
+
         /*  setRealTimeMonitor(false);
         setReceptionProcess(null);
 

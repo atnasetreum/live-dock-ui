@@ -26,8 +26,8 @@ import { EventData, ProcessEventRole, ReceptionProcess } from "@/types";
 import { receptionProcessesService } from "@/services";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useCurrentUser } from "@/common/UserContext";
-import { formatTime, Toast } from "@/utils";
 import TimeLineEvents from "./TimeLineEvents";
+import { formatTime, Toast } from "@/utils";
 
 interface Props {
   selectReceptionProcess: (receptionProcess: ReceptionProcess) => void;
@@ -251,6 +251,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                   border: `1px solid ${theme.surfaces.border}`,
                   overflow: "hidden",
                 }}
+                id={`reception-process-${receptionProcess.id}`}
               >
                 <ButtonBase
                   sx={{
