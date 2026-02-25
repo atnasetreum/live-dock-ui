@@ -140,10 +140,14 @@ const DashboardPage = () => {
           element.scrollIntoView({ behavior: "smooth", block: "center" });
           element.style.backgroundColor = "rgba(163, 245, 170, 0.1)";
           element.style.transition = "background-color 300ms ease";
+          element.style.transform = "scale(3)";
+          element.style.transition =
+            "background-color 300ms ease, transform 300ms ease";
           element.style.transform = "scale(1.05)";
 
           setTimeout(() => {
             element.style.backgroundColor = "";
+            element.style.transform = "";
           }, 3000);
         }
 
