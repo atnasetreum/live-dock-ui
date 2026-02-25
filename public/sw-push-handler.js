@@ -62,7 +62,26 @@ self.handlePush = (event) => {
       self.registration.showNotification("Prueba Vibración", {
         body: "¡Notificación con vibración divertida!",
 
-        vibrate: [100, 50, 100, 50, 200], // patrón de vibración tipo tambor
+        vibrate: [
+          100,
+          30,
+          100,
+          30,
+          100, // ráfaga rápida (como alarma)
+          500,
+          200, // vibración larga + pausa
+          300,
+          100,
+          300,
+          100, // dos golpes fuertes
+          1000,
+          500, // vibración muy larga + pausa
+          200,
+          50,
+          200,
+          50,
+          200, // cierre con ritmo juguetón
+        ],
         tag: "demo-vibracion",
       }),
       // Cuando se muestra la notificación, se registra el evento de "NOTIFICATION_SHOWN"
