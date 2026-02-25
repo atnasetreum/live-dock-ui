@@ -28,7 +28,7 @@ self.handlePush = (event) => {
     },
     lang,
     timestamp,
-    vibrate: [100, 50, 100],
+    vibrate: [100, 50, 100, 50, 200],
     renotify: true, // Si se recibe una nueva notificación con el mismo tag, se mostrará de nuevo y vibrará
     requireInteraction, // La notificación permanecerá visible hasta que el usuario interactúe con ella
     silent: false,
