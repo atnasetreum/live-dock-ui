@@ -19,7 +19,7 @@ self.addEventListener("install", (event) => {
       for (const client of clientsList) {
         client.postMessage({
           type: "NEW_VERSION",
-          message: "Nueva versión instalada correctamente.",
+          message: "Nueva versión instalada correctamente",
         });
       }
     })(),
