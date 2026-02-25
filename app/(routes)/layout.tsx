@@ -12,6 +12,7 @@ import { useSocket } from "@/common/SocketProvider";
 import { UserProvider } from "@/common/UserContext";
 import { GlowLayer } from "@/theme/tokens";
 import { UsersOnDuty } from "@/types";
+import { Toast } from "@/utils";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -47,7 +48,7 @@ export default function MainLayout({
       navigator.serviceWorker.addEventListener("message", (event) => {
         if (event.data?.type === "NEW_VERSION") {
           alert(event.data.message);
-          // Aquí puedes usar un toast de tu UI framework en lugar de alert()
+          Toast.info("Nueva versión instalada");
         }
       });
     }
