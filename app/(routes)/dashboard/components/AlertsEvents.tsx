@@ -23,12 +23,16 @@ const AlertsEvents = () => {
 
   const currentUser = useCurrentUser();
 
-  useEffect(() => {
+  const getData = () => {
     receptionProcessesService
       .findAllPriorityAlerts({
         startDate: getCurrentDate(), // Solo alertas del día actual
       })
       .then(setAlerts);
+  };
+
+  useEffect(() => {
+    getData();
   }, []);
 
   useEffect(() => {
@@ -42,6 +46,10 @@ const AlertsEvents = () => {
       setAlerts((prev) => [event, ...prev]);
     };
 
+    const handleReloadAlerts = () => {
+      getData();
+    };
+
     /* socket.on(`LOGISTICA:events-process-updated`, handleEventsProcessUpdated);
     socket.on(`CALIDAD:events-process-updated`, handleEventsProcessUpdated);
     socket.on(`PRODUCCION:events-process-updated`, handleEventsProcessUpdated); */
@@ -50,6 +58,8 @@ const AlertsEvents = () => {
       `${currentUser.role}:events-process-updated`,
       handleEventsProcessUpdated,
     );
+
+    socket.on("reception-process:reload_alerts", handleReloadAlerts);
 
     return () => {
       /* socket.off(
@@ -65,6 +75,8 @@ const AlertsEvents = () => {
         `${currentUser.role}:events-process-updated`,
         handleEventsProcessUpdated,
       );
+
+      socket.off("reception-process:reload_alerts", handleReloadAlerts);
     };
   }, [socket, currentUser]);
 
