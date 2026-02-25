@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, type ChangeEvent, type ComponentProps } from "react";
+import {
+  useEffect,
+  useState,
+  type ChangeEvent,
+  type ComponentProps,
+} from "react";
 
 import { Space_Grotesk } from "next/font/google";
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
@@ -162,6 +167,30 @@ const LoginPage = () => {
       .catch(() => setIsSubmitting(false));
   };
 
+  useEffect(() => {
+    if (!("vibrate" in navigator)) {
+      console.warn("Este dispositivo/navegador no soporta vibración.");
+    }
+  }, []);
+
+  const vibrarLatido = () => {
+    navigator.vibrate([200, 100, 400, 100, 200]);
+  };
+
+  const vibrarSOS = () => {
+    navigator.vibrate([
+      100, 30, 100, 30, 100, 150, 200, 30, 200, 30, 200, 150, 100, 30, 100, 30,
+      100,
+    ]);
+  };
+
+  const vibrarExagerado = () => {
+    navigator.vibrate([
+      100, 30, 100, 30, 100, 500, 200, 300, 100, 300, 100, 1000, 500, 200, 50,
+      200, 50, 200,
+    ]);
+  };
+
   return (
     <Box
       className={spaceGrotesk.className}
@@ -209,6 +238,13 @@ const LoginPage = () => {
         },
       }}
     >
+      <div style={{ padding: "2rem" }}>
+        <h1>Prueba de Vibración en Next.js</h1>
+        <button onClick={vibrarLatido}>Latido</button>
+        <button onClick={vibrarSOS}>SOS</button>
+        <button onClick={vibrarExagerado}>Exagerado</button>
+      </div>
+
       <Box
         aria-hidden
         sx={{
