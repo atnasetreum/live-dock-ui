@@ -8,9 +8,14 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
     (async () => {
+      // Reclama todas las páginas abiertas
+      await self.clients.claim();
+
+      // Avisar a todas las páginas que ya están bajo control del nuevo SW
       const clientsList = await self.clients.matchAll({
         includeUncontrolled: true,
       });
+
       for (const client of clientsList) {
         client.postMessage({
           type: "NEW_VERSION",
