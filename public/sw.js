@@ -14,8 +14,7 @@ self.addEventListener("install", (event) => {
       for (const client of clientsList) {
         client.postMessage({
           type: "NEW_VERSION",
-          message:
-            "Nueva versión instalada correctamente, recarga la página para actualizar a la última versión.",
+          message: "Nueva versión instalada correctamente.",
         });
       }
     })(),

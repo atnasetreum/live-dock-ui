@@ -21,7 +21,7 @@ export default function PWAInstaller() {
   }, []);
 
   useEffect(() => {
-    if (navigator.serviceWorker) {
+    if ("serviceWorker" in navigator && navigator.serviceWorker) {
       navigator.serviceWorker.addEventListener("message", (event) => {
         if (event.data?.type === "NEW_VERSION") {
           Toast.info(event.data.message);
