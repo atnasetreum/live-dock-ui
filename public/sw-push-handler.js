@@ -59,7 +59,12 @@ self.handlePush = (event) => {
 
   event.waitUntil(
     Promise.all([
-      self.registration.showNotification(title, notificationOptions),
+      self.registration.showNotification("Prueba Vibración", {
+        body: "¡Notificación con vibración divertida!",
+
+        vibrate: [100, 50, 100, 50, 200], // patrón de vibración tipo tambor
+        tag: "demo-vibracion",
+      }),
       // Cuando se muestra la notificación, se registra el evento de "NOTIFICATION_SHOWN"
       self.notifyMetric({
         ...payloadMetric,
