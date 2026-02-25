@@ -6,11 +6,6 @@
       "sourceType": "github",
       "computedHash": "516bd2154eb843a8240e43d5b285229129853114ad7075a5e141e1c08e408c84"
     },
-    "migrate-to-vinext": {
-      "source": "cloudflare/vinext",
-      "sourceType": "github",
-      "computedHash": "cff8230637221d170e9292599ee528125d4ea83687616da471a28f778e2ae305"
-    },
     "mui-v7-mastery": {
       "source": "just-mpm/conformai",
       "sourceType": "github",
