@@ -776,11 +776,21 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
                     {historicalRows.length ? (
                       historicalRows.map((row) => (
                         <TableRow key={row.id} hover>
-                          <TableCell>{row.id}</TableCell>
-                          <TableCell>{row.material}</TableCell>
-                          <TableCell>{row.turns}</TableCell>
-                          <TableCell>{row.volume}</TableCell>
-                          <TableCell>{row.time}</TableCell>
+                          <TableCell sx={{ color: theme.palette.textPrimary }}>
+                            {row.id}
+                          </TableCell>
+                          <TableCell sx={{ color: theme.palette.textPrimary }}>
+                            {row.material}
+                          </TableCell>
+                          <TableCell sx={{ color: theme.palette.textPrimary }}>
+                            {row.turns}
+                          </TableCell>
+                          <TableCell sx={{ color: theme.palette.textPrimary }}>
+                            {row.volume}
+                          </TableCell>
+                          <TableCell sx={{ color: theme.palette.textPrimary }}>
+                            {row.time}
+                          </TableCell>
                           <TableCell>
                             <Chip
                               label={row.status}
