@@ -18,6 +18,7 @@ import {
   LinearProgress,
   Paper,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 
@@ -42,6 +43,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
   const [isLoadingConfirm, setIsLoadingConfirm] = useState<boolean>(false);
   const [currentActionRole, setCurrentActionRole] = useState<string>("");
   const [currentStatus, setCurrentStatus] = useState<string>("");
+  const [rejectionNotes, setRejectionNotes] = useState<string>("");
   const currentUser = useCurrentUser();
 
   const { theme } = useThemeConfig();
@@ -61,6 +63,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
     setOpenAuthDialog(true);
     setCurrentActionRole(actionRole);
     setCurrentStatus(currentStatusRow);
+    setRejectionNotes("");
   };
 
   const handleConfirmAuthorize = async () => {
@@ -70,17 +73,33 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
     if (!currentUser)
       return Toast.error("No se ha identificado el usuario actual.");
 
+    const isRejectAction = currentActionRole === "rechazar";
+    const rejectionNotesTrimmed = rejectionNotes.trim();
+
+    if (isRejectAction && !rejectionNotesTrimmed) {
+      return Toast.error("Debes capturar el motivo de rechazo.");
+    }
+
     setIsLoadingConfirm(true);
 
     if (
       currentActionRole === "confirmacion_ingreso_metric" ||
-      currentActionRole === "confirmacion_analisis_metric"
+      currentActionRole === "confirmacion_analisis_metric" ||
+      currentActionRole === "confirmacion_descarga_metric" ||
+      currentActionRole === "confirmacion_peso_sap_metric" ||
+      currentActionRole === "confirmacion_liberacion_sap_metric"
     ) {
       const clientInfo = await getClientInfo();
       const actionConfirm =
         currentActionRole === "confirmacion_analisis_metric"
           ? "calidad_confirma_test"
-          : "logistica_confirma_ingreso";
+          : currentActionRole === "confirmacion_descarga_metric"
+            ? "produccion_confirma_descarga"
+            : currentActionRole === "confirmacion_peso_sap_metric"
+              ? "logistica_confirma_pendiente_peso_en_saP"
+              : currentActionRole === "confirmacion_liberacion_sap_metric"
+                ? "calidad_confima_liberacion_en_sap"
+                : "logistica_confirma_ingreso";
 
       return receptionProcessesService
         .notifyMetric({
@@ -124,7 +143,10 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
     switch (currentRole) {
       case ProcessEventRole.LOGISTICA:
         if (currentStatus === "LOGISTICA PENDIENTE DE AUTORIZACION") {
-          actionRole = "logistica-autorizo-ingreso";
+          actionRole =
+            newState === "rechazada"
+              ? "logistica-rechazo-ingreso"
+              : "logistica-autorizo-ingreso";
         } else if (
           currentStatus === "LOGISTICA PENDIENTE DE CONFIRMACION INGRESO"
         ) {
@@ -159,11 +181,13 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
       .changeOfStatus({
         id: selectedProcessId,
         actionRole,
+        ...(isRejectAction && { rejectionNotes: rejectionNotesTrimmed }),
       })
       .then(() => {
         setIsLoadingConfirm(false);
         setOpenAuthDialog(false);
         setSelectedProcessId(null);
+        setRejectionNotes("");
         Toast.success("Acción realizada con éxito.");
       });
   };
@@ -172,6 +196,34 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
     setOpenAuthDialog(false);
     setSelectedProcessId(null);
     setIsLoadingConfirm(false);
+    setRejectionNotes("");
+  };
+
+  const getCurrentActionLabel = (actionRole: string) => {
+    switch (actionRole) {
+      case "descargando":
+        return "descargar";
+      case "descargado":
+        return "marcar como descargado";
+      case "confirmacion_ingreso_metric":
+        return "confirmar ingreso";
+      case "confirmacion_analisis_metric":
+        return "confirmar análisis";
+      case "confirmacion_descarga_metric":
+        return "confirmar descarga";
+      case "confirmacion_peso_sap_metric":
+        return "confirmar captura de peso en SAP";
+      case "confirmacion_liberacion_sap_metric":
+        return "confirmar liberación en SAP";
+      case "captura-peso-sap":
+        return "notificar captura de peso en SAP";
+      case "liberar-sap":
+        return "notificar liberación en SAP";
+      case "autorizar":
+        return "autorizar";
+      default:
+        return "rechazar";
+    }
   };
 
   const calculateProgress = (events: EventData[]): number => {
@@ -263,6 +315,10 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
               formattedStatus?.includes("PENDIENTE LIBERACION") &&
               currentUser?.role === ProcessEventRole.CALIDAD; // TODO: Cambiar !=== por ===
 
+            const canRejectLogistica =
+              currentStatusRaw === "LOGISTICA_PENDIENTE_DE_AUTORIZACION" &&
+              currentUser?.role === ProcessEventRole.LOGISTICA;
+
             const canConfirmIngreso =
               currentStatusRaw ===
                 "LOGISTICA_PENDIENTE_DE_CONFIRMACION_INGRESO" &&
@@ -273,6 +329,21 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                 "CALIDAD_PENDIENTE_DE_CONFIRMACION_DE_ANALISIS" &&
               currentUser?.role === ProcessEventRole.CALIDAD;
 
+            const canConfirmDescarga =
+              currentStatusRaw ===
+                "PRODUCCION_PENDIENTE_DE_CONFIRMACION_PARA_DESCARGA" &&
+              currentUser?.role === ProcessEventRole.PRODUCCION;
+
+            const canConfirmPesoSAP =
+              currentStatusRaw ===
+                "LOGISTICA_PENDIENTE_DE_CONFIRMACION_CAPTURA_PESO_SAP" &&
+              currentUser?.role === ProcessEventRole.LOGISTICA;
+
+            const canConfirmLiberacionSAP =
+              currentStatusRaw ===
+                "CALIDAD_PENDIENTE_DE_CONFIRMACION_LIBERACION_SAP" &&
+              currentUser?.role === ProcessEventRole.CALIDAD;
+
             const hasActions =
               canAuthorize ||
               canDecision ||
@@ -281,7 +352,10 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
               canCaptureWeight ||
               canRelease ||
               canConfirmIngreso ||
-              canConfirmAnalisis;
+              canConfirmAnalisis ||
+              canConfirmDescarga ||
+              canConfirmPesoSAP ||
+              canConfirmLiberacionSAP;
 
             const progressValue = formattedStatus?.includes("FINALIZO")
               ? 100
@@ -487,7 +561,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                             alignItems: "stretch",
                           }}
                         >
-                          {canDecision && (
+                          {(canDecision || canRejectLogistica) && (
                             <Button
                               onClick={(e) =>
                                 handleAuthorize(
@@ -550,6 +624,90 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                   e,
                                   receptionProcess.id,
                                   "confirmacion_analisis_metric",
+                                  formattedStatus,
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<CheckCircleIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.success?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.success?.dark,
+                                },
+                              }}
+                            >
+                              Confirmacion
+                            </Button>
+                          )}
+                          {canConfirmDescarga && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "confirmacion_descarga_metric",
+                                  formattedStatus,
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<CheckCircleIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.success?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.success?.dark,
+                                },
+                              }}
+                            >
+                              Confirmacion
+                            </Button>
+                          )}
+                          {canConfirmPesoSAP && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "confirmacion_peso_sap_metric",
+                                  formattedStatus,
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<CheckCircleIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.success?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.success?.dark,
+                                },
+                              }}
+                            >
+                              Confirmacion
+                            </Button>
+                          )}
+                          {canConfirmLiberacionSAP && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "confirmacion_liberacion_sap_metric",
                                   formattedStatus,
                                 )
                               }
@@ -960,24 +1118,57 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
           }}
         >
           ¿Estás seguro de que deseas{" "}
-          <b>
-            {currentActionRole === "descargando"
-              ? "descargar"
-              : currentActionRole === "descargado"
-                ? "marcar como descargado"
-                : currentActionRole === "confirmacion_ingreso_metric"
-                  ? "confirmar ingreso"
-                  : currentActionRole === "confirmacion_analisis_metric"
-                    ? "confirmar análisis"
-                    : currentActionRole === "captura-peso-sap"
-                      ? "notificar captura de peso en SAP"
-                      : currentActionRole === "liberar-sap"
-                        ? "notificar liberación en SAP"
-                        : currentActionRole === "autorizar"
-                          ? "autorizar"
-                          : "rechazar"}
-          </b>{" "}
-          esta operación? Esta acción no puede ser revertida.
+          <b>{getCurrentActionLabel(currentActionRole)}</b> esta operación? Esta
+          acción no puede ser revertida.
+          {currentActionRole === "rechazar" && (
+            <TextField
+              multiline
+              minRows={3}
+              fullWidth
+              required
+              label="Motivo de rechazo (Obligatorio)"
+              placeholder="Describe el motivo del rechazo"
+              value={rejectionNotes}
+              onChange={(event) => setRejectionNotes(event.target.value)}
+              sx={{
+                mt: 2,
+                "& .MuiInputLabel-root": {
+                  color:
+                    theme.name === "dark"
+                      ? "rgba(255, 255, 255, 0.82)"
+                      : theme.palette.textSecondary,
+                },
+                "& .MuiOutlinedInput-root": {
+                  color: theme.palette.textPrimary,
+                  backgroundColor:
+                    theme.name === "dark"
+                      ? "rgba(255, 255, 255, 0.04)"
+                      : theme.forms.fieldBackground,
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor:
+                    theme.name === "dark"
+                      ? "rgba(255, 255, 255, 0.32)"
+                      : theme.surfaces.border,
+                },
+                "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                  {
+                    borderColor:
+                      theme.name === "dark"
+                        ? "rgba(255, 255, 255, 0.5)"
+                        : theme.forms.borderHover,
+                  },
+                "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                  {
+                    borderColor:
+                      theme.name === "dark"
+                        ? "rgba(255, 255, 255, 0.78)"
+                        : theme.forms.borderFocus,
+                    borderWidth: 2,
+                  },
+              }}
+            />
+          )}
         </DialogContent>
         <DialogActions
           sx={{
@@ -1008,7 +1199,10 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
             onClick={() => handleConfirmAuthorize()}
             variant="contained"
             startIcon={<CheckCircleIcon />}
-            disabled={isLoadingConfirm}
+            disabled={
+              isLoadingConfirm ||
+              (currentActionRole === "rechazar" && !rejectionNotes.trim())
+            }
             sx={{
               textTransform: "none",
               fontSize: "0.95rem",

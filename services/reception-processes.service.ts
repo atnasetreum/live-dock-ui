@@ -25,7 +25,11 @@ export const receptionProcessesService = {
     );
     return data;
   },
-  changeOfStatus(payload: { id: number; actionRole: string }) {
+  changeOfStatus(payload: {
+    id: number;
+    actionRole: string;
+    rejectionNotes?: string;
+  }) {
     return axiosClient.post(
       `${receptionProcessesService.baseUrl}/change-of-status`,
       payload,
