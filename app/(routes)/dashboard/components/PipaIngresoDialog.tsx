@@ -91,8 +91,10 @@ const PipaIngresoDialog = ({
       </DialogTitle>
       <DialogContent sx={{ px: 2.5 }}>
         <Typography sx={{ color: theme.palette.textSecondary }}>
-          Esta accion creara un nuevo proceso de recepcion.{" "}
-          <center>¿Deseas continuar?</center>
+          Esta accion creara un nuevo proceso de recepcion.
+          <Box component="span" sx={{ display: "block", textAlign: "center" }}>
+            ¿Deseas continuar?
+          </Box>
         </Typography>
         <FormControl
           fullWidth
@@ -136,7 +138,7 @@ const PipaIngresoDialog = ({
             <MenuItem value="ALCOHOL">ALCOHOL</MenuItem>
             <MenuItem value="AGUA">AGUA</MenuItem>
             <MenuItem value="LESS">LESS</MenuItem>
-            <MenuItem value="COLGATE">COLGATE</MenuItem>
+            <MenuItem value="A GRANEL">A GRANEL</MenuItem>
           </Select>
         </FormControl>
       </DialogContent>

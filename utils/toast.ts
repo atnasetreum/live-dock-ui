@@ -21,7 +21,7 @@ export interface ToastOptions {
 export const Toast = {
   success: (message: string, options?: ToastOptions) =>
     showToast.success(message, {
-      duration: options?.duration ?? 4000,
+      duration: options?.duration ?? 10000,
       position: options?.position ?? "top-right",
       progress: options?.progress ?? true,
       transition: options?.transition ?? "fadeIn",
@@ -30,7 +30,7 @@ export const Toast = {
 
   error: (message: string, options?: ToastOptions) =>
     showToast.error(message, {
-      duration: options?.duration ?? 4000,
+      duration: options?.duration ?? 10000,
       position: options?.position ?? "top-right",
       progress: options?.progress ?? true,
       transition: options?.transition ?? "fadeIn",
@@ -39,7 +39,7 @@ export const Toast = {
 
   warning: (message: string, options?: ToastOptions) =>
     showToast.warning(message, {
-      duration: options?.duration ?? 4000,
+      duration: options?.duration ?? 10000,
       position: options?.position ?? "top-right",
       progress: options?.progress ?? true,
       transition: options?.transition ?? "fadeIn",
@@ -48,7 +48,7 @@ export const Toast = {
 
   info: (message: string, options?: ToastOptions) =>
     showToast.info(message, {
-      duration: options?.duration ?? 4000,
+      duration: options?.duration ?? 10000,
       position: options?.position ?? "top-right",
       progress: options?.progress ?? true,
       transition: options?.transition ?? "fadeIn",

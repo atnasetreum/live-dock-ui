@@ -43,4 +43,21 @@ export const receptionProcessesService = {
     });
     return data;
   },
+  notifyMetric: async (payload: {
+    id: number;
+    notifiedUserId: number;
+    actionConfirm: string;
+    visibleAt: number;
+    reactionTimeSec: number;
+    accionAt: string;
+    systemDelaySec: number;
+    eventType: string;
+    metadata: string;
+  }) => {
+    const { data } = await axiosClient.post(
+      `${receptionProcessesService.baseUrl}/notify-metric`,
+      payload,
+    );
+    return data;
+  },
 };

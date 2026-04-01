@@ -9,7 +9,6 @@ import TimelineIcon from "@mui/icons-material/Timeline";
 import {
   Box,
   Button,
-  ButtonBase,
   Chip,
   Collapse,
   Dialog,
@@ -27,7 +26,7 @@ import { receptionProcessesService } from "@/services";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useCurrentUser } from "@/common/UserContext";
 import TimeLineEvents from "./TimeLineEvents";
-import { formatTime, Toast } from "@/utils";
+import { formatTime, getClientInfo, Toast } from "@/utils";
 
 interface Props {
   selectReceptionProcess: (receptionProcess: ReceptionProcess) => void;
@@ -64,7 +63,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
     setCurrentStatus(currentStatusRow);
   };
 
-  const handleConfirmAuthorize = () => {
+  const handleConfirmAuthorize = async () => {
     if (!selectedProcessId)
       return Toast.error("No se ha seleccionado ningún proceso.");
 
@@ -72,6 +71,36 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
       return Toast.error("No se ha identificado el usuario actual.");
 
     setIsLoadingConfirm(true);
+
+    if (
+      currentActionRole === "confirmacion_ingreso_metric" ||
+      currentActionRole === "confirmacion_analisis_metric"
+    ) {
+      const clientInfo = await getClientInfo();
+      const actionConfirm =
+        currentActionRole === "confirmacion_analisis_metric"
+          ? "calidad_confirma_test"
+          : "logistica_confirma_ingreso";
+
+      return receptionProcessesService
+        .notifyMetric({
+          id: selectedProcessId,
+          notifiedUserId: currentUser.id,
+          actionConfirm,
+          visibleAt: Date.now(),
+          reactionTimeSec: 0,
+          accionAt: new Date().toISOString(),
+          systemDelaySec: 0,
+          eventType: "ACTION_CLICKED_CONFIRM",
+          metadata: JSON.stringify(clientInfo),
+        })
+        .then(() => {
+          setIsLoadingConfirm(false);
+          setOpenAuthDialog(false);
+          setSelectedProcessId(null);
+          Toast.success("Acción realizada con éxito.");
+        });
+    }
 
     const newState =
       currentActionRole === "autorizar" ? "autorizada" : "rechazada";
@@ -95,6 +124,10 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
     switch (currentRole) {
       case ProcessEventRole.LOGISTICA:
         if (currentStatus === "LOGISTICA PENDIENTE DE AUTORIZACION") {
+          actionRole = "logistica-autorizo-ingreso";
+        } else if (
+          currentStatus === "LOGISTICA PENDIENTE DE CONFIRMACION INGRESO"
+        ) {
           actionRole = "logistica-autorizo-ingreso";
         } else if (
           currentStatus === "LOGISTICA PENDIENTE DE CAPTURA PESO SAP"
@@ -230,13 +263,25 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
               formattedStatus?.includes("PENDIENTE LIBERACION") &&
               currentUser?.role === ProcessEventRole.CALIDAD; // TODO: Cambiar !=== por ===
 
+            const canConfirmIngreso =
+              currentStatusRaw ===
+                "LOGISTICA_PENDIENTE_DE_CONFIRMACION_INGRESO" &&
+              currentUser?.role === ProcessEventRole.LOGISTICA;
+
+            const canConfirmAnalisis =
+              currentStatusRaw ===
+                "CALIDAD_PENDIENTE_DE_CONFIRMACION_DE_ANALISIS" &&
+              currentUser?.role === ProcessEventRole.CALIDAD;
+
             const hasActions =
               canAuthorize ||
               canDecision ||
               canDownload ||
               canEndDownload ||
               canCaptureWeight ||
-              canRelease;
+              canRelease ||
+              canConfirmIngreso ||
+              canConfirmAnalisis;
 
             const progressValue = formattedStatus?.includes("FINALIZO")
               ? 100
@@ -253,7 +298,10 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                 }}
                 id={`reception-process-${receptionProcess.id}`}
               >
-                <ButtonBase
+                <Box
+                  component="div"
+                  role="button"
+                  tabIndex={0}
                   sx={{
                     width: "100%",
                     textAlign: "left",
@@ -264,12 +312,18 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                     "&:hover": {
                       backgroundColor: theme.surfaces.panel,
                     },
-                    "&.Mui-focusVisible": {
+                    "&:focus-visible": {
                       outline: `2px solid ${theme.forms.borderFocus}`,
                       outlineOffset: 2,
                     },
                   }}
                   onClick={() => toggleExpanded(receptionProcess.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      toggleExpanded(receptionProcess.id);
+                    }
+                  }}
                   aria-expanded={isExpanded}
                   aria-controls={`reception-process-${receptionProcess.id}`}
                 >
@@ -461,6 +515,62 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                               Rechazar
                             </Button>
                           )}
+                          {canConfirmIngreso && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "confirmacion_ingreso_metric",
+                                  formattedStatus,
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<CheckCircleIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.success?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.success?.dark,
+                                },
+                              }}
+                            >
+                              Confirmacion
+                            </Button>
+                          )}
+                          {canConfirmAnalisis && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "confirmacion_analisis_metric",
+                                  formattedStatus,
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<CheckCircleIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.success?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.success?.dark,
+                                },
+                              }}
+                            >
+                              Confirmacion
+                            </Button>
+                          )}
                           {(canAuthorize || canDecision) && (
                             <Button
                               onClick={(e) =>
@@ -625,7 +735,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                       }}
                     />
                   </Box>
-                </ButtonBase>
+                </Box>
                 <Collapse
                   in={isExpanded}
                   timeout="auto"
@@ -855,13 +965,17 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
               ? "descargar"
               : currentActionRole === "descargado"
                 ? "marcar como descargado"
-                : currentActionRole === "captura-peso-sap"
-                  ? "notificar captura de peso en SAP"
-                  : currentActionRole === "liberar-sap"
-                    ? "notificar liberación en SAP"
-                    : currentActionRole === "autorizar"
-                      ? "autorizar"
-                      : "rechazar"}
+                : currentActionRole === "confirmacion_ingreso_metric"
+                  ? "confirmar ingreso"
+                  : currentActionRole === "confirmacion_analisis_metric"
+                    ? "confirmar análisis"
+                    : currentActionRole === "captura-peso-sap"
+                      ? "notificar captura de peso en SAP"
+                      : currentActionRole === "liberar-sap"
+                        ? "notificar liberación en SAP"
+                        : currentActionRole === "autorizar"
+                          ? "autorizar"
+                          : "rechazar"}
           </b>{" "}
           esta operación? Esta acción no puede ser revertida.
         </DialogContent>
