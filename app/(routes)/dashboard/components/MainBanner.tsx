@@ -218,11 +218,11 @@ const MainBanner = ({ onPipaIngreso, onOpenDashboard }: MainBannerProps) => {
           </Typography>
         </Box>
         <Stack spacing={2} width={{ xs: "100%", md: "auto" }}>
-          {onOpenDashboard && (
+          {/* {onOpenDashboard && (
             <Button
               variant="contained"
               startIcon={<TimelineIcon />}
-              //onClick={onOpenDashboard}
+              onClick={onOpenDashboard}
               sx={{
                 textTransform: "none",
                 fontWeight: 600,
@@ -238,7 +238,7 @@ const MainBanner = ({ onPipaIngreso, onOpenDashboard }: MainBannerProps) => {
             >
               Dashboard en tiempo real
             </Button>
-          )}
+          )} */}
           {currentUser.role === ProcessEventRole.VIGILANCIA && (
             <Button
               variant="outlined"
