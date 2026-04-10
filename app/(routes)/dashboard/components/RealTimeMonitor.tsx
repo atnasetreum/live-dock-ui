@@ -71,7 +71,7 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
             }
           },
         });
-      } else if (lastStatus === ProcessState.CALIDAD_RECHAZO) {
+      } else if (lastStatus === ProcessState.FINALIZO_PROCESO_POR_RECHAZO) {
         Swal.fire({
           icon: "error",
           title: "Material rechazado por calidad",
