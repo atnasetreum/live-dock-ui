@@ -45,7 +45,10 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
 
   useEffect(() => {
     if (role === ProcessEventRole.SISTEMA) {
-      if (lastStatus === ProcessState.CALIDAD_APROBO) {
+      if (
+        lastStatus ===
+        ProcessState.PRODUCCION_PENDIENTE_DE_CONFIRMACION_PARA_DESCARGA
+      ) {
         Swal.fire({
           icon: "success",
           title: "¡Material aprobado por calidad!",
@@ -119,7 +122,7 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
       >
         <Toolbar sx={{ gap: 2, flexWrap: "wrap" }}>
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            {lastStatus}Flujo del proceso # {receptionProcess.id} -{" "}
+            Flujo del proceso # {receptionProcess.id} -{" "}
             {receptionProcess.typeOfMaterial}
           </Typography>
           <Chip
