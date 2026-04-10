@@ -32,6 +32,12 @@ const ProcessFlow = ({ receptionProcess, currentStatus }: Props) => {
 
   return (
     <Stack spacing={{ xs: 1.5, md: 2 }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
+        Proveedor - {receptionProcess.providerName || "N/A"}
+      </Typography>
+      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+        Placas - {receptionProcess.licensePlates || "N/A"}
+      </Typography>
       <Stack alignItems="center">
         <Paper
           elevation={0}
@@ -61,12 +67,6 @@ const ProcessFlow = ({ receptionProcess, currentStatus }: Props) => {
             },
           }}
         >
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
-            Proveedor - {receptionProcess.providerName || "N/A"}
-          </Typography>
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-            Placas - {receptionProcess.licensePlates || "N/A"}
-          </Typography>
           <FormControl>
             <RadioGroup
               row={!isSmallScreen}
