@@ -143,7 +143,7 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
             sx={{
               fontWeight: 600,
               color: textPrimary,
-              backgroundColor: theme.palette.warning,
+              backgroundColor: theme.palette.errorTranslucent,
               border: `1px solid ${border}`,
             }}
           />
@@ -152,8 +152,8 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
             label={`Placas: ${licensePlates || "N/A"}`}
             sx={{
               fontWeight: 600,
-              color: textPrimary,
-              backgroundColor: theme.palette.warning,
+              color: theme.palette.textSecondary,
+              backgroundColor: theme.surfaces.translucent,
               border: `1px solid ${border}`,
             }}
           />
