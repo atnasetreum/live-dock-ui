@@ -74,7 +74,7 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
       } else if (lastStatus === ProcessState.FINALIZO_PROCESO_POR_RECHAZO) {
         Swal.fire({
           icon: "error",
-          title: "Material rechazado por calidad",
+          title: `Material rechazado por ${events.length > 3 ? "calidad" : "logistica"}!`,
           html: `<strong>Proveedor:</strong> ${providerName || ""}`,
           footer: `<strong>Placas:</strong> ${licensePlates || ""}`,
           showConfirmButton: false,
