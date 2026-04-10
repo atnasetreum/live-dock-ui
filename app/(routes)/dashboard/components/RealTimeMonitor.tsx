@@ -143,7 +143,7 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
             sx={{
               fontWeight: 600,
               color: textPrimary,
-              backgroundColor: theme.palette.secondary,
+              backgroundColor: theme.palette.warning,
               border: `1px solid ${border}`,
             }}
           />
@@ -153,7 +153,7 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
             sx={{
               fontWeight: 600,
               color: textPrimary,
-              backgroundColor: theme.palette.secondary,
+              backgroundColor: theme.palette.warning,
               border: `1px solid ${border}`,
             }}
           />
