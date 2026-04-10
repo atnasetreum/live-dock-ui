@@ -152,8 +152,8 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
             label={`Placas: ${licensePlates || "N/A"}`}
             sx={{
               fontWeight: 600,
-              color: theme.palette.textSecondary,
-              backgroundColor: theme.surfaces.translucent,
+              color: textPrimary,
+              backgroundColor: theme.palette.errorTranslucent,
               border: `1px solid ${border}`,
             }}
           />
