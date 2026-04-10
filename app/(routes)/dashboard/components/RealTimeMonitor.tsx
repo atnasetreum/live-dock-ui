@@ -96,7 +96,7 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
         });
       }
     }
-  }, [providerName, licensePlates, lastStatus, role]);
+  }, [providerName, licensePlates, lastStatus, role, events]);
 
   return (
     <Dialog
@@ -134,6 +134,26 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
               backgroundColor: !lastStatus.includes("RECHAZO")
                 ? theme.surfaces.translucent
                 : theme.palette.errorTranslucent,
+              border: `1px solid ${border}`,
+            }}
+          />
+          <Chip
+            size="small"
+            label={`Proveedor: ${providerName || "N/A"}`}
+            sx={{
+              fontWeight: 600,
+              color: textPrimary,
+              backgroundColor: theme.palette.secondary,
+              border: `1px solid ${border}`,
+            }}
+          />
+          <Chip
+            size="small"
+            label={`Placas: ${licensePlates || "N/A"}`}
+            sx={{
+              fontWeight: 600,
+              color: textPrimary,
+              backgroundColor: theme.palette.secondary,
               border: `1px solid ${border}`,
             }}
           />
