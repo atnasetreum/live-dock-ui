@@ -87,6 +87,8 @@ const DashboardPage = () => {
   const [isDashboardBIOpen, setIsDashboardBIOpen] = useState(false);
   const [isPipaDialogOpen, setIsPipaDialogOpen] = useState(false);
   const [isPipaSubmitting, setIsPipaSubmitting] = useState(false);
+  const [pipaProviderName, setPipaProviderName] = useState("");
+  const [pipaLicensePlates, setPipaLicensePlates] = useState("");
   const [pipaMaterialType, setPipaMaterialType] = useState("");
   const [receptionProcess, setReceptionProcess] =
     useState<ReceptionProcess | null>(null);
@@ -222,6 +224,8 @@ const DashboardPage = () => {
 
   const handleClosePipaDialog = () => {
     if (isPipaSubmitting) return;
+    setPipaProviderName("");
+    setPipaLicensePlates("");
     setPipaMaterialType("");
     setIsPipaDialogOpen(false);
   };
@@ -232,9 +236,13 @@ const DashboardPage = () => {
 
     try {
       await receptionProcessesService.create({
+        providerName: pipaProviderName.trim(),
+        licensePlates: pipaLicensePlates.trim(),
         typeOfMaterial: pipaMaterialType,
       });
       Toast.success("Ingreso de pipa registrado.");
+      setPipaProviderName("");
+      setPipaLicensePlates("");
       setPipaMaterialType("");
       setIsPipaDialogOpen(false);
     } finally {
@@ -275,9 +283,13 @@ const DashboardPage = () => {
         <PipaIngresoDialog
           open={isPipaDialogOpen}
           isSubmitting={isPipaSubmitting}
+          providerName={pipaProviderName}
+          licensePlates={pipaLicensePlates}
           materialType={pipaMaterialType}
           onClose={handleClosePipaDialog}
           onConfirm={handleConfirmPipaIngreso}
+          onProviderNameChange={setPipaProviderName}
+          onLicensePlatesChange={setPipaLicensePlates}
           onMaterialTypeChange={setPipaMaterialType}
         />
         {isDashboardBIOpen ? (

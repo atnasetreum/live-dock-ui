@@ -1,4 +1,4 @@
-import * as React from "react";
+import { forwardRef, ReactElement, Ref, useEffect, useMemo } from "react";
 
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -11,14 +11,16 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import { TransitionProps } from "@mui/material/transitions";
+import Swal from "sweetalert2";
 
 import { useThemeConfig } from "@/theme/ThemeProvider";
-import { ReceptionProcess } from "@/types";
+import { ProcessEventRole, ProcessState, ReceptionProcess } from "@/types";
 import ProcessFlow from "./ProcessFlow";
+import { useCurrentUser } from "@/common/UserContext";
 
-const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & { children: React.ReactElement<unknown> },
-  ref: React.Ref<unknown>,
+const Transition = forwardRef(function Transition(
+  props: TransitionProps & { children: ReactElement<unknown> },
+  ref: Ref<unknown>,
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -30,14 +32,68 @@ interface Props {
 
 const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
   const { theme } = useThemeConfig();
-  const { events } = receptionProcess;
+  const { events, providerName, licensePlates } = receptionProcess;
+
+  const { role } = useCurrentUser();
 
   const border = theme.surfaces.border;
   const textPrimary = theme.palette.textPrimary;
 
-  const lastStatus = React.useMemo(() => {
+  const lastStatus = useMemo(() => {
     return events[events.length - 1]?.status ?? "SIN_EVENTOS";
   }, [events]);
+
+  useEffect(() => {
+    if (role === ProcessEventRole.SISTEMA) {
+      if (lastStatus === ProcessState.CALIDAD_APROBO) {
+        Swal.fire({
+          icon: "success",
+          title: "¡Material aprobado por calidad!",
+          html: `<strong>Proveedor:</strong> ${providerName || ""}`,
+          footer: `<strong>Placas:</strong> ${licensePlates || ""}`,
+          showConfirmButton: false,
+          timer: 15000,
+          timerProgressBar: true,
+          background: "#fff url(/images/fondo.jpeg) no-repeat",
+          backdrop: `
+          rgba(3, 3, 47, 0.4)
+          url("/images/ok.gif") 
+          left top
+          no-repeat
+        `,
+          didOpen: () => {
+            const container = Swal.getContainer();
+            if (container) {
+              container.style.zIndex = "1600";
+            }
+          },
+        });
+      } else if (lastStatus === ProcessState.CALIDAD_RECHAZO) {
+        Swal.fire({
+          icon: "error",
+          title: "Material rechazado por calidad",
+          html: `<strong>Proveedor:</strong> ${providerName || ""}`,
+          footer: `<strong>Placas:</strong> ${licensePlates || ""}`,
+          showConfirmButton: false,
+          timer: 15000,
+          timerProgressBar: true,
+          background: "#fff url(/images/fondo.jpeg) no-repeat",
+          backdrop: `
+          rgba(3, 3, 47, 0.4)
+          url("/images/reject.gif") 
+          left top
+          no-repeat
+        `,
+          didOpen: () => {
+            const container = Swal.getContainer();
+            if (container) {
+              container.style.zIndex = "1600";
+            }
+          },
+        });
+      }
+    }
+  }, [providerName, licensePlates, lastStatus, role]);
 
   return (
     <Dialog
@@ -63,7 +119,7 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
       >
         <Toolbar sx={{ gap: 2, flexWrap: "wrap" }}>
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Flujo del proceso # {receptionProcess.id} -{" "}
+            {lastStatus}Flujo del proceso # {receptionProcess.id} -{" "}
             {receptionProcess.typeOfMaterial}
           </Typography>
           <Chip

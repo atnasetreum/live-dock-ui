@@ -3,6 +3,8 @@ import { User } from "./users.interfaces";
 export interface ReceptionProcess {
   id: number;
   status: ReceptionProcessStatus;
+  providerName: string | null;
+  licensePlates: string | null;
   typeOfMaterial: string;
   isActive: boolean;
   createdBy: User;

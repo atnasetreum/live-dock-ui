@@ -222,7 +222,7 @@ const MainBanner = ({ onPipaIngreso, onOpenDashboard }: MainBannerProps) => {
             <Button
               variant="contained"
               startIcon={<TimelineIcon />}
-              onClick={onOpenDashboard}
+              //onClick={onOpenDashboard}
               sx={{
                 textTransform: "none",
                 fontWeight: 600,

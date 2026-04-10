@@ -13,6 +13,7 @@ import {
   MenuItem,
   Select,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
@@ -22,18 +23,26 @@ import { useThemeConfig } from "@/theme/ThemeProvider";
 type PipaIngresoDialogProps = {
   open: boolean;
   isSubmitting: boolean;
+  providerName: string;
+  licensePlates: string;
   materialType: string;
   onClose: () => void;
   onConfirm: () => void;
+  onProviderNameChange: (value: string) => void;
+  onLicensePlatesChange: (value: string) => void;
   onMaterialTypeChange: (value: string) => void;
 };
 
 const PipaIngresoDialog = ({
   open,
   isSubmitting,
+  providerName,
+  licensePlates,
   materialType,
   onClose,
   onConfirm,
+  onProviderNameChange,
+  onLicensePlatesChange,
   onMaterialTypeChange,
 }: PipaIngresoDialogProps) => {
   const { theme } = useThemeConfig();
@@ -96,9 +105,74 @@ const PipaIngresoDialog = ({
             ¿Deseas continuar?
           </Box>
         </Typography>
+        <TextField
+          fullWidth
+          required
+          autoComplete="off"
+          label="Nombre del proveedor"
+          value={providerName}
+          onChange={(event) => onProviderNameChange(event.target.value)}
+          sx={{
+            mt: 2,
+            "& .MuiInputLabel-root": {
+              color: theme.palette.textSecondary,
+              backgroundColor: theme.forms.labelBackground,
+              px: 0.6,
+              borderRadius: 1,
+            },
+            "& .MuiOutlinedInput-root": {
+              backgroundColor: theme.forms.fieldBackground,
+              color: theme.forms.inputColor,
+              borderRadius: 2,
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: theme.forms.border,
+            },
+            "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: theme.forms.borderHover,
+            },
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+              {
+                borderColor: theme.forms.borderFocus,
+                boxShadow: theme.forms.focusShadow,
+              },
+          }}
+        />
+        <TextField
+          fullWidth
+          required
+          autoComplete="off"
+          label="Numero de placas"
+          value={licensePlates}
+          onChange={(event) => onLicensePlatesChange(event.target.value)}
+          sx={{
+            mt: 2,
+            "& .MuiInputLabel-root": {
+              color: theme.palette.textSecondary,
+              backgroundColor: theme.forms.labelBackground,
+              px: 0.6,
+              borderRadius: 1,
+            },
+            "& .MuiOutlinedInput-root": {
+              backgroundColor: theme.forms.fieldBackground,
+              color: theme.forms.inputColor,
+              borderRadius: 2,
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: theme.forms.border,
+            },
+            "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: theme.forms.borderHover,
+            },
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+              {
+                borderColor: theme.forms.borderFocus,
+                boxShadow: theme.forms.focusShadow,
+              },
+          }}
+        />
         <FormControl
           fullWidth
-          size="small"
           sx={{
             mt: 2,
             "& .MuiInputLabel-root": {
@@ -172,7 +246,12 @@ const PipaIngresoDialog = ({
         <Button
           variant="contained"
           onClick={onConfirm}
-          disabled={isSubmitting || !materialType}
+          disabled={
+            isSubmitting ||
+            !providerName.trim() ||
+            !licensePlates.trim() ||
+            !materialType
+          }
           fullWidth
           startIcon={
             isSubmitting ? (

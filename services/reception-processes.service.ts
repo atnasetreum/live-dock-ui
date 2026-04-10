@@ -3,7 +3,11 @@ import { ReceptionProcess } from "@/types";
 
 export const receptionProcessesService = {
   baseUrl: "/reception-process",
-  create: async (payload: { typeOfMaterial: string }) => {
+  create: async (payload: {
+    providerName: string;
+    licensePlates: string;
+    typeOfMaterial: string;
+  }) => {
     const { data } = await axiosClient.post<ReceptionProcess>(
       `${receptionProcessesService.baseUrl}`,
       payload,

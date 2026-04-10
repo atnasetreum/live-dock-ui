@@ -406,12 +406,48 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                       display: "grid",
                       gridTemplateColumns: {
                         xs: "1fr",
-                        sm: "minmax(140px, 1fr) minmax(200px, 1.8fr) minmax(140px, 1fr) minmax(140px, 1fr)",
+                        sm: "minmax(170px, 1.4fr) minmax(120px, 0.9fr) minmax(240px, 2fr) minmax(130px, 1fr) minmax(70px, 0.5fr)",
                       },
-                      gap: { xs: 1.5, sm: 2 },
-                      alignItems: "center",
+                      gap: { xs: 1.5, sm: 1.5 },
+                      alignItems: "start",
                     }}
                   >
+                    <Box>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: theme.palette.textSecondary,
+                          textTransform: "uppercase",
+                          letterSpacing: 0.5,
+                          fontSize: "0.7rem",
+                          display: "block",
+                          mb: 0.25,
+                        }}
+                      >
+                        Proveedor / placas
+                      </Typography>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: 600,
+                          color: theme.palette.textPrimary,
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {receptionProcess.providerName ?? "Sin proveedor"}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: theme.palette.textSecondary,
+                          display: "block",
+                          mt: 0.25,
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        {receptionProcess.licensePlates ?? "Sin placas"}
+                      </Typography>
+                    </Box>
                     <Box>
                       <Typography
                         variant="caption"
@@ -462,7 +498,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                         {formattedStatus ?? "Sin eventos"}
                       </Typography>
                     </Box>
-                    <Box sx={{ display: { xs: "none", sm: "block" } }}>
+                    <Box>
                       <Typography
                         variant="caption"
                         sx={{
@@ -492,17 +528,22 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                       alignItems="center"
                       spacing={1}
                       sx={{
+                        width: "100%",
                         justifyContent: {
                           xs: "space-between",
-                          sm: "flex-start",
+                          sm: "flex-end",
                         },
+                        textAlign: { sm: "right" },
                       }}
                     >
                       <Typography
                         variant="inherit"
-                        sx={{ color: theme.palette.textSecondary }}
+                        sx={{
+                          color: theme.palette.textSecondary,
+                          fontSize: "1.5rem",
+                        }}
                       >
-                        #{receptionProcess.id}
+                        # {receptionProcess.id}
                       </Typography>
                     </Stack>
                     {/* Contenedor de botones */}
