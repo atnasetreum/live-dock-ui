@@ -142,7 +142,10 @@ const AlertsEvents = () => {
               </Stack>
               <Typography
                 variant="body2"
-                sx={{ color: theme.palette.textSecondary }}
+                sx={{
+                  color: theme.palette.textSecondary,
+                  whiteSpace: "pre-line",
+                }}
               >
                 {alert.detail}
               </Typography>

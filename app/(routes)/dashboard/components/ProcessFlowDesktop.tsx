@@ -369,8 +369,12 @@ const decisionMap: Record<string, string[]> = {
   ],
   PRODUCCION_PENDIENTE_DE_DESCARGA: ["production-pending-download"],
   PRODUCCION_DESCARGANDO: ["production-downloading"],
+  VIGILANCIA_PENDIENTE_DE_CONFIRMACION_TICKET_PENDIENTE: [
+    "security-pending-ticket",
+  ],
+  VIGILANCIA_PENDIENTE_DE_ENTREGA_DE_TICKET: ["security-pending-ticket"],
   LOGISTICA_PENDIENTE_DE_CONFIRMACION_CAPTURA_PESO_SAP: [
-    "production-downloaded",
+    "logistics-pending-sap",
   ],
   LOGISTICA_PENDIENTE_DE_CAPTURA_PESO_SAP: ["logistics-pending-sap"],
   CALIDAD_PENDIENTE_DE_CONFIRMACION_LIBERACION_SAP: ["logistics-captured-sap"],
@@ -517,9 +521,9 @@ const ProcessFlowDesktop = ({ currentStatus }: Props) => {
           elementsSelectable={false}
           proOptions={{ hideAttribution: true }}
           style={{ background: theme.surfaces.panel }}
-          fitViewOptions={{ padding: 0.2, minZoom: 0.6 }}
+          fitViewOptions={{ padding: 0.2, minZoom: 0.5 }}
           //fitViewOptions={{ padding: 0.1, minZoom: 1.5, maxZoom: 2.5 }}
-          //defaultViewport={{ x: 0, y: 0, zoom: 1.5 }}
+          //defaultViewport={{ x: 0, y: 0, zoom: 0.5 }}
         >
           <Background color={theme.surfaces.border} gap={48} size={2} />
           <Controls showInteractive={false} position="bottom-right" />

@@ -317,22 +317,104 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                             )}
                           </Stack>
 
-                          <Typography
-                            variant="body1"
+                          <Stack spacing={1} sx={{ width: "100%" }}>
+                            <Box
+                              sx={{
+                                borderRadius: 1.25,
+                                px: 1,
+                                py: 0.85,
+                                border: `1px solid ${theme.surfaces.border}`,
+                              }}
+                            >
+                              <Typography
+                                variant="overline"
+                                sx={{
+                                  display: "block",
+                                  letterSpacing: 0.8,
+                                  textTransform: "none",
+                                  lineHeight: 1,
+                                  color: theme.palette.textSecondary,
+                                }}
+                              >
+                                Estatus
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  mt: 0.5,
+                                  fontWeight: 800,
+                                  color: theme.palette.textPrimary,
+                                  lineHeight: 1.35,
+                                }}
+                              >
+                                {eventItem.status?.replace(/_/g, " ")}
+                              </Typography>
+                            </Box>
+
+                            <Box
+                              sx={{
+                                borderRadius: 1.25,
+                                px: 1,
+                                py: 0.85,
+                                border: `1px dashed ${theme.surfaces.border}`,
+                                backgroundColor: theme.surfaces.panel,
+                              }}
+                            >
+                              <Typography
+                                variant="overline"
+                                sx={{
+                                  display: "block",
+                                  letterSpacing: 0.8,
+                                  textTransform: "none",
+                                  lineHeight: 1,
+                                  color: theme.palette.textSecondary,
+                                }}
+                              >
+                                Evento
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  mt: 0.5,
+                                  display: "block",
+                                  fontWeight: 600,
+                                  color: theme.palette.textSecondary,
+                                  lineHeight: 1.35,
+                                }}
+                              >
+                                {eventItem.event.replace(/_/g, " ")}
+                              </Typography>
+                            </Box>
+                          </Stack>
+
+                          <Box
                             sx={{
-                              fontWeight: 600,
-                              color: theme.palette.textPrimary,
-                              lineHeight: 1.4,
+                              borderTop: `1px dashed ${theme.surfaces.border}`,
+                              pt: 0.8,
                             }}
                           >
-                            {eventItem.status?.replace(/_/g, " ")}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: theme.palette.textSecondary }}
-                          >
-                            {eventItem.event.replace(/_/g, " ")}
-                          </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: theme.palette.textSecondary,
+                                display: "block",
+                              }}
+                            >
+                              Ejecutado por
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: theme.palette.textPrimary,
+                                fontWeight: 700,
+                                lineHeight: 1.3,
+                              }}
+                            >
+                              {eventItem.createdBy?.name ||
+                                eventItem.createdBy?.email ||
+                                "Usuario no identificado"}
+                            </Typography>
+                          </Box>
                         </Stack>
                       </Box>
                     </Stack>
