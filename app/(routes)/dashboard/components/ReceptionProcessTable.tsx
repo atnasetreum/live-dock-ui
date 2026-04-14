@@ -86,6 +86,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
       currentActionRole === "confirmacion_ingreso_metric" ||
       currentActionRole === "confirmacion_analisis_metric" ||
       currentActionRole === "confirmacion_descarga_metric" ||
+      currentActionRole === "confirmacion_ticket_pendiente_metric" ||
       currentActionRole === "confirmacion_peso_sap_metric" ||
       currentActionRole === "confirmacion_liberacion_sap_metric"
     ) {
@@ -95,11 +96,13 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
           ? "calidad_confirma_test"
           : currentActionRole === "confirmacion_descarga_metric"
             ? "produccion_confirma_descarga"
-            : currentActionRole === "confirmacion_peso_sap_metric"
-              ? "logistica_confirma_pendiente_peso_en_saP"
-              : currentActionRole === "confirmacion_liberacion_sap_metric"
-                ? "calidad_confima_liberacion_en_sap"
-                : "logistica_confirma_ingreso";
+            : currentActionRole === "confirmacion_ticket_pendiente_metric"
+              ? "vigilancia_confirma_pendiente_ticket_pendiente"
+              : currentActionRole === "confirmacion_peso_sap_metric"
+                ? "logistica_confirma_pendiente_peso_en_saP"
+                : currentActionRole === "confirmacion_liberacion_sap_metric"
+                  ? "calidad_confima_liberacion_en_sap"
+                  : "logistica_confirma_ingreso";
 
       return receptionProcessesService
         .notifyMetric({
@@ -175,6 +178,11 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
           actionRole = "descargado";
         }
         break;
+      case ProcessEventRole.VIGILANCIA:
+        if (currentStatus === "VIGILANCIA PENDIENTE DE ENTREGA DE TICKET") {
+          actionRole = "ticket-entregado";
+        }
+        break;
     }
 
     receptionProcessesService
@@ -205,12 +213,16 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
         return "descargar";
       case "descargado":
         return "marcar como descargado";
+      case "ticket-entregado":
+        return "notificar ticket entregado";
       case "confirmacion_ingreso_metric":
-        return "confirmar ingreso";
+        return "confirmar pendiente de ingreso";
       case "confirmacion_analisis_metric":
         return "confirmar análisis";
       case "confirmacion_descarga_metric":
         return "confirmar descarga";
+      case "confirmacion_ticket_pendiente_metric":
+        return "confirmar ticket pendiente";
       case "confirmacion_peso_sap_metric":
         return "confirmar captura de peso en SAP";
       case "confirmacion_liberacion_sap_metric":
@@ -306,6 +318,11 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
               formattedStatus?.endsWith("PRODUCCION DESCARGANDO") &&
               currentUser?.role === ProcessEventRole.PRODUCCION; // TODO: Cambiar !=== por ===
 
+            const canNotifyTicketDelivered =
+              currentStatusRaw ===
+                "VIGILANCIA_PENDIENTE_DE_ENTREGA_DE_TICKET" &&
+              currentUser?.role === ProcessEventRole.VIGILANCIA;
+
             const canCaptureWeight =
               formattedStatus?.endsWith(
                 "LOGISTICA PENDIENTE DE CAPTURA PESO SAP",
@@ -334,6 +351,11 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                 "PRODUCCION_PENDIENTE_DE_CONFIRMACION_PARA_DESCARGA" &&
               currentUser?.role === ProcessEventRole.PRODUCCION;
 
+            const canConfirmTicketPendiente =
+              currentStatusRaw ===
+                "VIGILANCIA_PENDIENTE_DE_CONFIRMACION_TICKET_PENDIENTE" &&
+              currentUser?.role === ProcessEventRole.VIGILANCIA;
+
             const canConfirmPesoSAP =
               currentStatusRaw ===
                 "LOGISTICA_PENDIENTE_DE_CONFIRMACION_CAPTURA_PESO_SAP" &&
@@ -349,11 +371,13 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
               canDecision ||
               canDownload ||
               canEndDownload ||
+              canNotifyTicketDelivered ||
               canCaptureWeight ||
               canRelease ||
               canConfirmIngreso ||
               canConfirmAnalisis ||
               canConfirmDescarga ||
+              canConfirmTicketPendiente ||
               canConfirmPesoSAP ||
               canConfirmLiberacionSAP;
 
@@ -655,7 +679,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                 },
                               }}
                             >
-                              Confirmacion
+                              Confirmación pentiende de ingreso
                             </Button>
                           )}
                           {canConfirmAnalisis && (
@@ -683,7 +707,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                 },
                               }}
                             >
-                              Confirmacion
+                              Confirmación pendiente de análisis
                             </Button>
                           )}
                           {canConfirmDescarga && (
@@ -711,7 +735,35 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                 },
                               }}
                             >
-                              Confirmacion
+                              Confirmación pendiente de descarga
+                            </Button>
+                          )}
+                          {canConfirmTicketPendiente && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "confirmacion_ticket_pendiente_metric",
+                                  formattedStatus,
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<CheckCircleIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.success?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.success?.dark,
+                                },
+                              }}
+                            >
+                              Confirmación pendiente de ticket pendiente
                             </Button>
                           )}
                           {canConfirmPesoSAP && (
@@ -739,7 +791,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                 },
                               }}
                             >
-                              Confirmacion
+                              Confirmación pendiente de captura de peso en SAP
                             </Button>
                           )}
                           {canConfirmLiberacionSAP && (
@@ -767,7 +819,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                 },
                               }}
                             >
-                              Confirmacion
+                              Confirmación pendiente de liberación en SAP
                             </Button>
                           )}
                           {(canAuthorize || canDecision) && (
@@ -852,6 +904,34 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                               }}
                             >
                               Notificar descarga completada
+                            </Button>
+                          )}
+                          {canNotifyTicketDelivered && (
+                            <Button
+                              onClick={(e) =>
+                                handleAuthorize(
+                                  e,
+                                  receptionProcess.id,
+                                  "ticket-entregado",
+                                  formattedStatus,
+                                )
+                              }
+                              variant="contained"
+                              size="small"
+                              startIcon={<PriorityHighIcon />}
+                              sx={{
+                                textTransform: "none",
+                                fontSize: "0.875rem",
+                                backgroundColor: theme.palette.success?.main,
+                                minHeight: { xs: 44, sm: 36 },
+                                px: 2,
+                                width: { xs: "100%", sm: "auto" },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.success?.dark,
+                                },
+                              }}
+                            >
+                              Notificar ticket entregado
                             </Button>
                           )}
                           {canCaptureWeight && (
