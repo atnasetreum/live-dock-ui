@@ -1,5 +1,13 @@
 import axiosClient from "@/common/axiosClient";
-import { User } from "@/types";
+import { ProcessEventRole, User } from "@/types";
+
+export interface UserPayload {
+  name: string;
+  email: string;
+  role: ProcessEventRole;
+  password?: string;
+  isActive?: boolean;
+}
 
 export const usersService = {
   baseUrl: "/users",
@@ -15,7 +23,7 @@ export const usersService = {
     return data;
   },
 
-  create: async (user: Partial<User>) => {
+  create: async (user: UserPayload) => {
     const { data } = await axiosClient.post<User>(
       `${usersService.baseUrl}`,
       user,
@@ -23,8 +31,8 @@ export const usersService = {
     return data;
   },
 
-  update: async (id: string, user: Partial<User>) => {
-    const { data } = await axiosClient.put<User>(
+  update: async (id: string, user: UserPayload) => {
+    const { data } = await axiosClient.patch<User>(
       `${usersService.baseUrl}/${id}`,
       user,
     );

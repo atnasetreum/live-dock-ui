@@ -2,8 +2,13 @@
 import { useEffect, useState } from "react";
 
 import { Space_Grotesk } from "next/font/google";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
+import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
+import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSettingsRounded";
 
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 
 import PushNotificationRequest from "./components/PushNotificationRequest";
 import { webPushService } from "@/services/web-push.service";
@@ -11,7 +16,7 @@ import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useSocket } from "@/common/SocketProvider";
 import { UserProvider } from "@/common/UserContext";
 import { GlowLayer } from "@/theme/tokens";
-import { UsersOnDuty } from "@/types";
+import { ProcessEventRole, UsersOnDuty } from "@/types";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -38,9 +43,12 @@ export default function MainLayout({
 }>) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<UsersOnDuty | null>(null);
+  const pathname = usePathname();
 
   const { theme } = useThemeConfig();
   const { socket, isConnected } = useSocket();
+  const isDashboardRoute = pathname?.startsWith("/dashboard");
+  const isUsersRoute = pathname?.startsWith("/users");
 
   useEffect(() => {
     if (!socket) return undefined;
@@ -156,7 +164,141 @@ export default function MainLayout({
         >
           {isConnected ? (
             currentUser ? (
-              <UserProvider currentUser={currentUser}>{children}</UserProvider>
+              <UserProvider currentUser={currentUser}>
+                <Stack spacing={3}>
+                  {currentUser.role === ProcessEventRole.ADMIN && (
+                    <Box
+                      sx={{
+                        p: { xs: 1.5, md: 2 },
+                        borderRadius: 4,
+                        background: theme.surfaces.glass,
+                        border: `1px solid ${theme.surfaces.border}`,
+                        boxShadow: theme.overlays.glassShadow,
+                        backdropFilter: "blur(10px)",
+                        position: "sticky",
+                        top: 12,
+                        zIndex: 20,
+                      }}
+                    >
+                      <Stack
+                        direction={{ xs: "column", sm: "row" }}
+                        spacing={2}
+                        alignItems={{ xs: "stretch", md: "center" }}
+                        justifyContent="space-between"
+                      >
+                        <Stack spacing={0.4}>
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
+                          >
+                            <AdminPanelSettingsRoundedIcon
+                              sx={{
+                                color: theme.palette.textPrimary,
+                                fontSize: 20,
+                              }}
+                            />
+                            <Typography
+                              variant="subtitle1"
+                              sx={{
+                                fontWeight: 700,
+                                color: theme.palette.textPrimary,
+                                lineHeight: 1.15,
+                              }}
+                            >
+                              Menu ADMIN
+                            </Typography>
+                          </Stack>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: theme.palette.textSecondary }}
+                          >
+                            Navegacion administrativa
+                          </Typography>
+                        </Stack>
+                        <Stack
+                          direction={{ xs: "column", sm: "row" }}
+                          spacing={1}
+                          sx={{
+                            p: 0.6,
+                            borderRadius: 3,
+                            background: theme.surfaces.translucent,
+                            border: `1px solid ${theme.surfaces.border}`,
+                          }}
+                        >
+                          <Button
+                            component={Link}
+                            href="/dashboard"
+                            startIcon={<DashboardRoundedIcon />}
+                            variant={
+                              isDashboardRoute ? "contained" : "outlined"
+                            }
+                            sx={{
+                              textTransform: "none",
+                              justifyContent: "flex-start",
+                              fontWeight: 700,
+                              minHeight: 40,
+                              px: 1.4,
+                              minWidth: { xs: "100%", sm: 154 },
+                              backgroundImage: isDashboardRoute
+                                ? theme.gradients.primary
+                                : "none",
+                              color: isDashboardRoute
+                                ? theme.buttons.containedText
+                                : theme.buttons.outlinedColor,
+                              borderColor: theme.buttons.outlinedColor,
+                              backgroundColor: isDashboardRoute
+                                ? undefined
+                                : theme.surfaces.card,
+                              "&:hover": {
+                                borderColor: theme.buttons.outlinedColor,
+                                backgroundColor: isDashboardRoute
+                                  ? undefined
+                                  : theme.surfaces.translucent,
+                              },
+                            }}
+                          >
+                            Dashboard
+                          </Button>
+                          <Button
+                            component={Link}
+                            href="/users"
+                            startIcon={<GroupRoundedIcon />}
+                            variant={isUsersRoute ? "contained" : "outlined"}
+                            sx={{
+                              textTransform: "none",
+                              justifyContent: "flex-start",
+                              fontWeight: 700,
+                              minHeight: 40,
+                              px: 1.4,
+                              minWidth: { xs: "100%", sm: 154 },
+                              backgroundImage: isUsersRoute
+                                ? theme.gradients.primary
+                                : "none",
+                              color: isUsersRoute
+                                ? theme.buttons.containedText
+                                : theme.buttons.outlinedColor,
+                              borderColor: theme.buttons.outlinedColor,
+                              backgroundColor: isUsersRoute
+                                ? undefined
+                                : theme.surfaces.card,
+                              "&:hover": {
+                                borderColor: theme.buttons.outlinedColor,
+                                backgroundColor: isUsersRoute
+                                  ? undefined
+                                  : theme.surfaces.translucent,
+                              },
+                            }}
+                          >
+                            Usuarios
+                          </Button>
+                        </Stack>
+                      </Stack>
+                    </Box>
+                  )}
+                  {children}
+                </Stack>
+              </UserProvider>
             ) : (
               <Box
                 sx={{
