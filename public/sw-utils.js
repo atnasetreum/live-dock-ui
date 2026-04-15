@@ -18,21 +18,32 @@ self.getClientInfo = async () => {
       "bitness", // 32 o 64 bits
     ]);
 
+    // 👇 AQUÍ está la respuesta real
+    const fullVersionList = highEntropy.fullVersionList;
+
+    // Buscar el navegador real
+    const browser = fullVersionList?.find(
+      (b) => !b.brand.includes("Not") && !b.brand.includes("Chromium"),
+    );
+
     return {
-      userAgent: navigator.userAgent, // Cadena completa del user agent
-      browserVersion: highEntropy.uaFullVersion, // Versión completa del navegador
-      brands, // Marca y versión del navegador (ej: Chrome 114)
-      platform, // Plataforma (ej: Windows, macOS, Android)
-      mobile, // Es un dispositivo móvil o no
-      platformVersion: highEntropy.platformVersion, // Versión del sistema operativo
-      architecture: highEntropy.architecture, // Arquitectura del dispositivo
       model: highEntropy.model, // Modelo del dispositivo (si está disponible)
-      bitness: highEntropy.bitness, // 32 o 64 bits
-      deviceMemory: navigator.deviceMemory || "unknown", // RAM disponible
+      browserName: browser?.brand || "unknown", // Nombre del navegador (ej: Chrome)
+      browserVersion:
+        browser?.version || highEntropy?.uaFullVersion || "unknown",
+      //brands, // Marca y versión del navegador (ej: Chrome 114)
+      mobile, // Es un dispositivo móvil o no
       language: navigator.language || "unknown", // Idioma
+      platform, // Plataforma (ej: Windows, macOS, Android)
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown", // Zona horaria
-      deviceMemory: navigator.deviceMemory || "unknown", // RAM disponible
       connection: navigator.connection?.effectiveType || "unknown", // Tipo de conexión (4g, 3g, etc)
+      //browserVersion: highEntropy.uaFullVersion, // Versión completa del navegador
+      platformVersion: highEntropy.platformVersion, // Versión del sistema operativo
+
+      //userAgent: navigator.userAgent, // Cadena completa del user agent
+      //architecture: highEntropy.architecture, // Arquitectura del dispositivo
+      //bitness: highEntropy.bitness, // 32 o 64 bits
+      //deviceMemory: navigator.deviceMemory || "unknown", // RAM disponible
     };
   } catch (error) {
     console.warn("userAgentData unavailable", error);
