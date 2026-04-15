@@ -369,9 +369,7 @@ const decisionMap: Record<string, string[]> = {
   ],
   PRODUCCION_PENDIENTE_DE_DESCARGA: ["production-pending-download"],
   PRODUCCION_DESCARGANDO: ["production-downloading"],
-  VIGILANCIA_PENDIENTE_DE_CONFIRMACION_TICKET_PENDIENTE: [
-    "security-pending-ticket",
-  ],
+  VIGILANCIA_PENDIENTE_DE_CONFIRMACION_TICKET_PESO: ["security-pending-ticket"],
   VIGILANCIA_PENDIENTE_DE_ENTREGA_DE_TICKET: ["security-pending-ticket"],
   LOGISTICA_PENDIENTE_DE_CONFIRMACION_CAPTURA_PESO_SAP: [
     "logistics-pending-sap",

@@ -97,9 +97,9 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
           : currentActionRole === "confirmacion_descarga_metric"
             ? "produccion_confirma_descarga"
             : currentActionRole === "confirmacion_ticket_pendiente_metric"
-              ? "vigilancia_confirma_pendiente_ticket_pendiente"
+              ? "vigilancia_confirma_pendiente_ticket_peso"
               : currentActionRole === "confirmacion_peso_sap_metric"
-                ? "logistica_confirma_pendiente_peso_en_saP"
+                ? "logistica_confirma_pendiente_peso_en_sap"
                 : currentActionRole === "confirmacion_liberacion_sap_metric"
                   ? "calidad_confima_liberacion_en_sap"
                   : "logistica_confirma_ingreso";
@@ -242,7 +242,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
     if (!events || events.length === 0) return 0;
 
     const eventCount = events.length;
-    const maxEvents = 12;
+    const maxEvents = 14;
 
     return Math.min((eventCount / maxEvents) * 100, 100);
   };
@@ -301,6 +301,8 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                 ?.status;
 
             const formattedStatus = currentStatusRaw?.replace(/_/g, " ");
+            const isRejectedStatus =
+              formattedStatus?.toLowerCase().includes("rechazo") ?? false;
 
             const canAuthorize =
               formattedStatus?.endsWith("AUTORIZACION") &&
@@ -353,7 +355,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
 
             const canConfirmTicketPendiente =
               currentStatusRaw ===
-                "VIGILANCIA_PENDIENTE_DE_CONFIRMACION_TICKET_PENDIENTE" &&
+                "VIGILANCIA_PENDIENTE_DE_CONFIRMACION_TICKET_PESO" &&
               currentUser?.role === ProcessEventRole.VIGILANCIA;
 
             const canConfirmPesoSAP =
@@ -390,8 +392,15 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                 key={receptionProcess.id}
                 sx={{
                   borderRadius: 2,
-                  backgroundColor: theme.surfaces.translucent,
-                  border: `1px solid ${theme.surfaces.border}`,
+                  backgroundColor: isRejectedStatus
+                    ? (theme.palette.errorTranslucent ??
+                      "rgba(244, 67, 54, 0.12)")
+                    : theme.surfaces.translucent,
+                  border: `1px solid ${
+                    isRejectedStatus
+                      ? (theme.palette.error?.main ?? "rgba(244, 67, 54, 0.75)")
+                      : theme.surfaces.border
+                  }`,
                   overflow: "hidden",
                 }}
                 id={`reception-process-${receptionProcess.id}`}
@@ -763,7 +772,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                                 },
                               }}
                             >
-                              Confirmación pendiente de ticket pendiente
+                              Confirmación pendiente de ticket de peso
                             </Button>
                           )}
                           {canConfirmPesoSAP && (

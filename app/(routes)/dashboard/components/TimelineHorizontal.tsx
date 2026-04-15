@@ -324,6 +324,9 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                                 px: 1,
                                 py: 0.85,
                                 border: `1px solid ${theme.surfaces.border}`,
+                                backgroundColor: isLatestEvent
+                                  ? theme.surfaces.panel
+                                  : "none",
                               }}
                             >
                               <Typography
@@ -357,7 +360,6 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                                 px: 1,
                                 py: 0.85,
                                 border: `1px dashed ${theme.surfaces.border}`,
-                                backgroundColor: theme.surfaces.panel,
                               }}
                             >
                               <Typography
