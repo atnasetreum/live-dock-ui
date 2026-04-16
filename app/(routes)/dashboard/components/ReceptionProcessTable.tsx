@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
@@ -24,6 +24,7 @@ import {
 
 import { EventData, ProcessEventRole, ReceptionProcess } from "@/types";
 import { receptionProcessesService } from "@/services";
+import { formatElapsedTime } from "@/hooks/useElapsedTime";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useCurrentUser } from "@/common/UserContext";
 import TimeLineEvents from "./TimeLineEvents";
@@ -44,9 +45,18 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
   const [currentActionRole, setCurrentActionRole] = useState<string>("");
   const [currentStatus, setCurrentStatus] = useState<string>("");
   const [rejectionNotes, setRejectionNotes] = useState<string>("");
+  const [nowTimestamp, setNowTimestamp] = useState<number>(() => Date.now());
   const currentUser = useCurrentUser();
 
   const { theme } = useThemeConfig();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNowTimestamp(Date.now());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleExpanded = (id: number) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -387,6 +397,25 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
               ? 100
               : calculateProgress(receptionProcess.events);
 
+            const lastEventAt = receptionProcess.events.reduce<
+              Date | undefined
+            >((latest, eventItem) => {
+              const current = new Date(eventItem.createdAt);
+              if (!latest || current > latest) {
+                return current;
+              }
+              return latest;
+            }, undefined);
+
+            const hasEnded =
+              formattedStatus?.includes("FINALIZO") ||
+              formattedStatus?.includes("RECHAZADO");
+
+            const elapsedLabel = formatElapsedTime(
+              receptionProcess.createdAt,
+              hasEnded ? lastEventAt : nowTimestamp,
+            );
+
             return (
               <Box
                 key={receptionProcess.id}
@@ -439,9 +468,9 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                       display: "grid",
                       gridTemplateColumns: {
                         xs: "1fr",
-                        sm: "minmax(170px, 1.4fr) minmax(120px, 0.9fr) minmax(240px, 2fr) minmax(130px, 1fr) minmax(70px, 0.5fr)",
+                        sm: "minmax(190px, 1.45fr) minmax(125px, 0.9fr) minmax(250px, 1.9fr) minmax(160px, 1.1fr) minmax(100px, 0.6fr)",
                       },
-                      gap: { xs: 1.5, sm: 1.5 },
+                      gap: { xs: 1.5, sm: 1.25 },
                       alignItems: "start",
                     }}
                   >
@@ -555,25 +584,60 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                       >
                         {formatTime(receptionProcess.createdAt)}
                       </Typography>
+                      <Chip
+                        icon={
+                          hasEnded ? (
+                            <CheckCircleIcon fontSize="small" />
+                          ) : (
+                            <TimelineIcon fontSize="small" />
+                          )
+                        }
+                        label={hasEnded ? `${elapsedLabel}` : `${elapsedLabel}`}
+                        size="small"
+                        sx={{
+                          mt: 0.75,
+                          backgroundColor: hasEnded
+                            ? theme.palette.success?.main
+                            : undefined,
+                          color: "#fff",
+                          "& .MuiChip-icon": {
+                            color: "#fff",
+                          },
+                          border: `1px solid ${
+                            hasEnded
+                              ? theme.palette.success?.dark
+                              : theme.palette.warning?.dark
+                          }`,
+                          fontWeight: 600,
+                        }}
+                      />
                     </Box>
                     <Stack
-                      direction="row"
-                      alignItems="center"
-                      spacing={1}
+                      spacing={0.35}
                       sx={{
                         width: "100%",
-                        justifyContent: {
-                          xs: "space-between",
-                          sm: "flex-end",
-                        },
+                        justifyContent: "flex-start",
                         textAlign: { sm: "right" },
+                        alignItems: { sm: "flex-end" },
                       }}
                     >
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: theme.palette.textSecondary,
+                          textTransform: "uppercase",
+                          letterSpacing: 0.5,
+                          fontSize: "0.7rem",
+                        }}
+                      >
+                        Proceso
+                      </Typography>
                       <Typography
                         variant="inherit"
                         sx={{
                           color: theme.palette.textSecondary,
                           fontSize: "1.5rem",
+                          lineHeight: 1.1,
                         }}
                       >
                         # {receptionProcess.id}
@@ -1083,6 +1147,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                       <TimeLineEvents
                         receptionProcess={receptionProcess}
                         currentStatus={currentStatusRaw}
+                        elapsedTimeLabel={elapsedLabel}
                       />
                       {/* // Metricas */}
                       {/* <Box

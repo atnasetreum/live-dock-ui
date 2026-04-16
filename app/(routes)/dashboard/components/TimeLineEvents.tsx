@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import { Box, Chip, Stack, Typography } from "@mui/material";
 import {
   Timeline,
@@ -14,63 +12,36 @@ import {
 } from "@mui/lab";
 
 import { ProcessEventRole, ReceptionProcess } from "@/types";
+import { formatElapsedTime } from "@/hooks/useElapsedTime";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { formatTime } from "@/utils";
-
-interface ProcessEvent {
-  id: number;
-  event: string;
-  createdAt: string;
-}
-
-const ElapsedTimeDisplay = ({
-  events,
-  isProcessFinalized,
-}: {
-  events: ProcessEvent[];
-  isProcessFinalized: boolean;
-}) => {
-  const [elapsedTime, setElapsedTime] = useState<string>("");
-
-  useEffect(() => {
-    const calculateElapsedTime = () => {
-      if (!events || events.length === 0) return;
-
-      const firstEventTime = new Date(events[0].createdAt).getTime();
-      const lastEventTime = isProcessFinalized
-        ? new Date(events[events.length - 1].createdAt).getTime()
-        : new Date().getTime();
-      const diffMs = lastEventTime - firstEventTime;
-
-      const hours = Math.floor(diffMs / (1000 * 60 * 60));
-      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-      setElapsedTime(`${hours}h ${minutes}m ${seconds}s`);
-    };
-
-    calculateElapsedTime();
-    const interval = setInterval(calculateElapsedTime, 1000);
-
-    return () => clearInterval(interval);
-  }, [events, isProcessFinalized]);
-
-  return <Typography variant="caption"> {elapsedTime}</Typography>;
-};
 
 interface Props {
   receptionProcess: ReceptionProcess;
   currentStatus: string;
+  elapsedTimeLabel?: string;
 }
 
 const TimeLineEvents = ({
   receptionProcess: { events },
   currentStatus,
+  elapsedTimeLabel,
 }: Props) => {
   const { theme } = useThemeConfig();
   const sortedEvents = [...(events ?? [])].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
+  const fallbackElapsedTime =
+    events && events.length > 0
+      ? formatElapsedTime(
+          events[0].createdAt,
+          currentStatus.includes("FINALIZO")
+            ? events[events.length - 1].createdAt
+            : undefined,
+        )
+      : "--";
+
+  const displayElapsedTime = elapsedTimeLabel ?? fallbackElapsedTime;
 
   return (
     <Box
@@ -90,15 +61,15 @@ const TimeLineEvents = ({
         </Typography>
         <Typography
           variant="subtitle2"
-          sx={{ color: theme.palette.textPrimary }}
+          sx={{
+            color: theme.palette.textSecondary,
+            textTransform: "uppercase",
+          }}
         >
-          Transcurrido
-          {events && events.length > 0 && (
-            <ElapsedTimeDisplay
-              events={events}
-              isProcessFinalized={currentStatus.includes("FINALIZO")}
-            />
-          )}
+          Tiempo transcurrido
+          <Typography component="span" variant="caption" sx={{ ml: 0.75 }}>
+            {displayElapsedTime}
+          </Typography>
         </Typography>
         <Chip
           label={`${events?.length ?? 0} eventos`}
@@ -126,17 +97,7 @@ const TimeLineEvents = ({
             const isPastEvent = !isLatestEvent;
             const prevEvent = index > 0 ? sortedEvents[index - 1] : undefined;
             const timeSincePrevious = prevEvent
-              ? (() => {
-                  const prevTime = new Date(prevEvent.createdAt).getTime();
-                  const currTime = new Date(eventItem.createdAt).getTime();
-                  const diffMs = Math.abs(currTime - prevTime);
-                  const hours = Math.floor(diffMs / (1000 * 60 * 60));
-                  const minutes = Math.floor(
-                    (diffMs % (1000 * 60 * 60)) / (1000 * 60),
-                  );
-                  const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-                  return `${hours}h ${minutes}m ${seconds}s desde anterior`;
-                })()
+              ? `${formatElapsedTime(eventItem.createdAt, prevEvent.createdAt)} desde anterior`
               : "Evento actual";
 
             return (
