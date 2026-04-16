@@ -15,11 +15,12 @@ export const receptionProcessesService = {
     return data;
   },
   findAll: async ({ startDate }: { startDate: string }) => {
+    console.log({ startDate });
     const { data } = await axiosClient.get<ReceptionProcess[]>(
       `${receptionProcessesService.baseUrl}`,
-      {
+      /* {
         params: { startDate },
-      },
+      }, */
     );
     return data;
   },
