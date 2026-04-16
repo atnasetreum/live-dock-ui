@@ -279,7 +279,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
             variant="overline"
             sx={{ letterSpacing: 3, color: theme.palette.textSecondary }}
           >
-            Movimientos
+            Movimientos ({data.length})
           </Typography>
           <Typography
             variant="h6"
@@ -288,7 +288,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
               color: theme.palette.textPrimary,
             }}
           >
-            Operaciones de hoy
+            Operaciones registradas
           </Typography>
         </Box>
         <Chip

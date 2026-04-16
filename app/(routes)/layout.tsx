@@ -8,15 +8,27 @@ import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
 import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSettingsRounded";
 
-import { Box, Button, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  MenuItem,
+  Select,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 import PushNotificationRequest from "./components/PushNotificationRequest";
 import { webPushService } from "@/services/web-push.service";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useSocket } from "@/common/SocketProvider";
 import { UserProvider } from "@/common/UserContext";
+import {
+  MonitorViewModeProvider,
+  useMonitorViewMode,
+} from "@/common/MonitorViewModeContext";
 import { GlowLayer } from "@/theme/tokens";
-import { ProcessEventRole, UsersOnDuty } from "@/types";
+import { MonitorViewMode, ProcessEventRole, UsersOnDuty } from "@/types";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -35,6 +47,202 @@ const glowLayerStyles = (layer: GlowLayer) => ({
   background: layer.gradient,
   filter: `blur(${layer.blur}px)`,
 });
+
+const monitorViewModeOptions: { value: MonitorViewMode; label: string }[] = [
+  { value: "timeline", label: "Linea de tiempo" },
+  { value: "horizontal", label: "Tablero" },
+  { value: "desktop", label: "Flujo" },
+];
+
+const AdminMenuBar = ({
+  isDashboardRoute,
+  isUsersRoute,
+}: {
+  isDashboardRoute: boolean;
+  isUsersRoute: boolean;
+}) => {
+  const { theme } = useThemeConfig();
+  const { monitorViewMode, setMonitorViewMode } = useMonitorViewMode();
+
+  return (
+    <Box
+      sx={{
+        p: { xs: 1.5, md: 2 },
+        borderRadius: 4,
+        background: theme.surfaces.glass,
+        border: `1px solid ${theme.surfaces.border}`,
+        boxShadow: theme.overlays.glassShadow,
+        backdropFilter: "blur(10px)",
+        position: "sticky",
+        top: 12,
+        zIndex: 20,
+      }}
+    >
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        alignItems={{ xs: "stretch", md: "center" }}
+        justifyContent="space-between"
+      >
+        <Stack spacing={0.4}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <AdminPanelSettingsRoundedIcon
+              sx={{
+                color: theme.palette.textPrimary,
+                fontSize: 20,
+              }}
+            />
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 700,
+                color: theme.palette.textPrimary,
+                lineHeight: 1.15,
+              }}
+            >
+              Menu ADMIN
+            </Typography>
+          </Stack>
+          <Typography
+            variant="caption"
+            sx={{ color: theme.palette.textSecondary }}
+          >
+            Navegacion administrativa
+          </Typography>
+        </Stack>
+
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={1.25}
+          alignItems={{ xs: "stretch", sm: "center" }}
+          sx={{ width: { xs: "100%", sm: "auto" } }}
+        >
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={1}
+            sx={{
+              p: 0.6,
+              borderRadius: 3,
+              background: theme.surfaces.translucent,
+              border: `1px solid ${theme.surfaces.border}`,
+              alignItems: "center",
+            }}
+          >
+            <Button
+              component={Link}
+              href="/dashboard"
+              startIcon={<DashboardRoundedIcon />}
+              variant={isDashboardRoute ? "contained" : "outlined"}
+              sx={{
+                textTransform: "none",
+                justifyContent: "flex-start",
+                fontWeight: 700,
+                minHeight: 40,
+                px: 1.4,
+                minWidth: { xs: "100%", sm: 154 },
+                backgroundImage: isDashboardRoute
+                  ? theme.gradients.primary
+                  : "none",
+                color: isDashboardRoute
+                  ? theme.buttons.containedText
+                  : theme.buttons.outlinedColor,
+                borderColor: theme.buttons.outlinedColor,
+                backgroundColor: isDashboardRoute
+                  ? undefined
+                  : theme.surfaces.card,
+                "&:hover": {
+                  borderColor: theme.buttons.outlinedColor,
+                  backgroundColor: isDashboardRoute
+                    ? undefined
+                    : theme.surfaces.translucent,
+                },
+              }}
+            >
+              Dashboard
+            </Button>
+            <Button
+              component={Link}
+              href="/users"
+              startIcon={<GroupRoundedIcon />}
+              variant={isUsersRoute ? "contained" : "outlined"}
+              sx={{
+                textTransform: "none",
+                justifyContent: "flex-start",
+                fontWeight: 700,
+                minHeight: 40,
+                px: 1.4,
+                minWidth: { xs: "100%", sm: 154 },
+                backgroundImage: isUsersRoute
+                  ? theme.gradients.primary
+                  : "none",
+                color: isUsersRoute
+                  ? theme.buttons.containedText
+                  : theme.buttons.outlinedColor,
+                borderColor: theme.buttons.outlinedColor,
+                backgroundColor: isUsersRoute ? undefined : theme.surfaces.card,
+                "&:hover": {
+                  borderColor: theme.buttons.outlinedColor,
+                  backgroundColor: isUsersRoute
+                    ? undefined
+                    : theme.surfaces.translucent,
+                },
+              }}
+            >
+              Usuarios
+            </Button>
+          </Stack>
+
+          <Stack
+            spacing={0.45}
+            sx={{
+              minWidth: { xs: "100%", sm: 176 },
+              pl: { xs: 0, sm: 0.25 },
+              borderLeft: {
+                xs: "none",
+                sm: `1px solid ${theme.surfaces.border}`,
+              },
+            }}
+          >
+            <FormControl size="small" fullWidth>
+              <Select
+                value={monitorViewMode}
+                onChange={(event) =>
+                  setMonitorViewMode(event.target.value as MonitorViewMode)
+                }
+                sx={{
+                  minHeight: 40,
+                  fontWeight: 700,
+                  borderRadius: 1,
+                  color: theme.buttons.outlinedColor,
+                  backgroundColor: theme.surfaces.card,
+                  "& .MuiSelect-select": {
+                    py: 0.85,
+                    px: 1.4,
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: theme.buttons.outlinedColor,
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: theme.buttons.outlinedColor,
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: theme.buttons.outlinedColor,
+                  },
+                }}
+              >
+                {monitorViewModeOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
+        </Stack>
+      </Stack>
+    </Box>
+  );
+};
 
 export default function MainLayout({
   children,
@@ -165,139 +373,17 @@ export default function MainLayout({
           {isConnected ? (
             currentUser ? (
               <UserProvider currentUser={currentUser}>
-                <Stack spacing={3}>
-                  {currentUser.role === ProcessEventRole.ADMIN && (
-                    <Box
-                      sx={{
-                        p: { xs: 1.5, md: 2 },
-                        borderRadius: 4,
-                        background: theme.surfaces.glass,
-                        border: `1px solid ${theme.surfaces.border}`,
-                        boxShadow: theme.overlays.glassShadow,
-                        backdropFilter: "blur(10px)",
-                        position: "sticky",
-                        top: 12,
-                        zIndex: 20,
-                      }}
-                    >
-                      <Stack
-                        direction={{ xs: "column", sm: "row" }}
-                        spacing={2}
-                        alignItems={{ xs: "stretch", md: "center" }}
-                        justifyContent="space-between"
-                      >
-                        <Stack spacing={0.4}>
-                          <Stack
-                            direction="row"
-                            spacing={1}
-                            alignItems="center"
-                          >
-                            <AdminPanelSettingsRoundedIcon
-                              sx={{
-                                color: theme.palette.textPrimary,
-                                fontSize: 20,
-                              }}
-                            />
-                            <Typography
-                              variant="subtitle1"
-                              sx={{
-                                fontWeight: 700,
-                                color: theme.palette.textPrimary,
-                                lineHeight: 1.15,
-                              }}
-                            >
-                              Menu ADMIN
-                            </Typography>
-                          </Stack>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: theme.palette.textSecondary }}
-                          >
-                            Navegacion administrativa
-                          </Typography>
-                        </Stack>
-                        <Stack
-                          direction={{ xs: "column", sm: "row" }}
-                          spacing={1}
-                          sx={{
-                            p: 0.6,
-                            borderRadius: 3,
-                            background: theme.surfaces.translucent,
-                            border: `1px solid ${theme.surfaces.border}`,
-                          }}
-                        >
-                          <Button
-                            component={Link}
-                            href="/dashboard"
-                            startIcon={<DashboardRoundedIcon />}
-                            variant={
-                              isDashboardRoute ? "contained" : "outlined"
-                            }
-                            sx={{
-                              textTransform: "none",
-                              justifyContent: "flex-start",
-                              fontWeight: 700,
-                              minHeight: 40,
-                              px: 1.4,
-                              minWidth: { xs: "100%", sm: 154 },
-                              backgroundImage: isDashboardRoute
-                                ? theme.gradients.primary
-                                : "none",
-                              color: isDashboardRoute
-                                ? theme.buttons.containedText
-                                : theme.buttons.outlinedColor,
-                              borderColor: theme.buttons.outlinedColor,
-                              backgroundColor: isDashboardRoute
-                                ? undefined
-                                : theme.surfaces.card,
-                              "&:hover": {
-                                borderColor: theme.buttons.outlinedColor,
-                                backgroundColor: isDashboardRoute
-                                  ? undefined
-                                  : theme.surfaces.translucent,
-                              },
-                            }}
-                          >
-                            Dashboard
-                          </Button>
-                          <Button
-                            component={Link}
-                            href="/users"
-                            startIcon={<GroupRoundedIcon />}
-                            variant={isUsersRoute ? "contained" : "outlined"}
-                            sx={{
-                              textTransform: "none",
-                              justifyContent: "flex-start",
-                              fontWeight: 700,
-                              minHeight: 40,
-                              px: 1.4,
-                              minWidth: { xs: "100%", sm: 154 },
-                              backgroundImage: isUsersRoute
-                                ? theme.gradients.primary
-                                : "none",
-                              color: isUsersRoute
-                                ? theme.buttons.containedText
-                                : theme.buttons.outlinedColor,
-                              borderColor: theme.buttons.outlinedColor,
-                              backgroundColor: isUsersRoute
-                                ? undefined
-                                : theme.surfaces.card,
-                              "&:hover": {
-                                borderColor: theme.buttons.outlinedColor,
-                                backgroundColor: isUsersRoute
-                                  ? undefined
-                                  : theme.surfaces.translucent,
-                              },
-                            }}
-                          >
-                            Usuarios
-                          </Button>
-                        </Stack>
-                      </Stack>
-                    </Box>
-                  )}
-                  {children}
-                </Stack>
+                <MonitorViewModeProvider>
+                  <Stack spacing={3}>
+                    {currentUser.role === ProcessEventRole.ADMIN && (
+                      <AdminMenuBar
+                        isDashboardRoute={isDashboardRoute}
+                        isUsersRoute={isUsersRoute}
+                      />
+                    )}
+                    {children}
+                  </Stack>
+                </MonitorViewModeProvider>
               </UserProvider>
             ) : (
               <Box

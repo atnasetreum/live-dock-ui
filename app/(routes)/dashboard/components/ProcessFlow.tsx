@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   FormControl,
@@ -15,7 +15,9 @@ import { useThemeConfig } from "@/theme/ThemeProvider";
 import TimelineHorizontal from "./TimelineHorizontal";
 import ProcessFlowDesktop from "./ProcessFlowDesktop";
 import TimeLineEvents from "./TimeLineEvents";
-import { ReceptionProcess } from "@/types";
+import { MonitorViewMode, ProcessEventRole, ReceptionProcess } from "@/types";
+import { useCurrentUser } from "@/common/UserContext";
+import { useMonitorViewMode } from "@/common/MonitorViewModeContext";
 
 interface Props {
   receptionProcess: ReceptionProcess;
@@ -24,11 +26,20 @@ interface Props {
 
 const ProcessFlow = ({ receptionProcess, currentStatus }: Props) => {
   const isSmallScreen = useMediaQuery("(max-width:900px)");
-  const [view, setView] = useState<"timeline" | "horizontal" | "desktop">(
+  const [view, setView] = useState<MonitorViewMode>(
     isSmallScreen ? "timeline" : "horizontal",
   );
+  const { role } = useCurrentUser();
+  const { monitorViewMode } = useMonitorViewMode();
+  const isSistemaRole = role === ProcessEventRole.SISTEMA;
 
   const { theme } = useThemeConfig();
+
+  useEffect(() => {
+    if (isSistemaRole) {
+      setView(monitorViewMode);
+    }
+  }, [isSistemaRole, monitorViewMode]);
 
   return (
     <Stack spacing={{ xs: 1.5, md: 2 }}>
@@ -66,9 +77,7 @@ const ProcessFlow = ({ receptionProcess, currentStatus }: Props) => {
               row={!isSmallScreen}
               value={view}
               onChange={(event) =>
-                setView(
-                  event.target.value as "timeline" | "horizontal" | "desktop",
-                )
+                !isSistemaRole && setView(event.target.value as MonitorViewMode)
               }
             >
               <FormControlLabel

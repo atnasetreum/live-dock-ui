@@ -197,7 +197,7 @@ const MainBanner = ({ onPipaIngreso, onOpenDashboard }: MainBannerProps) => {
             variant="overline"
             sx={{ letterSpacing: 4, color: theme.palette.textPrimary }}
           >
-            BIENVENIDO
+            BIENVENIDO - ({currentUser.role})
           </Typography>
           <Typography
             component="h1"
@@ -208,7 +208,7 @@ const MainBanner = ({ onPipaIngreso, onOpenDashboard }: MainBannerProps) => {
               color: theme.palette.textPrimary,
             }}
           >
-            # {currentUser.id} {currentUser.name}
+            {currentUser.name}
           </Typography>
           <Typography
             variant="body1"
