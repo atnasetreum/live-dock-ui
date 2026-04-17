@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-import TimelineIcon from "@mui/icons-material/Timeline";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
@@ -32,7 +31,7 @@ type MainBannerProps = {
   onOpenDashboard?: () => void;
 };
 
-const MainBanner = ({ onPipaIngreso, onOpenDashboard }: MainBannerProps) => {
+const MainBanner = ({ onPipaIngreso }: MainBannerProps) => {
   const { theme } = useThemeConfig();
   const [isPushEnabled, setIsPushEnabled] = useState(false);
   const [isPushBusy, setIsPushBusy] = useState(false);
@@ -192,27 +191,58 @@ const MainBanner = ({ onPipaIngreso, onOpenDashboard }: MainBannerProps) => {
               ? "Notificaciones activas"
               : "Activar notificaciones"}
           </Button>
-          <br />
-          <Typography
-            variant="overline"
-            sx={{ letterSpacing: 4, color: theme.palette.textPrimary }}
-          >
-            BIENVENIDO - ({currentUser.role})
-          </Typography>
-          <Typography
-            component="h1"
-            variant="h3"
-            sx={{
-              fontWeight: 600,
-              lineHeight: 1.1,
-              color: theme.palette.textPrimary,
-            }}
-          >
-            {currentUser.name}
-          </Typography>
+          <Stack spacing={0.9} sx={{ mt: 1 }}>
+            <Typography
+              variant="overline"
+              sx={{
+                letterSpacing: 3,
+                color: theme.palette.textSecondary,
+                lineHeight: 1,
+              }}
+            >
+              Bienvenido
+            </Typography>
+
+            <Typography
+              component="h1"
+              variant="h3"
+              sx={{
+                fontWeight: 700,
+                lineHeight: 1.08,
+                color: theme.palette.textPrimary,
+                fontSize: { xs: "2rem", md: "2.8rem" },
+              }}
+            >
+              {currentUser.name}
+            </Typography>
+
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              <Chip
+                size="small"
+                label={`Rol: ${currentUser.role}`}
+                sx={{
+                  backgroundColor: theme.surfaces.translucent,
+                  color: theme.palette.textPrimary,
+                  border: `1px solid ${theme.surfaces.border}`,
+                  fontWeight: 700,
+                }}
+              />
+              <Chip
+                size="small"
+                label={`ID: ${currentUser.id}`}
+                sx={{
+                  backgroundColor: theme.surfaces.translucent,
+                  color: theme.palette.textPrimary,
+                  border: `1px solid ${theme.surfaces.border}`,
+                  fontWeight: 700,
+                }}
+              />
+            </Stack>
+          </Stack>
+
           <Typography
             variant="body1"
-            sx={{ color: theme.palette.textSecondary }}
+            sx={{ color: theme.palette.textSecondary, mt: 1.1 }}
           >
             Seguimiento en tiempo real del flujo de recepción de pipas.
           </Typography>

@@ -597,16 +597,30 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                         sx={{
                           mt: 0.75,
                           backgroundColor: hasEnded
-                            ? theme.palette.success?.main
-                            : undefined,
-                          color: "#fff",
+                            ? theme.name === "dark"
+                              ? "rgba(34, 197, 94, 0.26)"
+                              : "rgba(22, 163, 74, 0.16)"
+                            : theme.name === "dark"
+                              ? "rgba(245, 158, 11, 0.28)"
+                              : "rgba(245, 158, 11, 0.18)",
+                          color: theme.palette.textPrimary,
                           "& .MuiChip-icon": {
-                            color: "#fff",
+                            color: hasEnded
+                              ? theme.name === "dark"
+                                ? "rgba(74, 222, 128, 0.95)"
+                                : "rgba(22, 163, 74, 0.95)"
+                              : theme.name === "dark"
+                                ? "rgba(251, 191, 36, 0.96)"
+                                : "rgba(217, 119, 6, 0.96)",
                           },
                           border: `1px solid ${
                             hasEnded
-                              ? theme.palette.success?.dark
-                              : theme.palette.warning?.dark
+                              ? theme.name === "dark"
+                                ? "rgba(74, 222, 128, 0.62)"
+                                : "rgba(22, 163, 74, 0.5)"
+                              : theme.name === "dark"
+                                ? "rgba(251, 191, 36, 0.68)"
+                                : "rgba(217, 119, 6, 0.5)"
                           }`,
                           fontWeight: 600,
                         }}

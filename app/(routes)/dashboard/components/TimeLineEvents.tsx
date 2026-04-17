@@ -287,7 +287,7 @@ const TimeLineEvents = ({
                             fontSize: "0.7rem",
                           }}
                         >
-                          Responsable
+                          Ejecutado por ✅
                         </Typography>
                         <Typography
                           variant="body2"
@@ -297,18 +297,10 @@ const TimeLineEvents = ({
                             fontWeight: 500,
                           }}
                         >
+                          #{eventItem.createdBy.id}{" "}
                           {eventItem.role !== ProcessEventRole.SISTEMA &&
-                            eventItem.createdBy.name}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            color: theme.palette.textSecondary,
-                            mt: 0.5,
-                            display: "block",
-                          }}
-                        >
-                          {eventItem.role}
+                            eventItem.createdBy.name}{" "}
+                          ({eventItem.role})
                         </Typography>
                       </Box>
                       <Box

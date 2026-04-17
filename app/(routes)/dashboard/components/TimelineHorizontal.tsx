@@ -3,7 +3,7 @@ import { useEffect, useState, useMemo } from "react";
 import { Box, Chip, Stack, Typography } from "@mui/material";
 
 import { useThemeConfig } from "@/theme/ThemeProvider";
-import { ReceptionProcess } from "@/types";
+import { ProcessEventRole, ReceptionProcess } from "@/types";
 import { formatTime } from "@/utils";
 
 interface Props {
@@ -402,7 +402,7 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                                 display: "block",
                               }}
                             >
-                              Ejecutado por
+                              Ejecutado por ✅
                             </Typography>
                             <Typography
                               variant="body2"
@@ -412,9 +412,13 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                                 lineHeight: 1.3,
                               }}
                             >
-                              {eventItem.createdBy?.name ||
+                              #{eventItem.createdBy.id}{" "}
+                              {eventItem.role !== ProcessEventRole.SISTEMA &&
+                                eventItem.createdBy.name}{" "}
+                              ({eventItem.role})
+                              {/* {eventItem.createdBy?.name ||
                                 eventItem.createdBy?.email ||
-                                "Usuario no identificado"}
+                                "Usuario no identificado"} */}
                             </Typography>
                           </Box>
                         </Stack>

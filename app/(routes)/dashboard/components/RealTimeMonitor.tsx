@@ -44,14 +44,13 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
   }, [events]);
 
   useEffect(() => {
-    if (role === ProcessEventRole.SISTEMA) {
-      if (
-        lastStatus ===
-        ProcessState.PRODUCCION_PENDIENTE_DE_CONFIRMACION_PARA_DESCARGA
-      ) {
+    if (role !== ProcessEventRole.SISTEMA) return;
+
+    switch (lastStatus) {
+      case ProcessState.PRODUCCION_PENDIENTE_DE_CONFIRMACION_PARA_DESCARGA:
         Swal.fire({
           icon: "success",
-          title: "¡Material aprobado por calidad!",
+          title: `¡Material aprobado por calidad!`,
           html: `<strong>Proveedor:</strong> ${providerName || ""}`,
           footer: `<strong>Placas:</strong> ${licensePlates || ""}`,
           showConfirmButton: false,
@@ -71,7 +70,8 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
             }
           },
         });
-      } else if (lastStatus === ProcessState.FINALIZO_PROCESO_POR_RECHAZO) {
+        break;
+      case ProcessState.FINALIZO_PROCESO_POR_RECHAZO:
         Swal.fire({
           icon: "error",
           title: `Material rechazado por ${events.length > 3 ? "calidad" : "logistica"}!`,
@@ -94,7 +94,31 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
             }
           },
         });
-      }
+        break;
+      case ProcessState.FINALIZO_PROCESO:
+        Swal.fire({
+          icon: "success",
+          title: `¡Proceso finalizado!`,
+          html: `<strong>Proveedor:</strong> ${providerName || ""}`,
+          footer: `<strong>Placas:</strong> ${licensePlates || ""}`,
+          showConfirmButton: false,
+          timer: 15000,
+          timerProgressBar: true,
+          background: "#fff url(/images/fondo.jpeg) no-repeat",
+          backdrop: `
+          rgba(3, 3, 47, 0.4)
+          url("/images/success.gif") 
+          left top
+          no-repeat
+        `,
+          didOpen: () => {
+            const container = Swal.getContainer();
+            if (container) {
+              container.style.zIndex = "1600";
+            }
+          },
+        });
+        break;
     }
   }, [providerName, licensePlates, lastStatus, role, events]);
 
