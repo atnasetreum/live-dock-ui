@@ -14,7 +14,7 @@ import {
 import { ProcessEventRole, ReceptionProcess } from "@/types";
 import { formatElapsedTime } from "@/hooks/useElapsedTime";
 import { useThemeConfig } from "@/theme/ThemeProvider";
-import { formatTime } from "@/utils";
+import { formatDateTime } from "@/utils";
 
 interface Props {
   receptionProcess: ReceptionProcess;
@@ -128,7 +128,7 @@ const TimeLineEvents = ({
                       fontWeight: 500,
                     }}
                   >
-                    {formatTime(eventItem.createdAt)}
+                    {formatDateTime(eventItem.createdAt)}
                   </Typography>
                   <Typography
                     variant="caption"
@@ -331,7 +331,7 @@ const TimeLineEvents = ({
                             fontWeight: 500,
                           }}
                         >
-                          {formatTime(eventItem.createdAt)}
+                          {formatDateTime(eventItem.createdAt)}
                         </Typography>
                         <Typography
                           variant="caption"

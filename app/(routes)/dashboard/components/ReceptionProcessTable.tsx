@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { DateTime } from "luxon";
 
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
@@ -24,18 +25,38 @@ import {
 
 import { EventData, ProcessEventRole, ReceptionProcess } from "@/types";
 import { receptionProcessesService } from "@/services";
+import type { ReceptionProcessFilters } from "@/services/reception-processes.service";
 import { formatElapsedTime } from "@/hooks/useElapsedTime";
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { useCurrentUser } from "@/common/UserContext";
 import TimeLineEvents from "./TimeLineEvents";
-import { formatTime, getClientInfo, Toast } from "@/utils";
+import ReceptionProcessFiltersPanel from "./ReceptionProcessFilters";
+import { formatDateTime, getClientInfo, Toast } from "@/utils";
 
 interface Props {
   selectReceptionProcess: (receptionProcess: ReceptionProcess) => void;
   data: ReceptionProcess[];
+  filters: ReceptionProcessFilters;
+  onFiltersChange: (filters: ReceptionProcessFilters) => void;
 }
 
-const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
+const ReceptionProcessTable = ({
+  selectReceptionProcess,
+  data,
+  filters,
+  onFiltersChange,
+}: Props) => {
+  const getDefaultDateRange = () => {
+    const current = DateTime.now().setZone("America/Mexico_City");
+    const end = current;
+    const start = current.minus({ days: 7 });
+
+    return {
+      startDate: start.toISODate() ?? "",
+      endDate: end.toISODate() ?? "",
+    };
+  };
+
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [openAuthDialog, setOpenAuthDialog] = useState(false);
   const [selectedProcessId, setSelectedProcessId] = useState<number | null>(
@@ -46,9 +67,21 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
   const [currentStatus, setCurrentStatus] = useState<string>("");
   const [rejectionNotes, setRejectionNotes] = useState<string>("");
   const [nowTimestamp, setNowTimestamp] = useState<number>(() => Date.now());
+  const [searchDraft, setSearchDraft] = useState<string>(filters.search ?? "");
   const currentUser = useCurrentUser();
 
   const { theme } = useThemeConfig();
+
+  const materialOptions = Array.from(
+    new Set(data.map((item) => item.typeOfMaterial).filter(Boolean)),
+  );
+  const statusOptions = Array.from(
+    new Set(
+      data
+        .map((item) => item.events?.[item.events.length - 1]?.status)
+        .filter(Boolean),
+    ),
+  ) as string[];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -57,6 +90,16 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if ((filters.search ?? "") !== searchDraft) {
+        onFiltersChange({ ...filters, search: searchDraft });
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchDraft, filters, onFiltersChange]);
 
   const toggleExpanded = (id: number) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -301,6 +344,61 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
           }}
         />
       </Stack>
+
+      <ReceptionProcessFiltersPanel
+        filters={filters}
+        searchDraft={searchDraft}
+        materialOptions={materialOptions}
+        statusOptions={statusOptions}
+        onSearchDraftChange={setSearchDraft}
+        onTypeOfMaterialChange={(value) =>
+          onFiltersChange({ ...filters, typeOfMaterial: value })
+        }
+        onStatusChange={(value) =>
+          onFiltersChange({ ...filters, status: value })
+        }
+        onStartDateChange={(value) => {
+          if (!value) return;
+
+          if (filters.endDate && value > filters.endDate) {
+            onFiltersChange({
+              ...filters,
+              startDate: value,
+              endDate: value,
+            });
+            return;
+          }
+
+          onFiltersChange({ ...filters, startDate: value });
+        }}
+        onEndDateChange={(value) => {
+          if (!value) return;
+
+          if (filters.startDate && value < filters.startDate) {
+            onFiltersChange({
+              ...filters,
+              startDate: value,
+              endDate: value,
+            });
+            return;
+          }
+
+          onFiltersChange({ ...filters, endDate: value });
+        }}
+        onClearFilters={() => {
+          const { startDate, endDate } = getDefaultDateRange();
+          setSearchDraft("");
+          onFiltersChange({
+            ...filters,
+            search: "",
+            typeOfMaterial: "",
+            status: "",
+            startDate,
+            endDate,
+          });
+        }}
+      />
+
       <Stack spacing={2.5}>
         {data.length ? (
           data.map((receptionProcess) => {
@@ -582,7 +680,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                           lineHeight: 1.4,
                         }}
                       >
-                        {formatTime(receptionProcess.createdAt)}
+                        {formatDateTime(receptionProcess.createdAt)}
                       </Typography>
                       <Chip
                         icon={
@@ -1147,7 +1245,7 @@ const ReceptionProcessTable = ({ selectReceptionProcess, data }: Props) => {
                               color: theme.palette.textPrimary,
                             }}
                           >
-                            {formatTime(receptionProcess.createdAt)}
+                            {formatDateTime(receptionProcess.createdAt)}
                           </Typography>
                           <Typography
                             variant="caption"

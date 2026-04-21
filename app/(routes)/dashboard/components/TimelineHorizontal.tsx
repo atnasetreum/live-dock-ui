@@ -4,7 +4,7 @@ import { Box, Chip, Stack, Typography } from "@mui/material";
 
 import { useThemeConfig } from "@/theme/ThemeProvider";
 import { ProcessEventRole, ReceptionProcess } from "@/types";
-import { formatTime } from "@/utils";
+import { formatDateTime } from "@/utils";
 
 interface Props {
   receptionProcess: ReceptionProcess;
@@ -268,7 +268,7 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                                 fontSize: "0.9rem",
                               }}
                             >
-                              {formatTime(eventItem.createdAt)}
+                              {formatDateTime(eventItem.createdAt)}
                             </Typography>
                             {isLatestEvent && (
                               <Chip

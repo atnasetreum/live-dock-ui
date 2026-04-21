@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { DateTime } from "luxon";
 
 //import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 //import { Box, Chip, Grid, Paper, Stack, Typography } from "@mui/material";
@@ -15,6 +16,7 @@ import RealTimeMonitor from "./components/RealTimeMonitor";
 import ConnectedUsers from "./components/ConnectedUsers";
 //import { useThemeConfig } from "@/theme/ThemeProvider";
 import { receptionProcessesService } from "@/services";
+import type { ReceptionProcessFilters } from "@/services/reception-processes.service";
 import { useCurrentUser } from "@/common/UserContext";
 import AlertsEvents from "./components/AlertsEvents";
 import { useSocket } from "@/common/SocketProvider";
@@ -24,8 +26,19 @@ import {
   ReceptionProcess,
   ReceptionProcessStatus,
 } from "@/types";
-import { getCurrentDate, Toast } from "@/utils";
+import { Toast } from "@/utils";
 import DashboardBI from "./components/DashboardBI";
+
+const getDefaultDateRange = () => {
+  const current = DateTime.now().setZone("America/Mexico_City");
+  const end = current;
+  const start = current.minus({ days: 7 });
+
+  return {
+    startDate: start.toISODate() ?? "",
+    endDate: end.toISODate() ?? "",
+  };
+};
 
 /* const stats = [
   {
@@ -93,32 +106,30 @@ const DashboardPage = () => {
   const [receptionProcess, setReceptionProcess] =
     useState<ReceptionProcess | null>(null);
   const [data, setData] = useState<ReceptionProcess[]>([]);
+  const [filters, setFilters] = useState<ReceptionProcessFilters>(() => {
+    const { startDate, endDate } = getDefaultDateRange();
+
+    return {
+      search: "",
+      typeOfMaterial: "",
+      status: "",
+      startDate,
+      endDate,
+    };
+  });
 
   const { socket } = useSocket();
   const { role } = useCurrentUser();
 
   useEffect(() => {
-    receptionProcessesService
-      .findAll({
-        startDate: getCurrentDate(), // Solo procesos del día actual
-      })
-      .then(setData);
-  }, []);
+    receptionProcessesService.findAll(filters).then(setData);
+  }, [filters]);
 
   useEffect(() => {
     if (!socket) return undefined;
 
-    const handleSessionsReady = (payload: ReceptionProcess) => {
-      const currentId = payload.id;
-      setData((prev) => {
-        const exists = prev.some((item) => item.id === currentId);
-
-        if (exists) {
-          return prev.map((item) => (item.id === currentId ? payload : item));
-        } else {
-          return [payload, ...prev];
-        }
-      });
+    const handleSessionsReady = () => {
+      receptionProcessesService.findAll(filters).then(setData);
     };
 
     socket.on("reception-process:status_update", handleSessionsReady);
@@ -126,7 +137,7 @@ const DashboardPage = () => {
     return () => {
       socket.off("reception-process:status_update", handleSessionsReady);
     };
-  }, [socket]);
+  }, [socket, filters]);
 
   useEffect(() => {
     if (!navigator.serviceWorker) return;
@@ -382,6 +393,8 @@ const DashboardPage = () => {
             <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
               <ReceptionProcessTable
                 data={data}
+                filters={filters}
+                onFiltersChange={setFilters}
                 selectReceptionProcess={(
                   currentReceptionProcess: ReceptionProcess,
                 ) => {

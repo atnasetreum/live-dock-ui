@@ -1,6 +1,14 @@
 import axiosClient from "@/common/axiosClient";
 import { ReceptionProcess } from "@/types";
 
+export type ReceptionProcessFilters = {
+  search?: string;
+  typeOfMaterial?: string;
+  status?: string;
+  startDate: string;
+  endDate: string;
+};
+
 export const receptionProcessesService = {
   baseUrl: "/reception-process",
   create: async (payload: {
@@ -14,13 +22,24 @@ export const receptionProcessesService = {
     );
     return data;
   },
-  findAll: async ({ startDate }: { startDate: string }) => {
-    console.log({ startDate });
+  findAll: async ({
+    search,
+    typeOfMaterial,
+    status,
+    startDate,
+    endDate,
+  }: ReceptionProcessFilters) => {
     const { data } = await axiosClient.get<ReceptionProcess[]>(
       `${receptionProcessesService.baseUrl}`,
-      /* {
-        params: { startDate },
-      }, */
+      {
+        params: {
+          search: search || undefined,
+          typeOfMaterial: typeOfMaterial || undefined,
+          status: status || undefined,
+          startDate,
+          endDate,
+        },
+      },
     );
     return data;
   },
