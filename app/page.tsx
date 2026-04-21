@@ -226,7 +226,9 @@ const LoginPage = () => {
         <Stack
           direction={{ xs: "column", lg: "row" }}
           spacing={{ xs: 4, lg: 8 }}
-          alignItems="stretch"
+          sx={{
+            alignItems: "stretch"
+          }}
         >
           <Box
             id="info-section"
@@ -341,9 +343,10 @@ const LoginPage = () => {
                 <Stack
                   direction="row"
                   spacing={1}
-                  alignItems="center"
-                  sx={{ mb: 1 }}
-                >
+                  sx={{
+                    alignItems: "center",
+                    mb: 1
+                  }}>
                   <Chip
                     icon={<LockOutlinedIcon fontSize="small" />}
                     label="Vigilancia y trazabilidad centralizadas"

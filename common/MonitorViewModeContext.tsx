@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import type { ReactNode } from "react";
 
@@ -47,22 +54,25 @@ export const MonitorViewModeProvider = ({
     };
   }, [socket]);
 
-  const setMonitorViewMode = (viewMode: MonitorViewMode) => {
-    setMonitorViewModeState(viewMode);
+  const setMonitorViewMode = useCallback(
+    (viewMode: MonitorViewMode) => {
+      setMonitorViewModeState(viewMode);
 
-    if (!socket) return;
+      if (!socket) return;
 
-    if (currentUser.role === ProcessEventRole.ADMIN) {
-      socket.emit("monitor:view_mode:set", { viewMode });
-    }
-  };
+      if (currentUser?.role === ProcessEventRole.ADMIN) {
+        socket.emit("monitor:view_mode:set", { viewMode });
+      }
+    },
+    [socket, currentUser?.role],
+  );
 
   const value = useMemo(
     () => ({
       monitorViewMode,
       setMonitorViewMode,
     }),
-    [monitorViewMode],
+    [monitorViewMode, setMonitorViewMode],
   );
 
   return (

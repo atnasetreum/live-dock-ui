@@ -107,21 +107,22 @@ const AlertsEvents = () => {
         sx={{
           fontWeight: 600,
           color: theme.palette.textPrimary,
+          mb: 1.5,
         }}
-        mb={1.5}
       >
         Alertas prioritarias
       </Typography>
       <Divider sx={{ borderColor: theme.divider }} />
-      <Stack spacing={2} mt={2}>
+      <Stack spacing={2} sx={{ mt: 2 }}>
         {alerts.length ? (
           alerts.map((alert, idx) => (
             <Box key={`alert-${idx}`}>
               <Stack
                 direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-              >
+                sx={{
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}>
                 <Typography
                   variant="subtitle1"
                   sx={{

@@ -152,8 +152,10 @@ const MainBanner = ({ onPipaIngreso }: MainBannerProps) => {
       <Stack
         direction={{ xs: "column", md: "row" }}
         spacing={2}
-        justifyContent="space-between"
-        alignItems={{ xs: "flex-start", md: "center" }}
+        sx={{
+          justifyContent: "space-between",
+          alignItems: { xs: "flex-start", md: "center" },
+        }}
       >
         <Box>
           <Button
@@ -216,7 +218,14 @@ const MainBanner = ({ onPipaIngreso }: MainBannerProps) => {
               {currentUser.name}
             </Typography>
 
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            <Stack
+              direction="row"
+              spacing={1}
+              useFlexGap
+              sx={{
+                flexWrap: "wrap",
+              }}
+            >
               <Chip
                 size="small"
                 label={`Rol: ${currentUser.role}`}
@@ -247,7 +256,12 @@ const MainBanner = ({ onPipaIngreso }: MainBannerProps) => {
             Seguimiento en tiempo real del flujo de recepción de pipas.
           </Typography>
         </Box>
-        <Stack spacing={2} width={{ xs: "100%", md: "auto" }}>
+        <Stack
+          spacing={2}
+          sx={{
+            width: { xs: "100%", md: "auto" },
+          }}
+        >
           {/* {onOpenDashboard && (
             <Button
               variant="contained"
@@ -349,8 +363,10 @@ const MainBanner = ({ onPipaIngreso }: MainBannerProps) => {
                     },
                   },
                 }}
-                inputProps={{
-                  inputMode: "numeric",
+                slotProps={{
+                  htmlInput: {
+                    inputMode: "numeric",
+                  },
                 }}
               />
               <Button
@@ -386,8 +402,10 @@ const MainBanner = ({ onPipaIngreso }: MainBannerProps) => {
       <Stack
         direction="row"
         spacing={1.5}
-        flexWrap="wrap"
-        mt={{ xs: 2, md: 3 }}
+        sx={{
+          flexWrap: "wrap",
+          mt: { xs: 2, md: 3 },
+        }}
       >
         {statusChips.map((chip) => (
           <Chip

@@ -52,7 +52,12 @@ const TimeLineEvents = ({
         border: `1px solid ${theme.surfaces.border}`,
       }}
     >
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Stack
+        direction="row"
+        sx={{
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}>
         <Typography
           variant="subtitle2"
           sx={{ color: theme.palette.textPrimary }}

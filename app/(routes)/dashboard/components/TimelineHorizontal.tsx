@@ -106,14 +106,24 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
         //Movimiento
       }}
     >
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Stack
+        direction="row"
+        sx={{
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}>
         <Typography
           variant="subtitle2"
           sx={{ color: theme.palette.textPrimary }}
         >
           Eventos
         </Typography>
-        <Stack alignItems="center" spacing={0} sx={{ minWidth: 90 }}>
+        <Stack
+          spacing={0}
+          sx={{
+            alignItems: "center",
+            minWidth: 90
+          }}>
           <Typography
             variant="caption"
             sx={{
@@ -140,7 +150,6 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
           }}
         />
       </Stack>
-
       <Box
         sx={{
           mt: 2,
@@ -196,9 +205,13 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                       key={eventItem.id}
                       direction="row"
                       spacing={1.5}
-                      alignItems="flex-start"
+                      sx={{
+                        alignItems: "flex-start"
+                      }}
                     >
-                      <Stack alignItems="center" spacing={0.5}>
+                      <Stack spacing={0.5} sx={{
+                        alignItems: "center"
+                      }}>
                         <Box
                           sx={{
                             width: 12,
@@ -228,7 +241,6 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                           />
                         )}
                       </Stack>
-
                       <Box
                         sx={{
                           flex: 1,
@@ -256,9 +268,10 @@ const TimelineHorizontal = ({ receptionProcess }: Props) => {
                           <Stack
                             direction="row"
                             spacing={1}
-                            alignItems="center"
-                            justifyContent="space-between"
-                          >
+                            sx={{
+                              alignItems: "center",
+                              justifyContent: "space-between"
+                            }}>
                             <Typography
                               variant="caption"
                               sx={{

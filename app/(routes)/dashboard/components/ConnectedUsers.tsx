@@ -65,8 +65,8 @@ const ConnectedUsers = () => {
         sx={{
           fontWeight: 600,
           color: theme.palette.textPrimary,
+          mb: 2,
         }}
-        mb={2}
       >
         Equipo en turno
       </Typography>
@@ -86,10 +86,11 @@ const ConnectedUsers = () => {
                 <Stack spacing={1.1}>
                   <Stack
                     direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
                     spacing={1}
-                  >
+                    sx={{
+                      alignItems: "center",
+                      justifyContent: "space-between"
+                    }}>
                     <Box>
                       <Typography
                         variant="caption"
@@ -128,8 +129,10 @@ const ConnectedUsers = () => {
                   <Stack
                     direction="row"
                     spacing={0.75}
-                    flexWrap="wrap"
                     useFlexGap
+                    sx={{
+                      flexWrap: "wrap"
+                    }}
                   >
                     <Chip
                       size="small"

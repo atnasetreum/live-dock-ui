@@ -313,9 +313,11 @@ const ReceptionProcessTable = ({
     >
       <Stack
         direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
+        sx={{
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
       >
         <Box>
           <Typography
@@ -344,7 +346,6 @@ const ReceptionProcessTable = ({
           }}
         />
       </Stack>
-
       <ReceptionProcessFiltersPanel
         filters={filters}
         searchDraft={searchDraft}
@@ -398,7 +399,6 @@ const ReceptionProcessTable = ({
           });
         }}
       />
-
       <Stack spacing={2.5}>
         {data.length ? (
           data.map((receptionProcess) => {
@@ -1290,7 +1290,7 @@ const ReceptionProcessTable = ({
                           }}
                         />
                       </Stack>
-                      <Stack spacing={1.25} mt={1.5}>
+                      <Stack spacing={1.25} sx={{ mt: 1.5 }}>
                         {receptionProcess.metrics?.length ? (
                           receptionProcess.metrics.map((metric) => (
                             <Box
@@ -1379,28 +1379,29 @@ const ReceptionProcessTable = ({
           </Typography>
         )}
       </Stack>
-
       {/* Dialog de Acción */}
       <Dialog
         open={openAuthDialog}
         onClose={handleCloseAuthDialog}
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            backgroundColor:
-              theme.name === "dark"
-                ? "rgba(10, 18, 50, 0.98)"
-                : "rgba(255, 255, 255, 0.99)",
-            border:
-              theme.name === "dark"
-                ? "2px solid rgba(255, 255, 255, 0.18)"
-                : `1px solid ${theme.surfaces.border}`,
-            boxShadow:
-              theme.name === "dark"
-                ? "0 0 60px rgba(0, 0, 0, 0.8), 0 25px 80px rgba(2, 7, 21, 0.7)"
-                : theme.overlays.panelShadow,
-            backgroundImage: "none",
-            minWidth: "320px",
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: 3,
+              backgroundColor:
+                theme.name === "dark"
+                  ? "rgba(10, 18, 50, 0.98)"
+                  : "rgba(255, 255, 255, 0.99)",
+              border:
+                theme.name === "dark"
+                  ? "2px solid rgba(255, 255, 255, 0.18)"
+                  : `1px solid ${theme.surfaces.border}`,
+              boxShadow:
+                theme.name === "dark"
+                  ? "0 0 60px rgba(0, 0, 0, 0.8), 0 25px 80px rgba(2, 7, 21, 0.7)"
+                  : theme.overlays.panelShadow,
+              backgroundImage: "none",
+              minWidth: "320px",
+            },
           },
         }}
       >

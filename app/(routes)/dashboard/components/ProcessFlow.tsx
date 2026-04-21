@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   FormControl,
@@ -7,7 +7,6 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  Typography,
   useMediaQuery,
 } from "@mui/material";
 
@@ -26,24 +25,23 @@ interface Props {
 
 const ProcessFlow = ({ receptionProcess, currentStatus }: Props) => {
   const isSmallScreen = useMediaQuery("(max-width:900px)");
-  const [view, setView] = useState<MonitorViewMode>(
+  const [localView, setLocalView] = useState<MonitorViewMode>(
     isSmallScreen ? "timeline" : "horizontal",
   );
   const { role } = useCurrentUser();
   const { monitorViewMode } = useMonitorViewMode();
   const isSistemaRole = role === ProcessEventRole.SISTEMA;
+  const view = isSistemaRole ? monitorViewMode : localView;
 
   const { theme } = useThemeConfig();
 
-  useEffect(() => {
-    if (isSistemaRole) {
-      setView(monitorViewMode);
-    }
-  }, [isSistemaRole, monitorViewMode]);
-
   return (
     <Stack spacing={{ xs: 1.5, md: 2 }}>
-      <Stack alignItems="center">
+      <Stack
+        sx={{
+          alignItems: "center",
+        }}
+      >
         <Paper
           elevation={0}
           sx={{
@@ -77,7 +75,8 @@ const ProcessFlow = ({ receptionProcess, currentStatus }: Props) => {
               row={!isSmallScreen}
               value={view}
               onChange={(event) =>
-                !isSistemaRole && setView(event.target.value as MonitorViewMode)
+                !isSistemaRole &&
+                setLocalView(event.target.value as MonitorViewMode)
               }
             >
               <FormControlLabel
@@ -99,18 +98,15 @@ const ProcessFlow = ({ receptionProcess, currentStatus }: Props) => {
           </FormControl>
         </Paper>
       </Stack>
-
       {view === "timeline" && (
         <TimeLineEvents
           receptionProcess={receptionProcess}
           currentStatus={currentStatus}
         />
       )}
-
       {view === "horizontal" && (
         <TimelineHorizontal receptionProcess={receptionProcess} />
       )}
-
       {view === "desktop" && (
         <ProcessFlowDesktop
           receptionProcess={receptionProcess}

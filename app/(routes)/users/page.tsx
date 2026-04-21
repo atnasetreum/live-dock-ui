@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 
@@ -328,9 +328,11 @@ const UsersPage = () => {
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={2}
-          alignItems={{ xs: "flex-start", md: "center" }}
-          justifyContent="space-between"
-          mb={2}
+          sx={{
+            alignItems: { xs: "flex-start", md: "center" },
+            justifyContent: "space-between",
+            mb: 2,
+          }}
         >
           <Box>
             <Typography
@@ -361,8 +363,8 @@ const UsersPage = () => {
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={2}
-          mb={2}
           sx={{
+            mb: 2,
             "& .MuiOutlinedInput-root": {
               color: theme.palette.textPrimary,
               "& fieldset": {
@@ -501,7 +503,9 @@ const UsersPage = () => {
                       <Stack
                         direction="row"
                         spacing={1}
-                        justifyContent="flex-end"
+                        sx={{
+                          justifyContent: "flex-end",
+                        }}
                       >
                         <Button
                           size="small"
@@ -602,31 +606,32 @@ const UsersPage = () => {
           />
         </Box>
       </Paper>
-
       <Dialog
         open={isDialogOpen}
         onClose={closeDialog}
         fullWidth
         maxWidth="sm"
-        BackdropProps={{
-          sx: {
-            backgroundColor:
-              theme.name === "dark"
-                ? "rgba(2, 6, 23, 0.72)"
-                : "rgba(11, 27, 45, 0.38)",
-            backdropFilter: "blur(3px)",
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor:
+                theme.name === "dark"
+                  ? "rgba(2, 6, 23, 0.72)"
+                  : "rgba(11, 27, 45, 0.38)",
+              backdropFilter: "blur(3px)",
+            },
           },
-        }}
-        PaperProps={{
-          sx: {
-            background:
-              theme.name === "dark"
-                ? "rgba(7,11,32,0.98)"
-                : "rgba(255,255,255,0.99)",
-            color: theme.palette.textPrimary,
-            border: `1px solid ${theme.surfaces.border}`,
-            boxShadow: theme.overlays.panelShadow,
-            borderRadius: 3,
+          paper: {
+            sx: {
+              background:
+                theme.name === "dark"
+                  ? "rgba(7,11,32,0.98)"
+                  : "rgba(255,255,255,0.99)",
+              color: theme.palette.textPrimary,
+              border: `1px solid ${theme.surfaces.border}`,
+              boxShadow: theme.overlays.panelShadow,
+              borderRadius: 3,
+            },
           },
         }}
       >
@@ -642,8 +647,8 @@ const UsersPage = () => {
         <DialogContent sx={{ pt: 2.5, backgroundColor: "transparent" }}>
           <Stack
             spacing={2}
-            mt={3}
             sx={{
+              mt: 3,
               "& .MuiOutlinedInput-root": {
                 color: theme.palette.textPrimary,
                 "& fieldset": {
@@ -710,8 +715,8 @@ const UsersPage = () => {
               }
               fullWidth
               autoComplete="off"
-              InputProps={
-                !editingUser
+              slotProps={{
+                input: !editingUser
                   ? {
                       endAdornment: (
                         <InputAdornment position="end">
@@ -736,8 +741,8 @@ const UsersPage = () => {
                         </InputAdornment>
                       ),
                     }
-                  : undefined
-              }
+                  : undefined,
+              }}
             />
           </Stack>
         </DialogContent>
@@ -761,31 +766,32 @@ const UsersPage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
       <Dialog
         open={Boolean(userToDelete)}
         onClose={closeDeleteDialog}
         fullWidth
         maxWidth="xs"
-        BackdropProps={{
-          sx: {
-            backgroundColor:
-              theme.name === "dark"
-                ? "rgba(2, 6, 23, 0.72)"
-                : "rgba(11, 27, 45, 0.38)",
-            backdropFilter: "blur(3px)",
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor:
+                theme.name === "dark"
+                  ? "rgba(2, 6, 23, 0.72)"
+                  : "rgba(11, 27, 45, 0.38)",
+              backdropFilter: "blur(3px)",
+            },
           },
-        }}
-        PaperProps={{
-          sx: {
-            background:
-              theme.name === "dark"
-                ? "rgba(7,11,32,0.98)"
-                : "rgba(255,255,255,0.99)",
-            color: theme.palette.textPrimary,
-            border: `1px solid ${theme.surfaces.border}`,
-            boxShadow: theme.overlays.panelShadow,
-            borderRadius: 3,
+          paper: {
+            sx: {
+              background:
+                theme.name === "dark"
+                  ? "rgba(7,11,32,0.98)"
+                  : "rgba(255,255,255,0.99)",
+              color: theme.palette.textPrimary,
+              border: `1px solid ${theme.surfaces.border}`,
+              boxShadow: theme.overlays.panelShadow,
+              borderRadius: 3,
+            },
           },
         }}
       >

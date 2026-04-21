@@ -195,10 +195,14 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
           boxShadow: theme.overlays.panelShadow,
         }}
       >
-        <Grid container spacing={{ xs: 2, md: 3 }} alignItems="center">
+        <Grid container spacing={{ xs: 2, md: 3 }} sx={{
+          alignItems: "center"
+        }}>
           <Grid size={{ xs: 12, md: 6 }}>
             <Stack spacing={1} sx={{ minWidth: 0 }}>
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1} sx={{
+                alignItems: "center"
+              }}>
                 <Chip
                   icon={<InsightsIcon />}
                   label="Monitoreo BI"
@@ -244,9 +248,10 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
             <Stack
               direction="column"
               spacing={1.5}
-              justifyContent={{ xs: "flex-start", md: "flex-end" }}
-              alignItems={{ xs: "stretch", md: "flex-end" }}
-            >
+              sx={{
+                justifyContent: { xs: "flex-start", md: "flex-end" },
+                alignItems: { xs: "stretch", md: "flex-end" }
+              }}>
               <Button
                 variant="contained"
                 startIcon={<DownloadIcon />}
@@ -297,7 +302,6 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
           </Grid>
         </Grid>
       </Paper>
-
       <Paper
         sx={{
           p: { xs: 2.5, md: 3 },
@@ -365,7 +369,6 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
           </Grid>
         </Grid>
       </Paper>
-
       <Grid container spacing={{ xs: 2, md: 2.5 }}>
         {kpiCards.map((card) => (
           <Grid key={card.label} size={{ xs: 12, sm: 6, md: 3 }}>
@@ -389,7 +392,9 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
                 >
                   {card.label}
                 </Typography>
-                <Stack direction="row" alignItems="baseline" spacing={1}>
+                <Stack direction="row" spacing={1} sx={{
+                  alignItems: "baseline"
+                }}>
                   <Typography
                     variant="h4"
                     sx={{
@@ -432,7 +437,6 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
           </Grid>
         ))}
       </Grid>
-
       <Grid container spacing={{ xs: 2, md: 2.5 }}>
         <Grid size={{ xs: 12, lg: 7 }}>
           <Paper
@@ -446,7 +450,9 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
             }}
           >
             <Stack spacing={2}>
-              <Stack direction="row" justifyContent="space-between">
+              <Stack direction="row" sx={{
+                justifyContent: "space-between"
+              }}>
                 <Stack spacing={0.5}>
                   <Typography variant="overline" sx={{ letterSpacing: 2.4 }}>
                     Tendencias
@@ -493,7 +499,9 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
                   />
                 ))}
               </Box>
-              <Stack direction="row" spacing={2} flexWrap="wrap">
+              <Stack direction="row" spacing={2} sx={{
+                flexWrap: "wrap"
+              }}>
                 <Stack spacing={0.5} sx={{ minWidth: 140 }}>
                   <Typography
                     variant="caption"
@@ -539,7 +547,9 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
               }}
             >
               <Stack spacing={2}>
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack direction="row" spacing={1} sx={{
+                  alignItems: "center"
+                }}>
                   <SpeedIcon sx={{ color: theme.palette.textPrimary }} />
                   <Typography
                     variant="h6"
@@ -551,7 +561,9 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
                 <Stack spacing={1.5}>
                   {efficiencyRows.map((row) => (
                     <Stack key={row.label} spacing={0.5}>
-                      <Stack direction="row" justifyContent="space-between">
+                      <Stack direction="row" sx={{
+                        justifyContent: "space-between"
+                      }}>
                         <Typography
                           variant="body2"
                           sx={{ color: theme.palette.textSecondary }}
@@ -594,7 +606,9 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
               }}
             >
               <Stack spacing={2}>
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack direction="row" spacing={1} sx={{
+                  alignItems: "center"
+                }}>
                   <TimelineIcon sx={{ color: theme.palette.textPrimary }} />
                   <Typography
                     variant="h6"
@@ -608,7 +622,9 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
                     <Stack
                       key={row.label}
                       direction="row"
-                      justifyContent="space-between"
+                      sx={{
+                        justifyContent: "space-between"
+                      }}
                     >
                       <Typography
                         variant="body2"
@@ -634,7 +650,6 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
           </Stack>
         </Grid>
       </Grid>
-
       <Grid container spacing={{ xs: 2, md: 2.5 }}>
         <Grid size={{ xs: 12, lg: 6 }}>
           <Paper
@@ -648,7 +663,9 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
             }}
           >
             <Stack spacing={2}>
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1} sx={{
+                alignItems: "center"
+              }}>
                 <LocalShippingIcon sx={{ color: theme.palette.textPrimary }} />
                 <Typography
                   variant="h6"
@@ -672,9 +689,10 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
                     <Stack spacing={1.25}>
                       <Stack
                         direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
+                        sx={{
+                          justifyContent: "space-between",
+                          alignItems: "center"
+                        }}>
                         <Stack spacing={0.25} sx={{ minWidth: 0 }}>
                           <Typography
                             variant="subtitle1"
@@ -738,10 +756,13 @@ const DashboardBI = ({ onClose }: DashboardBIProps) => {
               <Stack
                 direction="row"
                 spacing={1}
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Stack direction="row" spacing={1} alignItems="center">
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "space-between"
+                }}>
+                <Stack direction="row" spacing={1} sx={{
+                  alignItems: "center"
+                }}>
                   <ArrowOutwardIcon sx={{ color: theme.palette.textPrimary }} />
                   <Typography
                     variant="h6"

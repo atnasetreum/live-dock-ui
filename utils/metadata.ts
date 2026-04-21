@@ -36,7 +36,7 @@ export const getClientInfo = async () => {
   }
 
   try {
-    const { brands, platform, mobile } = nav.userAgentData;
+    const { platform, mobile } = nav.userAgentData;
 
     const highEntropy = await nav.userAgentData.getHighEntropyValues([
       "platformVersion", // Versión del SO

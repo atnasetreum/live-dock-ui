@@ -88,15 +88,17 @@ const ThemeSwitcher = () => {
         onClose={handleClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
-        PaperProps={{
-          sx: {
-            mt: 1,
-            borderRadius: 2,
-            backgroundColor: theme.surfaces.panel,
-            border: `1px solid ${theme.surfaces.border}`,
-            boxShadow: theme.overlays.panelShadow,
-            color: theme.palette.textPrimary,
-            minWidth: 180,
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 1,
+              borderRadius: 2,
+              backgroundColor: theme.surfaces.panel,
+              border: `1px solid ${theme.surfaces.border}`,
+              boxShadow: theme.overlays.panelShadow,
+              color: theme.palette.textPrimary,
+              minWidth: 180,
+            },
           },
         }}
       >

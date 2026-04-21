@@ -7,7 +7,7 @@ self.getClientInfo = async () => {
   }
 
   try {
-    const { brands, platform, mobile } = navigator.userAgentData;
+    const { platform, mobile } = navigator.userAgentData;
 
     const highEntropy = await navigator.userAgentData.getHighEntropyValues([
       "platformVersion", // Versión del SO

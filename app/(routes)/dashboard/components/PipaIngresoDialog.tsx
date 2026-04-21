@@ -53,23 +53,31 @@ const PipaIngresoDialog = ({
       onClose={onClose}
       fullWidth
       maxWidth="xs"
-      BackdropProps={{
-        sx: {
-          backgroundColor: "rgba(3, 8, 20, 0.7)",
-          backdropFilter: "blur(2px)",
+      slotProps={{
+        backdrop: {
+          sx: {
+            backgroundColor: "rgba(3, 8, 20, 0.7)",
+            backdropFilter: "blur(2px)",
+          },
         },
-      }}
-      PaperProps={{
-        sx: {
-          borderRadius: 3.5,
-          backgroundColor: theme.forms.labelBackground,
-          border: `1px solid ${theme.surfaces.border}`,
-          boxShadow: theme.overlays.panelShadow,
+        paper: {
+          sx: {
+            borderRadius: 3.5,
+            backgroundColor: theme.forms.labelBackground,
+            border: `1px solid ${theme.surfaces.border}`,
+            boxShadow: theme.overlays.panelShadow,
+          },
         },
       }}
     >
       <DialogTitle sx={{ p: 2.5, pb: 1.5 }}>
-        <Stack direction="row" spacing={1.5} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={1.5}
+          sx={{
+            alignItems: "center",
+          }}
+        >
           <Box
             sx={{
               width: 46,

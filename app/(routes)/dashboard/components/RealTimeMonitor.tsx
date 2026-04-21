@@ -128,10 +128,12 @@ const RealTimeMonitor = ({ handleClose, receptionProcess }: Props) => {
       open
       onClose={handleClose}
       slots={{ transition: Transition }}
-      PaperProps={{
-        sx: {
-          background: theme.palette.pageBackground,
-          color: textPrimary,
+      slotProps={{
+        paper: {
+          sx: {
+            background: theme.palette.pageBackground,
+            color: textPrimary,
+          },
         },
       }}
     >

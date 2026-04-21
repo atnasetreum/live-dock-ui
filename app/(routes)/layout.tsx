@@ -81,11 +81,14 @@ const AdminMenuBar = ({
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={2}
-        alignItems={{ xs: "stretch", md: "center" }}
-        justifyContent="space-between"
-      >
+        sx={{
+          alignItems: { xs: "stretch", md: "center" },
+          justifyContent: "space-between"
+        }}>
         <Stack spacing={0.4}>
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1} sx={{
+            alignItems: "center"
+          }}>
             <AdminPanelSettingsRoundedIcon
               sx={{
                 color: theme.palette.textPrimary,
@@ -114,9 +117,10 @@ const AdminMenuBar = ({
         <Stack
           direction={{ xs: "column", sm: "row" }}
           spacing={1.25}
-          alignItems={{ xs: "stretch", sm: "center" }}
-          sx={{ width: { xs: "100%", sm: "auto" } }}
-        >
+          sx={{
+            alignItems: { xs: "stretch", sm: "center" },
+            width: { xs: "100%", sm: "auto" }
+          }}>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={1}
