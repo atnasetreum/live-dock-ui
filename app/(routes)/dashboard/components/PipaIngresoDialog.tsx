@@ -117,6 +117,7 @@ const PipaIngresoDialog = ({
           fullWidth
           required
           autoComplete="off"
+          type="text"
           label="Nombre del proveedor"
           value={providerName}
           onChange={(event) => onProviderNameChange(event.target.value)}
@@ -150,7 +151,8 @@ const PipaIngresoDialog = ({
           fullWidth
           required
           autoComplete="off"
-          label="Numero de placas"
+          type="text"
+          label="Número de placas"
           value={licensePlates}
           onChange={(event) => onLicensePlatesChange(event.target.value)}
           sx={{
