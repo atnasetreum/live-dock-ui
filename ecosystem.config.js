@@ -12,7 +12,7 @@ module.exports = {
         PORT: 3001,
       },
       watch: false, // No observar cambios en producción
-      max_memory_restart: "500M", // Reiniciar si excede memoria
+      max_memory_restart: "5G", // Reinicia si excede 5GB de RAM
       out_file: "./logs/out.log", // Log de salida
       error_file: "./logs/error.log", // Log de errores
       merge_logs: true, // Unificar logs
