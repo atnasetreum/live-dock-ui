@@ -356,6 +356,18 @@ const MainBanner = ({ onPipaIngreso }: MainBannerProps) => {
                 sx={{
                   width: { xs: "100%", md: "auto" },
                   mb: 1,
+                  "& .MuiInputLabel-root": {
+                    color: theme.palette.textSecondary,
+                    backgroundColor:
+                      theme.name === "dark"
+                        ? "rgba(7, 11, 32, 0.96)"
+                        : theme.surfaces.panel,
+                    px: 0.6,
+                    borderRadius: 1,
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: theme.palette.textPrimary,
+                  },
                   "& .MuiOutlinedInput-root": {
                     color: theme.palette.textPrimary,
                     "& fieldset": {

@@ -113,118 +113,140 @@ const PipaIngresoDialog = ({
             ¿Deseas continuar?
           </Box>
         </Typography>
-        <TextField
-          fullWidth
-          required
-          autoComplete="off"
-          type="text"
-          label="Nombre del proveedor"
-          value={providerName}
-          onChange={(event) => onProviderNameChange(event.target.value)}
-          sx={{
-            mt: 2,
-            "& .MuiInputLabel-root": {
-              color: theme.palette.textSecondary,
-              backgroundColor: theme.forms.labelBackground,
-              px: 0.6,
-              borderRadius: 1,
-            },
-            "& .MuiOutlinedInput-root": {
-              backgroundColor: theme.forms.fieldBackground,
-              color: theme.forms.inputColor,
-              borderRadius: 2,
-            },
-            "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: theme.forms.border,
-            },
-            "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: theme.forms.borderHover,
-            },
-            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-              {
-                borderColor: theme.forms.borderFocus,
-                boxShadow: theme.forms.focusShadow,
+        <Box component="form" autoComplete="off" noValidate>
+          <TextField
+            fullWidth
+            required
+            autoComplete="off"
+            type="text"
+            label="Nombre del proveedor"
+            value={providerName}
+            onChange={(event) => onProviderNameChange(event.target.value)}
+            slotProps={{
+              htmlInput: {
+                autoComplete: "off",
+                name: "companyName",
+                id: "company-name",
               },
-          }}
-        />
-        <TextField
-          fullWidth
-          required
-          autoComplete="off"
-          type="text"
-          label="Número de placas"
-          value={licensePlates}
-          onChange={(event) => onLicensePlatesChange(event.target.value)}
-          sx={{
-            mt: 2,
-            "& .MuiInputLabel-root": {
-              color: theme.palette.textSecondary,
-              backgroundColor: theme.forms.labelBackground,
-              px: 0.6,
-              borderRadius: 1,
-            },
-            "& .MuiOutlinedInput-root": {
-              backgroundColor: theme.forms.fieldBackground,
-              color: theme.forms.inputColor,
-              borderRadius: 2,
-            },
-            "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: theme.forms.border,
-            },
-            "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: theme.forms.borderHover,
-            },
-            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-              {
-                borderColor: theme.forms.borderFocus,
-                boxShadow: theme.forms.focusShadow,
+            }}
+            sx={{
+              mt: 2,
+              "& .MuiInputLabel-root": {
+                color: theme.palette.textSecondary,
+                backgroundColor: theme.forms.labelBackground,
+                px: 0.6,
+                borderRadius: 1,
               },
-          }}
-        />
-        <FormControl
-          fullWidth
-          sx={{
-            mt: 2,
-            "& .MuiInputLabel-root": {
-              color: theme.palette.textSecondary,
-              backgroundColor: theme.forms.labelBackground,
-              px: 0.6,
-              borderRadius: 1,
-            },
-            "& .MuiOutlinedInput-root": {
-              backgroundColor: theme.forms.fieldBackground,
-              color: theme.forms.inputColor,
-              borderRadius: 2,
-            },
-            "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: theme.forms.border,
-            },
-            "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: theme.forms.borderHover,
-            },
-            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-              {
-                borderColor: theme.forms.borderFocus,
-                boxShadow: theme.forms.focusShadow,
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: theme.forms.fieldBackground,
+                color: theme.forms.inputColor,
+                borderRadius: 2,
               },
-          }}
-        >
-          <InputLabel id="pipa-material-type-label">
-            Tipo de material
-          </InputLabel>
-          <Select
-            labelId="pipa-material-type-label"
-            name="materialType"
-            value={materialType}
-            label="Tipo de material"
-            onChange={(event) => onMaterialTypeChange(event.target.value)}
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: theme.forms.border,
+              },
+              "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                {
+                  borderColor: theme.forms.borderHover,
+                },
+              "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                {
+                  borderColor: theme.forms.borderFocus,
+                  boxShadow: theme.forms.focusShadow,
+                },
+            }}
+          />
+          <TextField
+            fullWidth
+            required
+            autoComplete="off"
+            type="text"
+            label="Placas del vehiculo"
+            value={licensePlates}
+            onChange={(event) => onLicensePlatesChange(event.target.value)}
+            slotProps={{
+              htmlInput: {
+                autoComplete: "off",
+                name: "vehiclePlate",
+                id: "vehicle-plate",
+                inputMode: "text",
+                autoCapitalize: "characters",
+                spellCheck: "false",
+              },
+            }}
+            sx={{
+              mt: 2,
+              "& .MuiInputLabel-root": {
+                color: theme.palette.textSecondary,
+                backgroundColor: theme.forms.labelBackground,
+                px: 0.6,
+                borderRadius: 1,
+              },
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: theme.forms.fieldBackground,
+                color: theme.forms.inputColor,
+                borderRadius: 2,
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: theme.forms.border,
+              },
+              "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                {
+                  borderColor: theme.forms.borderHover,
+                },
+              "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                {
+                  borderColor: theme.forms.borderFocus,
+                  boxShadow: theme.forms.focusShadow,
+                },
+            }}
+          />
+          <FormControl
+            fullWidth
+            sx={{
+              mt: 2,
+              "& .MuiInputLabel-root": {
+                color: theme.palette.textSecondary,
+                backgroundColor: theme.forms.labelBackground,
+                px: 0.6,
+                borderRadius: 1,
+              },
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: theme.forms.fieldBackground,
+                color: theme.forms.inputColor,
+                borderRadius: 2,
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: theme.forms.border,
+              },
+              "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                {
+                  borderColor: theme.forms.borderHover,
+                },
+              "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                {
+                  borderColor: theme.forms.borderFocus,
+                  boxShadow: theme.forms.focusShadow,
+                },
+            }}
           >
-            <MenuItem value="ALCOHOL">ALCOHOL</MenuItem>
-            <MenuItem value="AGUA">AGUA</MenuItem>
-            <MenuItem value="LESS">LESS</MenuItem>
-            <MenuItem value="A GRANEL">A GRANEL</MenuItem>
-          </Select>
-        </FormControl>
+            <InputLabel id="pipa-material-type-label">
+              Tipo de material
+            </InputLabel>
+            <Select
+              labelId="pipa-material-type-label"
+              name="materialType"
+              value={materialType}
+              label="Tipo de material"
+              onChange={(event) => onMaterialTypeChange(event.target.value)}
+            >
+              <MenuItem value="ALCOHOL">ALCOHOL</MenuItem>
+              <MenuItem value="AGUA">AGUA</MenuItem>
+              <MenuItem value="LESS">LESS</MenuItem>
+              <MenuItem value="A GRANEL">A GRANEL</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
       </DialogContent>
       <DialogActions
         sx={{
