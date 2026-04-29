@@ -353,31 +353,42 @@ const MainBanner = ({ onPipaIngreso }: MainBannerProps) => {
                   setUserId(value);
                 }}
                 size="small"
+                slotProps={{
+                  inputLabel: { shrink: true },
+                  htmlInput: {
+                    inputMode: "numeric",
+                  },
+                }}
                 sx={{
                   width: { xs: "100%", md: "auto" },
                   mb: 1,
                   "& .MuiInputLabel-root": {
-                    color: theme.palette.textSecondary,
+                    color:
+                      theme.name === "dark"
+                        ? "rgba(189, 214, 255, 0.96)"
+                        : theme.palette.textSecondary,
                     backgroundColor:
                       theme.name === "dark"
-                        ? "rgba(7, 11, 32, 0.96)"
+                        ? "rgba(7, 11, 32, 0.98)"
                         : theme.surfaces.panel,
-                    px: 0.6,
+                    px: 0.7,
                     borderRadius: 1,
+                    zIndex: 1,
+                  },
+                  "& .MuiInputLabel-root.MuiInputLabel-shrink": {
+                    transform: "translate(14px, -8px) scale(0.75)",
                   },
                   "& .MuiInputLabel-root.Mui-focused": {
-                    color: theme.palette.textPrimary,
+                    color:
+                      theme.name === "dark"
+                        ? "rgba(220, 234, 255, 1)"
+                        : theme.palette.textPrimary,
                   },
                   "& .MuiOutlinedInput-root": {
                     color: theme.palette.textPrimary,
                     "& fieldset": {
                       borderColor: theme.buttons.outlinedColor,
                     },
-                  },
-                }}
-                slotProps={{
-                  htmlInput: {
-                    inputMode: "numeric",
                   },
                 }}
               />
