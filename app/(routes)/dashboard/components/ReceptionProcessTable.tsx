@@ -291,11 +291,14 @@ const ReceptionProcessTable = ({
     }
   };
 
-  const calculateProgress = (events: EventData[]): number => {
+  const calculateProgress = (
+    events: EventData[],
+    typeOfMaterial?: string,
+  ): number => {
     if (!events || events.length === 0) return 0;
 
     const eventCount = events.length;
-    const maxEvents = 14;
+    const maxEvents = typeOfMaterial === "AGUA" ? 8 : 14;
 
     return Math.min((eventCount / maxEvents) * 100, 100);
   };
@@ -493,7 +496,10 @@ const ReceptionProcessTable = ({
 
             const progressValue = formattedStatus?.includes("FINALIZO")
               ? 100
-              : calculateProgress(receptionProcess.events);
+              : calculateProgress(
+                  receptionProcess.events,
+                  receptionProcess.typeOfMaterial,
+                );
 
             const lastEventAt = receptionProcess.events.reduce<
               Date | undefined

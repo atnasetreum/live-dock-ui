@@ -27,6 +27,8 @@ import {
   processSteps,
   processConnections,
   type LaneId,
+  type ProcessFlowEdge,
+  type ProcessFlowStep,
 } from "./processFlowData";
 
 import "reactflow/dist/style.css";
@@ -60,13 +62,14 @@ const laneColorMap = laneConfig.reduce<Record<LaneId, string>>(
 
 type StepMeta = { laneIndex: number; column: number };
 
-const stepMeta = processSteps.reduce<Record<string, StepMeta>>((acc, step) => {
-  acc[step.id] = {
-    laneIndex: laneIndex[step.lane],
-    column: step.column,
-  };
-  return acc;
-}, {});
+const AGUA_EXCLUDED_STEP_IDS = new Set([
+  "security-pending-ticket",
+  "security-delivered-ticket",
+  "logistics-pending-sap",
+  "logistics-captured-sap",
+  "quality-pending-release",
+  "quality-release",
+]);
 
 const handlePositions = [
   Position.Top,
@@ -148,7 +151,10 @@ const determineEdgeHandles = (
   return { sourceHandle: "source-top", targetHandle: "target-bottom" };
 };
 
-const buildNodes = (completedStepIds: Set<string>) => {
+const buildNodes = (
+  steps: ProcessFlowStep[],
+  completedStepIds: Set<string>,
+) => {
   const nodes: Node[] = laneConfig.map((lane) => ({
     id: `lane-${lane.id}`,
     type: "lane",
@@ -158,7 +164,7 @@ const buildNodes = (completedStepIds: Set<string>) => {
     selectable: false,
   }));
 
-  processSteps.forEach((step) => {
+  steps.forEach((step) => {
     const type =
       step.kind === "circle"
         ? "circle"
@@ -355,7 +361,7 @@ const nodeTypes = {
   diamond: DiamondNode,
 };
 
-const decisionMap: Record<string, string[]> = {
+const defaultDecisionMap: Record<string, string[]> = {
   LOGISTICA_PENDIENTE_DE_CONFIRMACION_INGRESO: [
     "supplier-arrive",
     "security-create-progress",
@@ -380,18 +386,22 @@ const decisionMap: Record<string, string[]> = {
   FINALIZO_PROCESO: ["quality-release"],
 };
 
-const previousStepsMap = processConnections.reduce<Record<string, string[]>>(
-  (acc, edge) => {
-    if (!acc[edge.target]) {
-      acc[edge.target] = [];
-    }
-    acc[edge.target].push(edge.source);
-    return acc;
-  },
-  {},
-);
+const buildCompletedStepIds = (
+  lastStatus: string,
+  decisionMap: Record<string, string[]>,
+  connections: ProcessFlowEdge[],
+) => {
+  const previousStepsMap = connections.reduce<Record<string, string[]>>(
+    (acc, edge) => {
+      if (!acc[edge.target]) {
+        acc[edge.target] = [];
+      }
+      acc[edge.target].push(edge.source);
+      return acc;
+    },
+    {},
+  );
 
-const buildCompletedStepIds = (lastStatus: string) => {
   const completed = new Set<string>();
   const stack = [...(decisionMap[lastStatus] ?? [])];
 
@@ -419,23 +429,76 @@ interface Props {
   currentStatus: string;
 }
 
-const ProcessFlowDesktop = ({ currentStatus }: Props) => {
+const ProcessFlowDesktop = ({ receptionProcess, currentStatus }: Props) => {
   const { theme } = useThemeConfig();
+  const isAguaMaterial = receptionProcess.typeOfMaterial === "AGUA";
+
+  const renderedSteps = React.useMemo(
+    () =>
+      isAguaMaterial
+        ? processSteps.filter((step) => !AGUA_EXCLUDED_STEP_IDS.has(step.id))
+        : processSteps,
+    [isAguaMaterial],
+  );
+
+  const renderedConnections = React.useMemo(() => {
+    if (!isAguaMaterial) {
+      return processConnections;
+    }
+
+    return [
+      ...processConnections.filter(
+        (edge) =>
+          !AGUA_EXCLUDED_STEP_IDS.has(edge.source) &&
+          !AGUA_EXCLUDED_STEP_IDS.has(edge.target),
+      ),
+      {
+        id: "edge-download-end-agua",
+        source: "production-downloaded",
+        target: "production-end",
+        dashed: true,
+      },
+    ];
+  }, [isAguaMaterial]);
+
+  const decisionMap = React.useMemo(
+    () =>
+      isAguaMaterial
+        ? {
+            ...defaultDecisionMap,
+            FINALIZO_PROCESO: ["production-downloaded"],
+          }
+        : defaultDecisionMap,
+    [isAguaMaterial],
+  );
+
+  const stepMeta = React.useMemo(
+    () =>
+      renderedSteps.reduce<Record<string, StepMeta>>((acc, step) => {
+        acc[step.id] = {
+          laneIndex: laneIndex[step.lane],
+          column: step.column,
+        };
+        return acc;
+      }, {}),
+    [renderedSteps],
+  );
 
   const completedStepIds = React.useMemo(
-    () => buildCompletedStepIds(currentStatus),
-    [currentStatus],
+    () =>
+      buildCompletedStepIds(currentStatus, decisionMap, renderedConnections),
+    [currentStatus, decisionMap, renderedConnections],
   );
 
   const nodes = React.useMemo<Node[]>(
-    () => buildNodes(completedStepIds),
-    [completedStepIds],
+    () => buildNodes(renderedSteps, completedStepIds),
+    [renderedSteps, completedStepIds],
   );
   const connectionColor = theme.name === "light" ? "#1c5cb6" : "#7fc0ff";
 
   const edges = React.useMemo<Edge[]>(
     () =>
-      processConnections.map((edge) => {
+      renderedConnections.map((edge) => {
         const handleMap = determineEdgeHandles(
           stepMeta[edge.source],
           stepMeta[edge.target],
@@ -470,7 +533,7 @@ const ProcessFlowDesktop = ({ currentStatus }: Props) => {
           },
         };
       }),
-    [completedStepIds, connectionColor],
+    [completedStepIds, connectionColor, renderedConnections, stepMeta],
   );
 
   return (
